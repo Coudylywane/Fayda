@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
+  appId: 'sn.itcreative.faydah',
   appName: 'faydah',
   webDir: 'www'
 };

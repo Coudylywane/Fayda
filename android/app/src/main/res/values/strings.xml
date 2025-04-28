@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">faydah</string>
+    <string name="title_activity_main">faydah</string>
+    <string name="package_name">sn.itcreative.faydah</string>
+    <string name="custom_url_scheme">sn.itcreative.faydah</string>
+</resources>

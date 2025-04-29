@@ -1,20 +1,123 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content>
+  <!-- Section des cartes Gamou -->
+  <div class="flex overflow-x-auto space-x-4 p-4 bg-gray-100">
+    <div class="rounded-xl overflow-hidden min-w-[70%] shadow-lg relative h-32 bg-gray-800">
+      <div class="absolute inset-0 p-4 flex flex-col justify-end">
+        <h2 class="text-white text-3xl font-bold">Gamou</h2>
+        <p class="text-white opacity-90">Medina Baye 2024</p>
+        <p class="text-white text-xs mt-1">16 Octobre</p>
+      </div>
+    </div>
+    
+    <div class="rounded-xl overflow-hidden min-w-[70%] shadow-lg relative h-32 bg-gray-800">
+      <div class="absolute inset-0 p-4 flex flex-col justify-end">
+        <h2 class="text-white text-3xl font-bold">Zia</h2>
+        <p class="text-white opacity-90">Gamou Medina</p>
+        <p class="text-white text-xs mt-1">20 Octobre</p>
+      </div>
+    </div>
+  </div>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <!-- Navigation du milieu (exactement comme dans l'image) -->
+  <div class="bg-white border-b">
+    <div class="flex">
+      <div class="flex-1 flex flex-col items-center justify-center p-3 border-r">
+        <div class="w-8 h-8 flex items-center justify-center">
+          <ion-icon name="bookmark-outline" class="text-2xl text-gray-600"></ion-icon>
+        </div>
+        <p class="text-xs mt-1 text-gray-600">Mes favoris</p>
+      </div>
+      
+      <div class="flex-1 flex flex-col items-center justify-center p-3 border-r">
+        <div class="w-8 h-8 flex items-center justify-center">
+          <ion-icon name="wallet-outline" class="text-2xl text-gray-600"></ion-icon>
+        </div>
+        <p class="text-xs mt-1 text-gray-600">Mes contributions</p>
+      </div>
+      
+      <div class="flex-1 flex flex-col items-center justify-center p-3 border-r">
+        <div class="w-8 h-8 flex items-center justify-center">
+          <ion-icon name="home-outline" class="text-2xl text-gray-600"></ion-icon>
+        </div>
+        <p class="text-xs mt-1 text-gray-600">Dahira</p>
+      </div>
+      
+      <div class="flex-1 flex flex-col items-center justify-center p-3">
+        <div class="w-8 h-8 flex items-center justify-center">
+          <ion-icon name="book-outline" class="text-2xl text-gray-600"></ion-icon>
+        </div>
+        <p class="text-xs mt-1 text-gray-600">Mes ouvrages</p>
+      </div>
+    </div>
+    <div class="flex">
+      <div class="flex-1"></div>
+      <div class="flex-1"></div>
+      <div class="flex-1 border-b-4 border-yellow-400"></div>
+      <div class="flex-1"></div>
+    </div>
+  </div>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+  <!-- Section des citations -->
+  <div class="p-4">
+    <div class="flex items-center space-x-2 mb-4">
+      <div class="flex flex-col space-y-1">
+        <div class="h-1 w-6 bg-black rounded"></div>
+        <div class="h-1 w-6 bg-black rounded"></div>
+        <div class="h-1 w-6 bg-black rounded"></div>
+      </div>
+      <h2 class="text-xl font-bold">Citations de Cheikh Al Islam</h2>
+    </div>
+
+    <!-- Carte de citation -->
+    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
+      <div class="flex">
+        <div class="w-[40%]">
+          <div class="w-full h-full bg-green-600 bg-opacity-20 flex items-center justify-center">
+            <!-- Image stylisée comme dans l'exemple -->
+            <div class="w-32 h-32 rounded-full overflow-hidden flex items-center justify-center relative">
+              <div class="absolute inset-0 border-2 border-green-500 rounded-full bg-black opacity-20"></div>
+              <div class="w-16 h-16 rounded-full bg-green-500 bg-opacity-20"></div>
+            </div>
+          </div>
+        </div>
+        <div class="w-[60%] p-4 text-white">
+          <h3 class="text-lg font-bold mb-1">"L'Afrique aux africains.."</h3>
+          <p class="text-xs text-right mb-2">5 janvier 1943</p>
+          <p class="text-xs leading-tight">
+            Quiconque veut être juste, reconnaîtra les hommes par la vérité et non la vérité par les hommes. Chaque religion compte des hommes parfaits et imparfaits. Si en Islam, on relève des imperfections chez certains musulmans, cela se traduit par un écart de la voie droite et une iniquité, un abus et une injustice
+          </p>
+          <div class="flex justify-between mt-4">
+            <ion-icon name="bookmark-outline" class="text-2xl"></ion-icon>
+            <ion-icon name="share-social-outline" class="text-2xl"></ion-icon>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </ion-content>
+
+<!-- Tabs personnalisés en bas exactement comme dans l'image -->
+<!-- <div class="fixed bottom-0 left-0 right-0 bg-green-600 text-white">
+  <div class="flex justify-between items-center">
+    <a class="flex-1 flex flex-col items-center justify-center py-2">
+      <ion-icon name="home-outline" class="text-2xl"></ion-icon>
+      <span class="text-xs">Accueil</span>
+    </a>
+    <a class="flex-1 flex flex-col items-center justify-center py-2">
+      <ion-icon name="information-circle-outline" class="text-2xl"></ion-icon>
+      <span class="text-xs">Infos</span>
+    </a>
+    <a class="flex-1 flex flex-col items-center justify-center py-2">
+      <ion-icon name="library-outline" class="text-2xl"></ion-icon>
+      <span class="text-xs">Bibliothèque</span>
+    </a>
+    <a class="flex-1 flex flex-col items-center justify-center py-2">
+      <ion-icon name="stats-chart-outline" class="text-2xl"></ion-icon>
+      <span class="text-xs">Finances</span>
+    </a>
+    <a class="flex-1 flex flex-col items-center justify-center py-2">
+      <ion-icon name="person-outline" class="text-2xl"></ion-icon>
+      <span class="text-xs">Profil</span>
+    </a>
+  </div>
+</div> -->

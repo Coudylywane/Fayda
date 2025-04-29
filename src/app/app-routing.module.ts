@@ -20,10 +20,10 @@ const routes: Routes = [
     path: 'register',
     loadChildren: () => import('./features/auth/register/register.module').then( m => m.RegisterPageModule)
   },
-  {
-    path: 'tabs',
-    loadChildren: () => import('./features/tabs/tabs.module').then( m => m.TabsPageModule)
-  },
+  // {
+  //   path: 'tabs',
+  //   loadChildren: () => import('./features/tabs/tabs.module').then( m => m.TabsPageModule)
+  // },
   {
     path: 'profile',
     loadChildren: () => import('./features/profile/profile.module').then( m => m.ProfilePageModule)

@@ -32,6 +32,14 @@ const routes: Routes = [
     path: 'settings',
     loadChildren: () => import('./features/settings/settings.module').then( m => m.SettingsPageModule)
   },
+  {
+    path: 'infos',
+    loadChildren: () => import('./features/infos/infos.module').then( m => m.InfosPageModule)
+  },
+  {
+    path: 'bibliotheque',
+    loadChildren: () => import('./features/bibliotheque/bibliotheque.module').then( m => m.BibliothequePageModule)
+  },
 ];
 
 @NgModule({

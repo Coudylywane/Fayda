@@ -1,0 +1,49 @@
+<!-- gamou-events.component.html -->
+<div class="w-full h-full bg-gray-100 overflow-auto pb-16">
+  <!-- Featured card -->
+  <div class="grid grid-cols-3 gap-2 mb-4 p-4">
+    <div class="grid-cols-3 col-span-2 rounded-xl overflow-hidden shadow">
+      <img [src]="featuredEvent.image" alt="featured" class="w-full h-36 object-cover" />
+      <div class="flex items-center justify-between p-2">
+        <div class="  text-gray-800">
+          <h2 class="text-base font-semibold">{{ featuredEvent.title }}</h2>
+          <p class="text-sm ">{{ featuredEvent.commentCount }} commentaires</p>
+        </div>
+        <div class="text-gray-400">
+          <ion-icon name="chatbubble-outline" class="text-xl"></ion-icon>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2 col-span-1">
+      <ng-container *ngFor="let item of sideEvents">
+        <div class="rounded-xl overflow-hidden shadow">
+          <img [src]="item.image" alt="side" class="w-full h-16 object-cover" />
+          <div class="text-[10px] p-1">
+            <p class="font-medium truncate">{{ item.title }}</p>
+            <div class="w-2/3 h-1 mt-1 rounded-full bg-green-500"></div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- Liste d'événements -->
+  <div class="mt-4 bg-white shadow-sm rounded-lg mx-4">
+    <!-- Communauté New York -->
+    <ng-container *ngFor="let event of eventItem">
+      <div class="flex items-center p-4 border-b cursor-pointer" (click)="navigateToDetail('infos-detail')">
+        <img [src]="event.image" alt="avatar" class="w-12 h-12 rounded-lg object-cover mr-4">
+        <div class="flex-1">
+          <h3 class="font-bold text-gray-900">{{ event.title }}</h3>
+          <p class="text-gray-600">{{ event.subtitle }}</p>
+          <p class="text-gray-500 text-sm">{{ event.time }}</p>
+        </div>
+        <div class="flex items-center justify-center w-8 h-8 bg-green-600 rounded-full text-white text-sm font-bold">
+          {{ event.count }}
+        </div>
+      </div>
+    </ng-container>
+
+  </div>
+</div>

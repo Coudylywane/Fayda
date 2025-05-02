@@ -4,15 +4,16 @@ import { IonicModule } from '@ionic/angular';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { selectTheme } from 'src/app/store/theme.selectors';
-import { Colors, ThemeMode, ColorKey } from 'src/app/theme/colors';
+import { Colors, ThemeMode, ColorKey, getColorClass } from 'src/app/theme/colors';
 import { Location } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-base-layout',
   templateUrl: './base-layout.component.html',
   styleUrls: ['./base-layout.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule],
+  imports: [CommonModule, IonicModule, RouterModule],
 })
 export class BaseLayoutComponent implements OnInit, OnDestroy {
   @Input() title: string = 'Page Title';
@@ -22,16 +23,19 @@ export class BaseLayoutComponent implements OnInit, OnDestroy {
   @Input() contentClass: string = '';
   @Input() footerClass: string = '';
   @Input() colorName: ColorKey = 'surface';
+  @Input() textColorName: ColorKey = 'text';
   @Input() lightColor?: ColorKey;
   @Input() darkColor?: ColorKey;
 
   backgroundClass = '';
   private themeSub?: Subscription;
+  theme: ThemeMode = 'light';
 
   constructor(private store: Store, private location: Location) {}
   
   ngOnInit(): void {
     this.themeSub = this.store.select(selectTheme).subscribe(theme => {
+      this.theme = theme.theme;
       this.updateBackgroundClass(theme.theme);
     });
   }
@@ -51,6 +55,18 @@ export class BaseLayoutComponent implements OnInit, OnDestroy {
       theme === 'light'
         ? this.lightColor || (this.colorName ? Colors.light[this.colorName] : 'bg-transparent')
         : this.darkColor || (this.colorName ? Colors.dark[this.colorName] : 'bg-transparent');
+  }
+
+  get textColor(): string {
+    // if (this.textColorName) {
+    // console.log(getColorClass(this.theme, this.textColorName!)!.replace('bg-', 'text-'));
+    
+      return getColorClass(this.theme, this.textColorName!)!.replace('bg-', 'text-');
+  // }
+    // Default to inverse text color (white on dark bg, dark on light bg)
+    // return this.colorName === 'background' || this.colorName === 'surface' 
+    //   ? getColorClass(this.theme, 'text') 
+    //   : getColorClass(this.theme, 'inverseText');
   }
 }
 

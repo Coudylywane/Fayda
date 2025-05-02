@@ -1,0 +1,11 @@
+<app-base-layout title="Actualités de la communauté" [showBackButton]="true">
+  <!-- <ion-button header-end>
+    <ion-icon name="settings-outline"></ion-icon>
+  </ion-button> -->
+  
+  <div class="mt-2 w-full h-[100vh] border overflow-auto">
+    <!-- Contenu principal de la page -->
+     <app-event-list [eventItem]="eventItems" [featuredEvent]="featuredEvent" [sideEvents]="sideEvents"></app-event-list>
+  </div>
+
+</app-base-layout>

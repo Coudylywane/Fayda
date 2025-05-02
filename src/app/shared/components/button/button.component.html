@@ -1,3 +1,24 @@
-<p>
-  button works!
-</p>
+<!-- button.component.html -->
+<button 
+  [class]="textColor + ' ' + backgroundColor + ' ' + rounded + ' ' + font + '' + radius + ' flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50 rounded py-2 px-4 ' + (customClass || '')"
+  type="button"
+>
+  <ion-spinner *ngIf="isLoading" name="dots" class="mr-2"></ion-spinner>
+  
+  <!-- <ion-icon *ngIf="leftIcon" 
+    [name]="leftIcon.icon" 
+    [class]="'mr-1.5 ' + iconSizeClass + ' ' + (leftIcon.class || '')">
+  </ion-icon> -->
+  
+  <span>{{ value }}</span>
+  
+  <!-- <ion-icon *ngIf="rightIcon" 
+    [name]="rightIcon.icon" 
+    [class]="'ml-1.5 ' + iconSizeClass + ' ' + (rightIcon.class || '')">
+  </ion-icon>
+  
+  <ion-icon *ngIf="!leftIcon && !rightIcon && defaultIcon" 
+    [name]="defaultIcon.icon" 
+    [class]="iconSizeClass + ' ' + (defaultIcon.class || '')">
+  </ion-icon> -->
+</button>

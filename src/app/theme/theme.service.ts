@@ -1,27 +1,27 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { selectTheme } from '../store/theme.selectors';
+import * as ThemeActions from '../store/theme.actions';
 import { ThemeMode } from './colors';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  private themeSubject = new BehaviorSubject<ThemeMode>(this.getPreferredTheme());
-  theme$ = this.themeSubject.asObservable();
-
-  private getPreferredTheme(): ThemeMode {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  constructor(private store: Store) {
+    // Écoute le changement de thème système
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+      const newTheme: ThemeMode = event.matches ? 'dark' : 'light';
+      this.setTheme(newTheme);
+    });
   }
 
-  setTheme(mode: ThemeMode) {
-    this.themeSubject.next(mode);
-    document.documentElement.classList.toggle('dark', mode === 'dark');
+  theme$ = this.store.select(selectTheme);
+
+  setTheme(theme: ThemeMode) {
+    this.store.dispatch(ThemeActions.setTheme({ theme }));
+    // document.documentElement.classList.toggle('dark', theme === 'dark');
   }
 
   toggleTheme() {
-    const newTheme = this.themeSubject.value === 'light' ? 'dark' : 'light';
-    this.setTheme(newTheme);
-  }
-
-  get currentTheme(): ThemeMode {
-    return this.themeSubject.value;
+    this.store.dispatch(ThemeActions.toggleTheme());
   }
 }

@@ -7,5 +7,8 @@ export const Radius = {
     full: 'rounded-full',
   } as const;
   
-  export type RadiusKey = keyof typeof Radius;
-  
+export type RadiusKey = keyof typeof Radius;
+
+export function getRadiusClass(key: RadiusKey): string {
+    return Radius[key];
+}

@@ -24,4 +24,16 @@ export const FontSize = {
   export type FontSizeKey = keyof typeof FontSize;
   export type FontWeightKey = keyof typeof FontWeight;
   export type FontFamilyKey = keyof typeof FontFamily;
-  
+
+export function getFontSizeClass(key: FontSizeKey): string {
+    return FontSize[key];
+}
+export function getFontWeightClass(key: FontWeightKey): string {
+    return FontWeight[key];
+}
+export function getFontFamilyClass(key: FontFamilyKey): string {
+    return FontFamily[key];
+}
+export function getFontClass(size?: FontSizeKey, weight?: FontWeightKey, family?: FontFamilyKey): string {
+    return `${getFontSizeClass(size!)} ${getFontWeightClass(weight!)} ${getFontFamilyClass(family!)}`;
+}

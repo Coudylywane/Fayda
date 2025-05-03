@@ -1,52 +1,44 @@
 <div class="h-full flex flex-col">
-  <div class="flex-1 pb-16">
+  <div class="flex-1 pb-20">
     <!-- Router outlet pour l'affichage des pages -->
     <router-outlet></router-outlet>
   </div>
-  <div class="fixed bottom-0 left-0 right-0 bg-green-600 text-white z-50">
+  <!-- <ion-content > -->
+  <div class="fixed bottom-0 left-0 right-0 bg-green-700 text-white z-50 pb-safe-offset-2">
     <div class="flex justify-between items-center">
-      <a (click)="navigate('home')" 
-         class="flex-1 flex flex-col items-center justify-center py-2"
-         [class.opacity-100]="isActive('home')"
-         [class.opacity-80]="!isActive('home')">
-        <ion-icon name="home-outline" class="text-2xl"></ion-icon>
+      <a (click)="navigate('home')" class="flex-1 flex flex-col items-center justify-center py-2"
+        [class.opacity-100]="isActive('home')" [class.opacity-60]="!isActive('home')">
+        <ion-icon name="home" class="text-2xl"></ion-icon>
         <span class="text-xs">Accueil</span>
       </a>
-      <a (click)="navigate('infos')" 
-         class="flex-1 flex flex-col items-center justify-center py-2"
-         [class.opacity-100]="isActive('infos')"
-         [class.opacity-80]="!isActive('infos')">
-        <ion-icon name="information-circle-outline" class="text-2xl"></ion-icon>
+      <a (click)="navigate('infos')" class="flex-1 flex flex-col items-center justify-center py-2"
+        [class.opacity-100]="isActive('infos')" [class.opacity-60]="!isActive('infos')">
+        <ion-icon name="information-circle" class="text-2xl"></ion-icon>
         <span class="text-xs">Infos</span>
       </a>
-      <a (click)="navigate('bibliotheque')" 
-         class="flex-1 flex flex-col items-center justify-center py-2"
-         [class.opacity-100]="isActive('bibliotheque')"
-         [class.opacity-80]="!isActive('bibliotheque')">
-        <ion-icon name="library-outline" class="text-2xl"></ion-icon>
+      <a (click)="navigate('bibliotheque')" class="flex-1 flex flex-col items-center justify-center py-2"
+        [class.opacity-100]="isActive('bibliotheque')" [class.opacity-60]="!isActive('bibliotheque')">
+        <ion-icon name="book" class="text-2xl"></ion-icon>
         <span class="text-xs">Bibliotheque</span>
       </a>
-      <a (click)="navigate('settings')" 
-         class="flex-1 flex flex-col items-center justify-center py-2"
-         [class.opacity-100]="isActive('settings')"
-         [class.opacity-80]="!isActive('settings')">
-        <ion-icon name="library-outline" class="text-2xl"></ion-icon>
-        <span class="text-xs">Settings</span>
+      <a (click)="navigate('settings')" class="flex-1 flex flex-col items-center justify-center py-2"
+        [class.opacity-100]="isActive('settings')" [class.opacity-60]="!isActive('settings')">
+        <ion-icon name="stats-chart" class="text-2xl"></ion-icon>
+        <span class="text-xs">Finances</span>
       </a>
       <!-- <a (click)="navigate('finances')" 
-         class="flex-1 flex flex-col items-center justify-center py-2"
-         [class.opacity-100]="isActive('finances')"
-         [class.opacity-80]="!isActive('finances')">
-        <ion-icon name="stats-chart-outline" class="text-2xl"></ion-icon>
-        <span class="text-xs">Finances</span>
-      </a> -->
-      <a (click)="navigate('profile')" 
-         class="flex-1 flex flex-col items-center justify-center py-2"
-         [class.opacity-100]="isActive('profile')"
-         [class.opacity-80]="!isActive('profile')">
-        <ion-icon name="person-outline" class="text-2xl"></ion-icon>
+           class="flex-1 flex flex-col items-center justify-center py-2"
+           [class.opacity-100]="isActive('finances')"
+           [class.opacity-60]="!isActive('finances')">
+          <ion-icon name="stats-chart-outline" class="text-2xl"></ion-icon>
+          <span class="text-xs">Finances</span>
+        </a> -->
+      <a (click)="navigate('profile')" class="flex-1 flex flex-col items-center justify-center py-2"
+        [class.opacity-100]="isActive('profile')" [class.opacity-60]="!isActive('profile')">
+        <ion-icon name="person" class="text-2xl"></ion-icon>
         <span class="text-xs">Profile</span>
       </a>
     </div>
   </div>
+  <!-- </ion-content> -->
 </div>

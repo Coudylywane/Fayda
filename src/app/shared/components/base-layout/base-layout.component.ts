@@ -1,12 +1,13 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, NavController } from '@ionic/angular';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { selectTheme } from 'src/app/store/theme.selectors';
 import { Colors, ThemeMode, ColorKey, getColorClass } from 'src/app/theme/colors';
 import { Location } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { TabsService } from 'src/app/features/tabs/services/tabs.service';
 
 @Component({
   selector: 'app-base-layout',
@@ -31,7 +32,10 @@ export class BaseLayoutComponent implements OnInit, OnDestroy {
   private themeSub?: Subscription;
   theme: ThemeMode = 'light';
 
-  constructor(private store: Store, private location: Location) {}
+  constructor(private store: Store,
+    private location: Location,
+    private navigationService: TabsService,
+    private navController: NavController) {}
   
   ngOnInit(): void {
     this.themeSub = this.store.select(selectTheme).subscribe(theme => {
@@ -40,8 +44,9 @@ export class BaseLayoutComponent implements OnInit, OnDestroy {
     });
   }
 
-  goBack() {
-    this.location.back();
+  goBack(tab:string) {
+    this.location.replaceState("/home");
+      this.navigationService.setActiveTab(tab);
   }
 
   ngOnDestroy(): void {
@@ -58,15 +63,8 @@ export class BaseLayoutComponent implements OnInit, OnDestroy {
   }
 
   get textColor(): string {
-    // if (this.textColorName) {
-    // console.log(getColorClass(this.theme, this.textColorName!)!.replace('bg-', 'text-'));
-    
       return getColorClass(this.theme, this.textColorName!)!.replace('bg-', 'text-');
-  // }
-    // Default to inverse text color (white on dark bg, dark on light bg)
-    // return this.colorName === 'background' || this.colorName === 'surface' 
-    //   ? getColorClass(this.theme, 'text') 
-    //   : getColorClass(this.theme, 'inverseText');
+
   }
 }
 

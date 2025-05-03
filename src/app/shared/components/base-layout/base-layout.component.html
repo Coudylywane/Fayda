@@ -1,16 +1,16 @@
 <!-- Header -->
-<ion-header [translucent]="true" class="ion-no-border">
+<ion-header [translucent]="true" class="ion-no-border !bg-gray-100 pt-safe-offset-4">
   <ion-toolbar>
     <ion-title>{{ title }}</ion-title>
     <ion-buttons *ngIf="showBackButton" slot="start">
-      <ion-back-button defaultHref="/home"></ion-back-button>
+      <ion-back-button defaultHref="/home" (click)="goBack('home')" class="!text-green-700" text=""></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 
 <!-- Content -->
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="!bg-gray-100">
   <div class="main-content">
     <ng-content></ng-content>
   </div>

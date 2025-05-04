@@ -39,7 +39,11 @@ const routes: Routes = [
   {
     path: 'bibliotheque',
     loadChildren: () => import('./features/bibliotheque/bibliotheque.module').then( m => m.BibliothequePageModule)
+  },  {
+    path: 'finances',
+    loadChildren: () => import('./features/finances/finances.module').then( m => m.FinancesPageModule)
   },
+
 ];
 
 @NgModule({

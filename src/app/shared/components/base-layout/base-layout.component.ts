@@ -1,18 +1,20 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, NavController } from '@ionic/angular';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { selectTheme } from 'src/app/store/theme.selectors';
-import { Colors, ThemeMode, ColorKey } from 'src/app/theme/colors';
+import { Colors, ThemeMode, ColorKey, getColorClass } from 'src/app/theme/colors';
 import { Location } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { TabsService } from 'src/app/features/tabs/services/tabs.service';
 
 @Component({
   selector: 'app-base-layout',
   templateUrl: './base-layout.component.html',
   styleUrls: ['./base-layout.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule],
+  imports: [CommonModule, IonicModule, RouterModule],
 })
 export class BaseLayoutComponent implements OnInit, OnDestroy {
   @Input() title: string = 'Page Title';
@@ -22,22 +24,29 @@ export class BaseLayoutComponent implements OnInit, OnDestroy {
   @Input() contentClass: string = '';
   @Input() footerClass: string = '';
   @Input() colorName: ColorKey = 'surface';
+  @Input() textColorName: ColorKey = 'text';
   @Input() lightColor?: ColorKey;
   @Input() darkColor?: ColorKey;
 
   backgroundClass = '';
   private themeSub?: Subscription;
+  theme: ThemeMode = 'light';
 
-  constructor(private store: Store, private location: Location) {}
+  constructor(private store: Store,
+    private location: Location,
+    private navigationService: TabsService,
+    private navController: NavController) {}
   
   ngOnInit(): void {
     this.themeSub = this.store.select(selectTheme).subscribe(theme => {
+      this.theme = theme.theme;
       this.updateBackgroundClass(theme.theme);
     });
   }
 
-  goBack() {
-    this.location.back();
+  goBack(tab:string) {
+    this.location.replaceState("/home");
+      this.navigationService.setActiveTab(tab);
   }
 
   ngOnDestroy(): void {
@@ -51,6 +60,11 @@ export class BaseLayoutComponent implements OnInit, OnDestroy {
       theme === 'light'
         ? this.lightColor || (this.colorName ? Colors.light[this.colorName] : 'bg-transparent')
         : this.darkColor || (this.colorName ? Colors.dark[this.colorName] : 'bg-transparent');
+  }
+
+  get textColor(): string {
+      return getColorClass(this.theme, this.textColorName!)!.replace('bg-', 'text-');
+
   }
 }
 

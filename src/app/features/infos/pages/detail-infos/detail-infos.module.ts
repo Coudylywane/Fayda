@@ -7,14 +7,16 @@ import { IonicModule } from '@ionic/angular';
 import { DetailInfosPageRoutingModule } from './detail-infos-routing.module';
 
 import { DetailInfosPage } from './detail-infos.page';
+import { IconButtonComponent } from "../../../../shared/components/icon-button/icon-button.component";
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    DetailInfosPageRoutingModule
-  ],
+    DetailInfosPageRoutingModule,
+    IconButtonComponent
+],
   declarations: [DetailInfosPage]
 })
 export class DetailInfosPageModule {}

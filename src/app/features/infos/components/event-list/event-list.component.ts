@@ -1,7 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { IonIcon } from "@ionic/angular/standalone";
-import { FeaturedEvent } from '../../model/infos.model';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -19,7 +17,8 @@ export class EventListComponent {
   constructor(private router: Router) { };
 
   navigateToDetail(eventId: string): void {
-    this.router.navigate(['infos/detail-infos']);
+    // On navigue vers la page de détails de l'événement
+    this.router.navigate(['tabs/infos/detail-infos']);
     // Pour des besoins de debugging
     // console.log(`Navigating to info: ${eventId}`);
   }

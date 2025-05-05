@@ -9,7 +9,7 @@ import { ButtonComponent } from "../../../../shared/components/button/button.com
   selector: 'app-detail-fonds',
   templateUrl: './detail-fonds.component.html',
   styleUrls: ['./detail-fonds.component.scss'],
-  imports: [IonIcon, IonButton, IonContent, CommonModule, ButtonComponent],
+  imports: [IonIcon, IonContent, CommonModule, ButtonComponent],
 })
 export class DetailFondsComponent  implements OnInit {
 

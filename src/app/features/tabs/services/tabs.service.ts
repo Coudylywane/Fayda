@@ -13,7 +13,7 @@ export class TabsService {
 
   setActiveTab(tab: string) {
     this.activeTabSubject.next(tab);
-    this.router.navigateByUrl(`/${tab}`);
+    this.router.navigateByUrl(`/tabs/${tab}`);
   }
 
   getActiveTab() {

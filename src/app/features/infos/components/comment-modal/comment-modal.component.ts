@@ -2,12 +2,13 @@ import { Component, Input, OnInit } from '@angular/core';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { IconButtonComponent } from "../../../../shared/components/icon-button/icon-button.component";
 
 @Component({
   selector: 'app-comment-modal',
   templateUrl: './comment-modal.component.html',
   styleUrls: ['./comment-modal.component.scss'],
-  imports: [IonicModule, CommonModule, ReactiveFormsModule],
+  imports: [IonicModule, CommonModule, ReactiveFormsModule, IconButtonComponent],
 })
 export class CommentModalComponent implements OnInit {
   @Input() activity: any;
@@ -57,7 +58,7 @@ export class CommentModalComponent implements OnInit {
       // Here you would normally send the comment to your backend
       const newComment = {
         user: 'Vous',
-        avatar: 'assets/avatars/me.jpg',
+        avatar: 'assets/images/1.png',
         text: this.commentForm.value.comment,
         time: 'À l\'instant',
         likes: 0
@@ -66,5 +67,10 @@ export class CommentModalComponent implements OnInit {
       this.comments.unshift(newComment);
       this.commentForm.reset();
     }
+  }
+
+  adjustTextareaHeight(textarea: HTMLTextAreaElement): void {
+    textarea.style.height = '10px';
+    textarea.style.height = textarea.scrollHeight + 'px';
   }
 }

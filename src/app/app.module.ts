@@ -12,19 +12,20 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { TabsComponent } from './features/tabs/components/tabs.component';
 import { SharedModule } from './shared/shared.module';
 import { themeReducer } from './store/theme.reducer';
+import { TabsComponent } from "./features/tabs/components/tabs.component";
 
 @NgModule({
-  declarations: [AppComponent, TabsComponent],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
     SharedModule,
     StoreModule.forRoot({ theme: themeReducer }),
-  ],
+    TabsComponent
+],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
 })

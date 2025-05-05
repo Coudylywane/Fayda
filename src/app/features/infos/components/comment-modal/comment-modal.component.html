@@ -1,0 +1,61 @@
+<div class="h-[60%]">
+  <ion-header class="bg-white border-b border-gray-200">
+    <ion-toolbar>
+      <div class="flex justify-between items-center px-4 py-2">
+        <div class="flex items-center">
+          <app-icon-button (click)="dismissModal()" icon="close" size="xl" color="danger" variant="transparent" animation="rotate" tooltip="Reset"></app-icon-button>
+          <h2 class="text-lg font-semibold text-gray-800">{{ activity.title }}</h2>
+        </div>
+        <div class="flex items-center text-gray-500">
+          <ion-icon name="chatbubble-outline" class="mr-1"></ion-icon>
+          <span>{{ activity.commentCount }}</span>
+        </div>
+      </div>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content class="!bg-gray-100">
+    <div class="p-4 bg-gray-100">
+      <!-- Comment input section -->
+      <div class="bg-white rounded-xl shadow-sm mb-6 p-3">
+        <form [formGroup]="commentForm" (ngSubmit)="submitComment()">
+          <div class="flex items-center">
+            <img src="assets/images/1.png" alt="Your Avatar" class="w-10 h-10 rounded-full mr-3">
+            <div class="flex-1 relative">
+              <textarea 
+                placeholder="Ajouter un commentaire..." 
+                formControlName="comment"
+                rows="1"
+                cols="20"
+                class="w-full bg-gray-100 rounded-md px-4 py-2 text-sm resize-none overflow-hidden focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 border-transparent"
+                #autoGrowTextarea
+                (input)="adjustTextareaHeight(autoGrowTextarea)">
+              </textarea>
+            </div>        
+            <ion-button 
+              type="submit" 
+              fill="clear" 
+              [disabled]="!commentForm.valid"
+              class="ml-2 ">
+              <app-icon-button icon="send" size="xl" color="primary" variant="transparent" animation="rotate" tooltip="Reset"></app-icon-button>
+            </ion-button>
+          </div>
+        </form>
+      </div>
+  
+      <!-- Comments list -->
+      <div class="space-y-4">
+        <div *ngFor="let comment of comments" class="bg-white rounded-xl shadow-sm p-4">
+          <div class="flex mb-3">
+            <img [src]="comment.avatar" alt="comment.user" class="w-10 h-10 rounded-full mr-3">
+            <div class="flex space-x-2 items-center">
+              <h4 class="font-medium text-gray-800">{{ comment.user }}</h4>
+              <p class="text-xs text-gray-500">{{ comment.time }}</p>
+            </div>
+          </div>
+          <p class="text-gray-700 mb-3">{{ comment.text }}</p>
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</div>

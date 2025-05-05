@@ -8,6 +8,8 @@ import { ProfilePageRoutingModule } from './profile-routing.module';
 
 import { ProfilePage } from './profile.page';
 import { ButtonComponent } from "../../shared/components/button/button.component";
+import { ButtonDemoComponent } from "../../shared/components/button-demo/button-demo.component";
+import { IconButtonDemoComponent } from 'src/app/shared/components/icon-button-demo/icon-button-demo.component';
 
 @NgModule({
   imports: [
@@ -15,7 +17,9 @@ import { ButtonComponent } from "../../shared/components/button/button.component
     FormsModule,
     IonicModule,
     ProfilePageRoutingModule,
-    ButtonComponent
+    ButtonComponent,
+    ButtonDemoComponent,
+    IconButtonDemoComponent
 ],
   declarations: [ProfilePage]
 })

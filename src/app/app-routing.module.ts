@@ -9,7 +9,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'tabs/home',
     pathMatch: 'full'
   },
   {
@@ -20,18 +20,15 @@ const routes: Routes = [
     path: 'register',
     loadChildren: () => import('./features/auth/register/register.module').then( m => m.RegisterPageModule)
   },
-  // {
-  //   path: 'tabs',
-  //   loadChildren: () => import('./features/tabs/tabs.module').then( m => m.TabsPageModule)
-  // },
   {
-    path: 'profile',
-    loadChildren: () => import('./features/profile/profile.module').then( m => m.ProfilePageModule)
+    path: 'tabs',
+    loadChildren: () => import('./features/tabs-layout/tabs-layout.module').then( m => m.TabsLayoutPageModule)
   },
   {
-    path: 'settings',
-    loadChildren: () => import('./features/settings/settings.module').then( m => m.SettingsPageModule)
-  },
+    path: 'tabs/infos/detail-infos',
+    loadChildren: () => import('./features/infos/pages/detail-infos/detail-infos.module').then( m => m.DetailInfosPageModule)
+  }
+
 ];
 
 @NgModule({

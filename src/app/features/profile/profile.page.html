@@ -14,16 +14,20 @@
     </ion-toolbar>
   </ion-header> -->
   <div class="main-content">
-    <button class="bg-green-700 hover:bg-green-500 text-white font-bold py-2 px-4 rounded">
+    <button class="bg-green-700 hover:bg-green-500 text-white font-bold py-2 px-4 rounded border border-solid border-red-600">
       Button
     </button>
+
     <!-- Ajoute ce bloc où tu veux dans ton ion-content -->
     <ion-item lines="none">
       <ion-label>Mode sombre</ion-label>
       <ion-toggle slot="end" [checked]="isDark" (ionChange)="toggleTheme($event)"></ion-toggle>
     </ion-item>
-    <app-button value="'Mon bouton" [backgroundColorName]="'primary'" [borderColorName]="'secondary'"
-      [textColorName]="'text'" [customClass]="''" [rounded]="'md'" [isLoading]="false">
-    </app-button>
+
+
+    <!-- <app-button-demo></app-button-demo> -->
+
+    <h1>icon demo</h1>
+    <app-icon-button-demo></app-icon-button-demo>
   </div>
 </ion-content>

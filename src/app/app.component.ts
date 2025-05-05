@@ -13,6 +13,7 @@ export class AppComponent implements OnInit {
   ngOnInit () {
     this.showStatusBar ();
   }
+  
   showStatusBar () {
     StatusBar.show ();
   }

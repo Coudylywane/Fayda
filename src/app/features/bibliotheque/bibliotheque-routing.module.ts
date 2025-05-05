@@ -6,8 +6,15 @@ import { BibliothequePage } from './bibliotheque.page';
 const routes: Routes = [
   {
     path: '',
-    component: BibliothequePage
-  }
+    component: BibliothequePage,
+    // children: [
+    //   {
+    //     path: 'livres/:id',
+    //     loadChildren: () => import('./livres/livres.module').then(m => m.LivresPageModule),
+    //   }
+    // ]
+  },
+
 ];
 
 @NgModule({

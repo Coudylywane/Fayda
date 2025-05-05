@@ -1,0 +1,47 @@
+<ion-header class="bg-white">
+  <ion-toolbar class="px-2">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" class="text-black">
+        <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="font-bold text-xl text-black">{{ pageTitle }}</ion-title>
+    <div class="text-right text-gray-500 text-sm px-4">14 activités</div>
+  </ion-toolbar>
+</ion-header>
+
+<!-- <ion-content class="bg-gray-100"> -->
+  <div class="p-4">
+    <!-- Featured image -->
+    <div class="mb-6 rounded-xl overflow-hidden shadow-lg bg-white">
+      <img src="assets/images/1.png" alt="Gamou Médina Baye" class="w-full h-48 object-cover" />
+    </div>
+
+    <!-- Activities cards -->
+    <div class="space-y-4">
+      <div *ngFor="let activity of activities" 
+           class="bg-white rounded-xl overflow-hidden shadow-md"
+           (click)="openCommentModal(activity)">
+        <div class="relative">
+          <img [src]="activity.image" alt="activity.title" class="w-full h-40 object-cover" />
+          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+            <h3 class="text-white font-bold text-lg">{{ activity.title }}</h3>
+            <div class="flex items-center mt-1 text-gray-200 text-sm">
+              <ion-icon name="chatbubble-outline" class="mr-1"></ion-icon>
+              <span>{{ activity.commentCount }} commentaires</span>
+            </div>
+          </div>
+        </div>
+        <div class="p-3 flex justify-between items-center">
+          <div class="flex items-center text-gray-500 text-sm">
+            <ion-icon name="time-outline" class="mr-1"></ion-icon>
+            <span>Il y a {{ activity.time }}</span>
+          </div>
+          <ion-button fill="clear" size="small" class="text-blue-600">
+            <ion-icon name="ellipsis-horizontal"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- </ion-content> -->

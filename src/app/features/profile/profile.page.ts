@@ -9,6 +9,9 @@ import { Subscription } from 'rxjs';
   standalone: false,
 })
 export class ProfilePage implements OnDestroy {
+onSubmit() {
+throw new Error('Method not implemented.');
+}
   isDark = false;
   private themeSub?: Subscription;
 

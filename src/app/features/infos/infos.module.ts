@@ -8,7 +8,7 @@ import { InfosPageRoutingModule } from './infos-routing.module';
 
 import { InfosPage } from './infos.page';
 import { BaseLayoutComponent } from "../../shared/components/base-layout/base-layout.component";
-import { EventListComponent } from "./event-list/event-list.component";
+import { EventListComponent } from "./components/event-list/event-list.component";
 
 @NgModule({
   imports: [

@@ -2,7 +2,7 @@
 <div class="w-full h-full bg-gray-100 overflow-auto pb-16">
   <!-- Featured card -->
   <div class="grid grid-cols-3 gap-2 mb-4 p-4">
-    <div class="grid-cols-3 col-span-2 rounded-xl overflow-hidden shadow">
+    <div class="grid-cols-3 col-span-2 rounded-xl overflow-hidden shadow" (click)="navigateToDetail('')">
       <img [src]="featuredEvent.image" alt="featured" class="w-full h-36 object-cover" />
       <div class="flex items-center justify-between p-2">
         <div class="  text-gray-800">

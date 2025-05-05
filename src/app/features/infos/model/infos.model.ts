@@ -6,4 +6,12 @@ export interface FeaturedEvent {
     time?: string;
     subtitle?: string;
   };
-  
+
+
+export interface Activity {
+    id: number;
+    image: string;
+    title: string;
+    commentCount?: number;
+    time?: string;
+  }

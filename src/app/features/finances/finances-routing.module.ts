@@ -7,7 +7,12 @@ const routes: Routes = [
   {
     path: '',
     component: FinancesPage
-  }
+  },
+  // {
+  //   path: 'detail-fonds',
+  //   loadChildren: () => import('./components/detail-fonds/detail-fonds.module').then( m => m.DetailFondsPageModule)
+  // }
+
 ];
 
 @NgModule({

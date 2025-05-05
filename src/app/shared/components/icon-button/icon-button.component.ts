@@ -1,45 +1,26 @@
-// button.component.ts
+// icon-button.component.ts
 import { Component, Input, Output, EventEmitter, ElementRef, Renderer2, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-button',
+  selector: 'app-icon-button',
   standalone: true,
   imports: [IonicModule, CommonModule],
-  templateUrl: './button.component.html',
-  styles: [`
-    @keyframes rippleEffect {
-      0% {
-        transform: scale(0);
-        opacity: 0.5;
-      }
-      100% {
-        transform: scale(10);
-        opacity: 0;
-      }
-    }
-    
-    .animate-ripple {
-      animation: rippleEffect 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-    }
-    
-    .rounded-\\[inherit\\] {
-      border-radius: inherit;
-    }
-  `]
+  templateUrl: './icon-button.component.html',
+  styleUrls: ['./icon-button.component.scss'],
 })
-export class ButtonComponent implements OnInit {
-  @Input() text: string = 'Button';
-  @Input() size: 'sm' | 'md' | 'lg' | 'xl' = 'md';
-  @Input() radius: 'none' | 'sm' | 'md' | 'lg' | 'full' = 'md';
+export class IconButtonComponent implements OnInit {
+  @Input() icon: string = '';
+  @Input() size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' = 'md';
+  @Input() shape: 'circle' | 'square' | 'rounded' = 'circle';
   @Input() variant: 'solid' | 'light' | 'transparent' = 'solid';
   @Input() color: 'primary' | 'secondary' | 'warning' | 'danger' | 'dark' | 'light' = 'primary';
-  @Input() iconStart: string = '';
-  @Input() iconEnd: string = '';
   @Input() isLoading: boolean = false;
   @Input() disabled: boolean = false;
-  @Input() width: 'auto' | 'full' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' = 'auto';
+  @Input() tooltip: string = '';
+  @Input() badge: string | number = '';
+  @Input() animation: 'pulse' | 'rotate' | 'bounce' | 'none' = 'none';
   @Output() buttonClick = new EventEmitter<void>();
 
   rippleActive: boolean = false;
@@ -49,20 +30,20 @@ export class ButtonComponent implements OnInit {
   constructor(private el: ElementRef, private renderer: Renderer2) {}
   
   ngOnInit() {
-    // Ajouter la classe group pour activer les animations des enfants avec group-hover
+    // Add group class to enable animations on children with group-hover
     this.renderer.addClass(this.el.nativeElement.firstChild, 'group');
   }
 
   onClick(event?: MouseEvent): void {
     if (!this.disabled && !this.isLoading) {
-      // Effet de ripple
+      // Ripple effect
       if (event) {
         const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
         this.rippleX = event.clientX - rect.left;
         this.rippleY = event.clientY - rect.top;
         this.rippleActive = true;
         
-        // Réinitialiser l'effet de ripple après animation
+        // Reset ripple effect after animation
         setTimeout(() => {
           this.rippleActive = false;
         }, 800);
@@ -74,47 +55,44 @@ export class ButtonComponent implements OnInit {
 
   get sizeClasses(): string {
     const sizeMap = {
-      'sm': 'px-3 py-1 text-sm',
-      'md': 'px-4 py-2 text-base',
-      'lg': 'px-5 py-2.5 text-lg',
-      'xl': 'px-6 py-3 text-xl'
+      'xs': 'p-1 text-xs',
+      'sm': 'p-2 text-sm',
+      'md': 'p-3 text-base',
+      'lg': 'p-4 text-lg',
+      'xl': 'p-5 text-xl'
     };
     return sizeMap[this.size] || sizeMap['md'];
   }
 
   get iconSizeClasses(): string {
     const sizeMap = {
-      'sm': 'text-sm',
-      'md': 'text-base',
-      'lg': 'text-lg',
-      'xl': 'text-xl'
+      'xs': 'text-sm',
+      'sm': 'text-base',
+      'md': 'text-lg',
+      'lg': 'text-xl',
+      'xl': 'text-2xl'
     };
     return sizeMap[this.size] || sizeMap['md'];
   }
 
-  get radiusClasses(): string {
-    const radiusMap = {
-      'none': 'rounded-none',
-      'sm': 'rounded-sm',
-      'md': 'rounded-md',
-      'lg': 'rounded-lg',
-      'full': 'rounded-full'
+  get dimensionClasses(): string {
+    const dimensionMap = {
+      'xs': 'h-8 w-8 min-w-8',
+      'sm': 'h-10 w-10 min-w-10',
+      'md': 'h-12 w-12 min-w-12',
+      'lg': 'h-14 w-14 min-w-14',
+      'xl': 'h-16 w-16 min-w-16'
     };
-    return radiusMap[this.radius] || radiusMap['md'];
+    return dimensionMap[this.size] || dimensionMap['md'];
   }
 
-  get widthClasses(): string {
-    const widthMap = {
-      'auto': 'w-auto',
-      'full': 'w-full',
-      'xs': 'w-24',
-      'sm': 'w-32',
-      'md': 'w-40',
-      'lg': 'w-48',
-      'xl': 'w-56',
-      '2xl': 'w-64'
+  get shapeClasses(): string {
+    const shapeMap = {
+      'circle': 'rounded-full',
+      'square': 'rounded-none',
+      'rounded': 'rounded-lg'
     };
-    return widthMap[this.width] || widthMap['auto'];
+    return shapeMap[this.shape] || shapeMap['circle'];
   }
 
   get backgroundClasses(): string {
@@ -154,11 +132,32 @@ export class ButtonComponent implements OnInit {
     }
   }
 
-  get textClasses(): string {
-    return '';
-  }
-
   get disabledClasses(): string {
     return this.disabled || this.isLoading ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer';
+  }
+
+  get animationClasses(): string {
+    const animationMap = {
+      'pulse': 'pulse-on-hover',
+      'rotate': 'group-hover:rotate-45 transition-transform duration-300',
+      'bounce': 'hover:animate-bounce',
+      'none': ''
+    };
+    return animationMap[this.animation] || '';
+  }
+
+  get badgeClasses(): string {
+    if (!this.badge) return '';
+    
+    const badgeColorMap = {
+      'primary': 'bg-green-600 text-white',
+      'secondary': 'bg-purple-600 text-white',
+      'warning': 'bg-yellow-600 text-white',
+      'danger': 'bg-red-600 text-white',
+      'dark': 'bg-gray-800 text-white',
+      'light': 'bg-gray-200 text-gray-900'
+    };
+    
+    return badgeColorMap[this.color] || badgeColorMap['primary'];
   }
 }

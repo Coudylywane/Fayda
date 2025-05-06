@@ -43,7 +43,7 @@ export class DetailOuvragePage implements OnInit {
 
   goToRead() {
     if (this.book) {
-      this.router.navigate(['bibliotheque/lire-ouvrage/:id', this.book.id]);
+      this.router.navigate(['bibliotheque/lire-ouvrage', this.book.id]);
     }
   }
 }

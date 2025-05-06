@@ -22,7 +22,7 @@ export class BibliothequePage implements OnInit {
   ) { }
 
   goToDetail(bookId: number) {
-    this.router.navigate(['bibliotheque/detail-ouvrage', bookId]);
+    this.router.navigate(['tabs/bibliotheque/detail-ouvrage', bookId]);
   }
   
   ngOnInit() {
@@ -95,7 +95,7 @@ export class BibliothequePage implements OnInit {
       }
     ];
   }
-  
+
   setActiveTab(tab: 'tafsirs' | 'ouvrages') {
     this.activeTab = tab;
   }

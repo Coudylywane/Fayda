@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
   selector: 'app-lire-ouvrage',
   templateUrl: './lire-ouvrage.page.html',
   styleUrls: ['./lire-ouvrage.page.scss'],
+  standalone: false
 })
 export class LireOuvragePage implements OnInit {
 

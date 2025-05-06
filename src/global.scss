@@ -73,18 +73,6 @@
   --background: #f3f4f6; /* Couleur bg-gray-100 de Tailwind */
 }
 
-// @media (min-width: 768px) {
-//   .campaign-modal {
-//     --width: 400px;
-//     --height: 80%;
-//     // --border-radius: 8px;
-//   }
-  
-//   .campaign-modal .modal-wrapper {
-//     position: absolute;
-//     top: 5%;
-//     left: 50%;
-//     transform: translateX(-50%);
-//     bottom: unset;
-//   }
-// }
+ion-content {
+  --background: inherit !important;
+}

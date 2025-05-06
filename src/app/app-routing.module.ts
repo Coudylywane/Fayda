@@ -25,10 +25,13 @@ const routes: Routes = [
     loadChildren: () => import('./features/tabs-layout/tabs-layout.module').then( m => m.TabsLayoutPageModule)
   },
   {
-    path: 'tabs/infos/detail-infos',
+    path: 'infos/detail-infos',
     loadChildren: () => import('./features/infos/pages/detail-infos/detail-infos.module').then( m => m.DetailInfosPageModule)
+  },
+  {
+    path: 'bibliotheque/lire-ouvrage/:id',
+    loadChildren: () => import('./features/bibliotheque/pages/lire-ouvrage/lire-ouvrage.module').then( m => m.LireOuvragePageModule)
   }
-
 ];
 
 @NgModule({

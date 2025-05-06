@@ -36,6 +36,7 @@ export class ButtonComponent implements OnInit {
   @Input() variant: 'solid' | 'light' | 'transparent' = 'solid';
   @Input() color: 'primary' | 'secondary' | 'warning' | 'danger' | 'dark' | 'light' = 'primary';
   @Input() iconStart: string = '';
+  @Input() fontWeight: 'thin' | 'light' | 'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold' | 'black' = 'medium';
   @Input() iconEnd: string = '';
   @Input() isLoading: boolean = false;
   @Input() disabled: boolean = false;
@@ -81,6 +82,21 @@ export class ButtonComponent implements OnInit {
     };
     return sizeMap[this.size] || sizeMap['md'];
   }
+
+  get fontWeightClasses(): string {
+    const weightMap = {
+      'thin': 'font-thin',
+      'light': 'font-light',
+      'normal': 'font-normal',
+      'medium': 'font-medium',
+      'semibold': 'font-semibold',
+      'bold': 'font-bold',
+      'extrabold': 'font-extrabold',
+      'black': 'font-black'
+    };
+    return weightMap[this.fontWeight] || weightMap['medium'];
+  }
+  
 
   get iconSizeClasses(): string {
     const sizeMap = {

@@ -1,3 +1,4 @@
+import { FontSize } from './../../../theme/typography';
 // icon-button.component.ts
 import { Component, Input, Output, EventEmitter, ElementRef, Renderer2, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
@@ -13,6 +14,7 @@ import { CommonModule } from '@angular/common';
 export class IconButtonComponent implements OnInit {
   @Input() icon: string = '';
   @Input() size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' = 'md';
+  @Input() fontSize: 'xs' | 'sm' | 'md' | 'lg' | 'xl' = 'md';
   @Input() shape: 'circle' | 'square' | 'rounded' = 'circle';
   @Input() variant: 'solid' | 'light' | 'transparent' = 'solid';
   @Input() color: 'primary' | 'secondary' | 'warning' | 'danger' | 'dark' | 'light' = 'primary';
@@ -72,7 +74,7 @@ export class IconButtonComponent implements OnInit {
       'lg': 'text-xl',
       'xl': 'text-2xl'
     };
-    return sizeMap[this.size] || sizeMap['md'];
+    return sizeMap[this.fontSize] || sizeMap['md'];
   }
 
   get dimensionClasses(): string {

@@ -2,7 +2,7 @@
 <div class="w-full h-full bg-gray-100 overflow-auto pb-16">
   <!-- Featured card -->
   <div class="grid grid-cols-3 gap-2 mb-4 p-4">
-    <div class="grid-cols-3 col-span-2 rounded-xl overflow-hidden shadow" (click)="navigateToDetail('')">
+    <div class="grid-cols-3 col-span-2 rounded-xl overflow-hidden shadow bg-white" (click)="navigateToDetail('')">
       <img [src]="featuredEvent.image" alt="featured" class="w-full h-36 object-cover" />
       <div class="flex items-center justify-between p-2">
         <div class="  text-gray-800">
@@ -17,7 +17,7 @@
 
     <div class="flex flex-col gap-2 col-span-1">
       <ng-container *ngFor="let item of sideEvents">
-        <div class="rounded-xl overflow-hidden shadow">
+        <div class="rounded-xl overflow-hidden shadow bg-white" (click)="navigateToDetail('infos-detail')">
           <img [src]="item.image" alt="side" class="w-full h-16 object-cover" />
           <div class="text-[10px] p-1">
             <p class="font-medium truncate">{{ item.title }}</p>
@@ -29,10 +29,10 @@
   </div>
 
   <!-- Liste d'événements -->
-  <div class="mt-4 bg-white shadow-sm rounded-lg mx-4">
+  <div class="mt-4 shadow-sm md:shadow-none rounded-lg overflow-hidden mx-4 md:grid md:grid-cols-2 md:gap-4">
     <!-- Communauté New York -->
     <ng-container *ngFor="let event of eventItem">
-      <div class="flex items-center p-4 border-b cursor-pointer" (click)="navigateToDetail('infos-detail')">
+      <div class="flex items-center rounded-lg p-4 border-b cursor-pointer bg-white" (click)="navigateToDetail('infos-detail')">
         <img [src]="event.image" alt="avatar" class="w-12 h-12 rounded-lg object-cover mr-4">
         <div class="flex-1">
           <h3 class="font-bold text-gray-900">{{ event.title }}</h3>

@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Ouvrage, Tafsir } from './model/bibliotheque.model';
+import { Book, Ouvrage, Tafsir } from './model/bibliotheque.model';
+import { Router } from '@angular/router';
+import { BooksService } from './services/books.service';
 
 @Component({
   selector: 'app-bibliotheque',
@@ -12,10 +14,19 @@ export class BibliothequePage implements OnInit {
   activeTab: 'tafsirs' | 'ouvrages' = 'tafsirs';
   tafsirs: Tafsir[] = [];
   ouvrages: Ouvrage[] = [];
+  books: Book[] = [];
 
-  constructor() {}
+  constructor(
+    private booksService: BooksService,
+    private router: Router
+  ) { }
 
+  goToDetail(bookId: number) {
+    this.router.navigate(['bibliotheque/detail-ouvrage', bookId]);
+  }
+  
   ngOnInit() {
+    this.books = this.booksService.getAllBooks();
     // Données simulées pour les tafsirs
     this.tafsirs = [
       {
@@ -84,7 +95,7 @@ export class BibliothequePage implements OnInit {
       }
     ];
   }
-
+  
   setActiveTab(tab: 'tafsirs' | 'ouvrages') {
     this.activeTab = tab;
   }

@@ -47,13 +47,10 @@
   <!-- Texte du bouton avec animation d'apparition -->
   <span 
     class="relative transition-all duration-300" *ngIf="!isLoading"
-    [ngClass]="{'font-medium': !isLoading && !disabled}"
+    [ngClass]="[fontWeightClasses, '']"
   >{{ text }}</span>
 
-  <span 
-  class="relative transition-all duration-300" *ngIf="isLoading"
-  [ngClass]="{'font-medium': !isLoading && !disabled}"
->chargement...</span>
+  <span class="relative transition-all duration-300" *ngIf="isLoading">chargement...</span>
   
   <!-- Icône après le texte avec animation -->
   <ion-icon 

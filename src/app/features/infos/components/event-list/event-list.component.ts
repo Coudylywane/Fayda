@@ -18,7 +18,7 @@ export class EventListComponent {
 
   navigateToDetail(eventId: string): void {
     // On navigue vers la page de détails de l'événement
-    this.router.navigate(['tabs/infos/detail-infos']);
+    this.router.navigate(['infos/detail-infos']);
     // Pour des besoins de debugging
     // console.log(`Navigating to info: ${eventId}`);
   }

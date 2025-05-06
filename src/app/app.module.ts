@@ -1,7 +1,7 @@
-/*
-  Author: Dr_EPL
-  dolnickenzanza@gmail.com
-  @2025
+/**
+* @author Dr_EPL
+* @summary "dolnickenzanza@gmail.com"
+* @copyright 2025
 */
 
 import { NgModule } from '@angular/core';

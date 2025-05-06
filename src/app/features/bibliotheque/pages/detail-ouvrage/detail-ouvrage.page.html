@@ -1,0 +1,68 @@
+<ion-header class="ion-no-border">
+  <div class="relative">
+    <!-- Header Image -->
+    <img [src]="book!.coverImage" alt="{{ book!.title }}" class="w-full h-[512px] object-cover " />
+    
+    <!-- Overlay sombre -->
+    <div class="absolute inset-0 bg-black/70 z-0"></div>  
+
+    <!-- Back Button -->
+    <ion-buttons class="absolute top-10 left-2">
+      <ion-button (click)="goBack()" class="text-white bg-black/10 rounded-full">
+        <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <!-- Mark Button -->
+    <ion-buttons class="absolute top-8 right-2">
+      <app-icon-button [icon]="isFavorite ? 'bookmark' : 'bookmark-outline'" [color]="isFavorite ? 'danger' : 'danger'"
+        size="lg" shape="circle" variant="transparent" animation="rotate" (buttonClick)="toogleMark()"
+        fontSize="xl"></app-icon-button>
+    </ion-buttons>
+
+    <!-- Book (centré verticalement et horizontalement) -->
+    <div *ngIf="book" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-60 z-10">
+      <img [src]="book.coverImage" alt="{{ book.title }}" class="w-full h-full object-cover shadow-lg rounded" />
+    </div>
+
+    <div class="absolute bottom-0 w-full left-1/2 -translate-x-1/2 p-4 bg-gradient-to-t from-black/60 to-transparent text-center" *ngIf="book">
+      <h2 class="text-lg font-bold text-white">{{ book.title }}</h2>
+      <p class="text-sm text-gray-200">{{ book.author }}</p>
+      <div class="flex justify-center mt-4 h-6">
+        
+      </div>
+    </div>
+    <div class="absolute -bottom-6 left-1/2 -translate-x-1/2">
+      <app-button fontWeight="bold" text="LIRE" size="xl" radius="md" iconEnd="book" variant="solid" color="primary" width="md" (buttonClick)="goToRead()">
+      </app-button>
+    </div>
+  </div>
+</ion-header>
+<ion-content>
+  <div class="flex flex-col container mx-auto px-4 pt-8 bg-gray-100">
+    <div class="flex flex-col items-center p-4" *ngIf="book">
+  
+      <div class="w-full text-center bg-white p-4 rounded-lg">
+        <h3 class="text-lg font-bold mb-2">Résumé</h3>
+        <p class="text-sm text-gray-300 mb-4">
+          {{ book.description }}
+        </p>
+  
+        <div class="flex justify-between text-center">
+          <div class="flex flex-col items-center">
+            <ion-icon name="eye" class="text-2xl mb-1"></ion-icon>
+            <span class="text-lg font-bold mb-1">{{ book.reads }}</span>
+          </div>
+          <div class="flex flex-col items-center">
+            <ion-icon name="book" class="text-2xl mb-1"></ion-icon>
+            <span class="text-lg font-bold mb-1">{{ book.pages }}</span>
+          </div>
+          <div class="flex flex-col items-center">
+            <ion-icon name="language" class="text-2xl mb-1"></ion-icon>
+            <span class="text-lg font-bold mb-1">{{ book.language }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

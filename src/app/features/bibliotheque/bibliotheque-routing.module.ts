@@ -14,6 +14,12 @@ const routes: Routes = [
     //   }
     // ]
   },
+  {
+    path: 'bibliotheque/detail-ouvrage/:id',
+    loadChildren: () => import('./pages/detail-ouvrage/detail-ouvrage.module').then( m => m.DetailOuvragePageModule)
+  },
+
+
 
 ];
 

@@ -20,10 +20,10 @@
 </ion-header>
 
 <ion-content class="!bg-gray-100">
-  <div class="p-4 bg-gray-100">
+  <div class="p-4 bg-gray-100 md:container mx-auto px-4">
 
     <!-- Activities cards -->
-    <div class="space-y-4">
+    <div class="space-y-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-4">
       <div *ngFor="let activity of activities" 
            class="bg-white rounded-xl overflow-hidden shadow-md"
            (click)="openCommentModal(activity)">

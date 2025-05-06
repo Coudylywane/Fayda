@@ -7,8 +7,7 @@
     <!-- Contenu principal de la page -->
     <!-- tafsirs.component.html -->
     <div class="w-full h-full bg-gray-100 bg-opacity-75 overflow-auto pb-16">
-      <!-- Onglets de navigation -->
-      <div class="flex rounded-md bg-white mx-4 mt-4 shadow-md overflow-hidden">
+      <div class="flex rounded-md bg-white mt-4 shadow-md overflow-hidden max-w-sm mx-auto">
         <button class="flex-1 py-3 text-center font-bold transition-colors duration-200"
           [ngClass]="activeTab === 'tafsirs' ? 'text-green-700 bg-white' : 'text-gray-400 bg-gray-200'"
           (click)="setActiveTab('tafsirs')">
@@ -20,37 +19,62 @@
           Ouvrages
         </button>
       </div>
+      <!-- Onglets de navigation -->
 
       <!-- Liste des Tafsirs (visible quand l'onglet Tafsirs est actif) -->
       <div class="mt-6" *ngIf="activeTab === 'tafsirs'">
-        <ng-container *ngFor="let tafsir of tafsirs">
-          <div
-            class="mx-4 mb-4 bg-white rounded-2xl shadow-md overflow-hidden transform transition-transform hover:translate-y-px">
-            <div class="flex justify-between items-center p-4">
-              <div>
-                <h3 class="text-lg font-bold text-gray-800">{{ tafsir.title }}</h3>
-                <p class="text-gray-500">{{ tafsir.author }} - {{ tafsir.ayahCount }} ayah</p>
+        <div class="md:grid md:grid-cols-2 md:gap-4">
+          <ng-container *ngFor="let tafsir of tafsirs">
+            <div
+              class="mx-4 mb-4 bg-white rounded-2xl shadow-md overflow-hidden transform transition-transform hover:translate-y-px">
+              <div class="flex justify-between items-center p-4 md:m-0">
+                <div>
+                  <h3 class="text-lg font-bold text-gray-800">{{ tafsir.title }}</h3>
+                  <p class="text-gray-500">{{ tafsir.author }} - {{ tafsir.ayahCount }} ayah</p>
+                </div>
+                <div class="text-2xl font-bold text-green-700">{{ tafsir.number }}</div>
               </div>
-              <div class="text-2xl font-bold text-green-700">{{ tafsir.number }}</div>
             </div>
-          </div>
-        </ng-container>
+          </ng-container>
+        </div>
       </div>
 
       <!-- Liste des Ouvrages (visible quand l'onglet Ouvrages est actif) -->
-      <div class="mt-6" *ngIf="activeTab === 'ouvrages'">
-        <ng-container *ngFor="let ouvrage of ouvrages">
-          <div
-            class="mx-4 mb-4 bg-white rounded-2xl shadow-md overflow-hidden transform transition-transform hover:translate-y-px">
-            <div class="flex justify-between items-center p-4">
-              <div>
-                <h3 class="text-lg font-bold text-gray-800">{{ ouvrage.title }}</h3>
-                <p class="text-gray-500">{{ ouvrage.author }} - {{ ouvrage.pageCount }} pages</p>
+      <!-- <div class="mt-6" *ngIf="activeTab === 'ouvrages'">
+        <div class="md:grid md:grid-cols-2 md:gap-4">
+          <ng-container *ngFor="let ouvrage of ouvrages">
+            <div
+              class="mx-4 mb-4 bg-white rounded-2xl shadow-md overflow-hidden transform transition-transform hover:translate-y-px">
+              <div class="flex justify-between items-center p-4">
+                <div>
+                  <h3 class="text-lg font-bold text-gray-800">{{ ouvrage.title }}</h3>
+                  <p class="text-gray-500">{{ ouvrage.author }} - {{ ouvrage.pageCount }} pages</p>
+                </div>
+                <div class="text-2xl font-bold text-green-700">{{ ouvrage.number }}</div>
               </div>
-              <div class="text-2xl font-bold text-green-700">{{ ouvrage.number }}</div>
             </div>
+          </ng-container>
+        </div>
+      </div> -->
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4 p-4 overflow-y-auto" *ngIf="activeTab === 'ouvrages'">
+        <div 
+          *ngFor="let book of books" 
+          class="bg-white rounded-lg overflow-hidden cursor-pointer"
+          (click)="goToDetail(book.id)"
+        >
+          <div class="rounded-xl">
+            <img 
+              [src]="book.coverImage" 
+              alt="book.title" 
+              class="w-full h-full max-h-60 object-cover"
+            />
           </div>
-        </ng-container>
+          <div class="p-2 text-center">
+            <h3 class="text-sm font-semibold truncate">{{ book.title }}</h3>
+            <p class="text-xs text-gray-600 truncate">{{ book.subtitle }}</p>
+            <p class="text-xs text-gray-500 truncate">{{ book.author }}</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>

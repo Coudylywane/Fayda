@@ -1,0 +1,70 @@
+<!-- pdf-viewer.component.html -->
+<div class="flex flex-col h-full w-full">
+  <!-- Barre d'outils supérieure -->
+  <div class="p-2 flex justify-center items-center bg-gray-100 border-b border-gray-300">
+    <div class="flex items-center space-x-4">
+      <!-- Navigation des pages -->
+      <!-- <button 
+        (click)="prevPage()" 
+        [disabled]="pageNum <= 1" 
+        class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white disabled:bg-gray-300 disabled:text-gray-500">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button> -->
+      <app-icon-button [disabled]="pageNum <= 1" size="sm" fontSize="lg" radius="md"  icon="chevron-back" variant="solid" color="primary" animation="pulse" width="md" (buttonClick)="prevPage()">
+      </app-icon-button>
+      
+      <div class="text-center text-sm">
+        <span class="font-semibold">{{ pageNum }}</span> / {{ totalPages }}
+      </div>
+      
+      <app-icon-button [disabled]="pageNum >= totalPages" size="sm" fontSize="lg" radius="md"  icon="chevron-forward" variant="solid" color="primary" animation="pulse" width="md" (buttonClick)="nextPage()">
+      </app-icon-button>
+      
+      <!-- Contrôles de zoom -->
+      <app-icon-button size="sm" fontSize="lg" radius="md"  icon="remove" variant="solid" color="light" animation="pulse" width="md" (buttonClick)="zoomOut()">
+      </app-icon-button>
+      <app-icon-button size="sm" fontSize="lg" radius="md"  icon="add" variant="solid" color="light" animation="pulse" width="md" (buttonClick)="zoomIn()">
+      </app-icon-button>
+    </div>
+  </div>
+  
+  <!-- Conteneur principal du PDF -->
+  <div class="flex-1 overflow-auto relative bg-white">
+    <!-- Indicateur de chargement -->
+    <div *ngIf="isLoading" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80">
+      <ion-spinner name="lines-sharp-small" class="w-12 h-12 text-green-700"></ion-spinner>
+    </div>
+    
+    <!-- Message d'erreur -->
+    <div *ngIf="error" class="absolute inset-0 flex items-center justify-center bg-white">
+      <div class="text-center text-red-500">
+        <ion-icon name="alert-circle-outline" class="text-5xl"></ion-icon>
+        <p class="mt-2">{{ error }}</p>
+      </div>
+    </div>
+    
+    <!-- Conteneur du Canvas -->
+    <div 
+      #canvasContainer 
+      class="flex items-center justify-center min-h-full p-4">
+      <!-- Le canvas sera inséré ici dynamiquement -->
+    </div>
+  </div>
+  
+  <!-- Barre d'outils inférieure (optionnelle) -->
+  <div class="p-2 flex justify-center items-center bg-gray-100">
+    <!-- Saisie directe du numéro de page -->
+    <div class="flex items-center space-x-2">
+      <span class="text-sm">Aller à la page:</span>
+      <input 
+        type="number" 
+        min="1" 
+        [max]="totalPages" 
+        [(ngModel)]="pageNum" 
+        (change)="goToPage(pageNum)" 
+        label="Page"
+        placeholder=""
+        class="w-16 h-8 px-2 border-none rounded-md" />
+    </div>
+  </div>
+</div>

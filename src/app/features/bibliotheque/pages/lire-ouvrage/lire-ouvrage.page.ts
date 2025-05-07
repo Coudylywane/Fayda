@@ -3,6 +3,7 @@ import { PdfService } from '../../services/pdf-viewer.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Book } from '../../model/bibliotheque.model';
 import { BooksService } from '../../services/books.service';
+import { TabsService } from 'src/app/features/tabs/services/tabs.service';
 
 @Component({
   selector: 'app-lire-ouvrage',
@@ -13,7 +14,6 @@ import { BooksService } from '../../services/books.service';
 export class LireOuvragePage implements OnInit {
 
   pdfUrl!: string;
-  // fileName: string = 'Lettres précieuses';
   isLoading: boolean = true;
   error: string | null = null;
   book: Book | undefined;
@@ -21,7 +21,8 @@ export class LireOuvragePage implements OnInit {
   constructor(private pdfService: PdfService,
     private route: ActivatedRoute,
     private router: Router,
-    private booksService: BooksService) {}
+    private booksService: BooksService,
+    private navigationService: TabsService, ) {}
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -38,6 +39,7 @@ export class LireOuvragePage implements OnInit {
 
   goBack() {
     this.router.navigate(['tabs/bibliotheque/detail-ouvrage', this.book?.id]);
+    this.navigationService.setActiveTabWithoutNavigation('bibliotheque',);
   }
 
   async loadDocument() {

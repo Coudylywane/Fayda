@@ -1,7 +1,7 @@
 <!-- Header -->
 <ion-header [translucent]="true" class="ion-no-border pt-safe-offset">
-  <ion-toolbar>
-    <ion-title>{{ title }}</ion-title>
+  <ion-toolbar style="--background: #f3f4f6 !important">
+    <ion-title class="font-bold" style="--color: #000000">{{ title }}</ion-title>
     <ion-buttons *ngIf="showBackButton" slot="start">
       <ion-back-button slot="icon-only" defaultHref="/home" (click)="goBack('home')" class="!text-green-700" text="Retour"></ion-back-button>
     </ion-buttons>

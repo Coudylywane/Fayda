@@ -19,4 +19,8 @@ export class TabsService {
   getActiveTab() {
     return this.activeTabSubject.value;
   }
+
+  setActiveTabWithoutNavigation(tab: string) {
+    this.activeTabSubject.next(tab);
+  }
 }

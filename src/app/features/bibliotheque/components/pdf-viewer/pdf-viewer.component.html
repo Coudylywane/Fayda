@@ -4,12 +4,6 @@
   <div class="p-2 flex justify-center items-center bg-gray-100 border-b border-gray-300">
     <div class="flex items-center space-x-4">
       <!-- Navigation des pages -->
-      <!-- <button 
-        (click)="prevPage()" 
-        [disabled]="pageNum <= 1" 
-        class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white disabled:bg-gray-300 disabled:text-gray-500">
-        <ion-icon name="chevron-back-outline"></ion-icon>
-      </button> -->
       <app-icon-button [disabled]="pageNum <= 1" size="sm" fontSize="lg" radius="md"  icon="chevron-back" variant="solid" color="primary" animation="pulse" width="md" (buttonClick)="prevPage()">
       </app-icon-button>
       

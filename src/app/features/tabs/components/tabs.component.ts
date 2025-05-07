@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { TabsService } from '../services/tabs.service';
-import { IonIcon } from "@ionic/angular/standalone";  
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, ModalController } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
+import { ProfilModalComponent } from '../../profil-modal/profil-modal.component';
 
 @Component({
   selector: 'app-tabs',
@@ -14,7 +14,7 @@ export class TabsComponent  implements OnInit {
 
   activeTab: string = 'home';
 
-  constructor(private navigationService: TabsService) {}
+  constructor(private navigationService: TabsService, private modalCtrl: ModalController) {}
 
   ngOnInit() {
     this.navigationService.activeTab$.subscribe(tab => {
@@ -28,5 +28,13 @@ export class TabsComponent  implements OnInit {
 
   isActive(tab: string): boolean {
     return this.activeTab === tab;
+  }
+
+  async openUserProfileModal() {
+    const modal = await this.modalCtrl.create({
+      component: ProfilModalComponent,
+      cssClass: 'profil-modal'
+    });
+    return await modal.present();
   }
 }

@@ -33,7 +33,7 @@
           <ion-icon name="stats-chart" class="text-2xl"></ion-icon>
           <span class="text-xs">Finances</span>
         </a>
-      <a (click)="navigate('profile')" class="flex-1 flex flex-col items-center justify-center py-2"
+      <a (click)="openUserProfileModal()" class="flex-1 flex flex-col items-center justify-center py-2"
         [class.opacity-100]="isActive('profile')" [class.opacity-60]="!isActive('profile')">
         <ion-icon name="person" class="text-2xl"></ion-icon>
         <span class="text-xs">Profile</span>

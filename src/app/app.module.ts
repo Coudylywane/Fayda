@@ -9,12 +9,12 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
-
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
 import { themeReducer } from './store/theme.reducer';
-import { TabsComponent } from "./features/tabs/components/tabs.component";
+import { IonicStorageModule } from '@ionic/storage-angular';
+import { provideHttpClient } from '@angular/common/http';
 
 @NgModule({
   declarations: [AppComponent],
@@ -24,9 +24,11 @@ import { TabsComponent } from "./features/tabs/components/tabs.component";
     AppRoutingModule,
     SharedModule,
     StoreModule.forRoot({ theme: themeReducer }),
-    TabsComponent
+    IonicStorageModule.forRoot(),
 ],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  providers: [
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    provideHttpClient()],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

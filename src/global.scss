@@ -64,6 +64,13 @@
   --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
 }
 
+@media (min-width: 768px) {
+  .campaign-modal {
+    --width: 50%;
+    --height: 80%;
+  }
+}
+
 .campaign-modal .modal-wrapper {
   position: absolute;
   bottom: 0;
@@ -74,5 +81,5 @@
 }
 
 ion-content {
-  --background: inherit !important;
+--background: #f3f4f6 !important;
 }

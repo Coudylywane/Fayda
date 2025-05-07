@@ -1,13 +1,31 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>lire-ouvrage</ion-title>
-  </ion-toolbar>
+<ion-header class="ion-no-border">
+  <div class="flex flex-col h-full bg-gray-900 text-white">
+    <header class="p-4 flex items-center justify-between">
+      <button (click)="goBack()" class="text-white">
+        <ion-icon name="arrow-back-outline" class="text-2xl"></ion-icon>
+      </button>
+      <h2 class="text-lg font-bold truncate">{{book?.title}}</h2>
+      <div class="text-sm text-gray-400">
+      </div>
+    </header>  
+  </div>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">lire-ouvrage</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  <div class="w-full h-full">
+    <app-pdf-viewer 
+      [pdfSrc]="pdfUrl" 
+      *ngIf="pdfUrl">
+    </app-pdf-viewer>
+    
+    <div *ngIf="isLoading" class="w-full h-full flex items-center justify-center">
+      <ion-spinner name="lines-sharp-small" ></ion-spinner>
+      <p class="ml-2">Chargement du document...</p>
+    </div>
+    
+    <div *ngIf="error" class="w-full h-full flex items-center justify-center text-red-500">
+      <ion-icon name="alert-circle-outline" class="text-3xl mr-2"></ion-icon>
+      <p>{{ error }}</p>
+    </div>
+  </div>
 </ion-content>

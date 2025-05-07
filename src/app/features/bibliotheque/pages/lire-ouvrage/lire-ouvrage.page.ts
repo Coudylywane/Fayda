@@ -1,4 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { PdfService } from '../../services/pdf-viewer.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Book } from '../../model/bibliotheque.model';
+import { BooksService } from '../../services/books.service';
 
 @Component({
   selector: 'app-lire-ouvrage',
@@ -8,9 +12,50 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LireOuvragePage implements OnInit {
 
-  constructor() { }
+  pdfUrl!: string;
+  // fileName: string = 'Lettres précieuses';
+  isLoading: boolean = true;
+  error: string | null = null;
+  book: Book | undefined;
+
+  constructor(private pdfService: PdfService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private booksService: BooksService) {}
 
   ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.book = this.booksService.getBookById(+id);
+      if (this.book) {
+        // Dans une application réelle, ceci serait le chemin vers le fichier PDF
+        this.pdfUrl = `http://localhost:4200/assets/books/1.pdf`;
+      }
+    }
+
+    this.loadDocument();
+  }
+
+  goBack() {
+    this.router.navigate(['tabs/bibliotheque/detail-ouvrage', this.book?.id]);
+  }
+
+  async loadDocument() {
+    this.isLoading = true;
+    this.error = null;
+
+    try {
+      
+      //  Précharger les premières pages pour une expérience plus fluide
+      const pdfData = await this.pdfService.loadPdf(this.pdfUrl).toPromise();
+      await this.pdfService.preloadPdfPages(pdfData!, 1, 5); // Précharge les 5 premières pages
+      
+      this.isLoading = false;
+    } catch (err) {
+      console.error('Erreur lors du chargement du document:', err);
+      this.error = 'Impossible de charger le document';
+      this.isLoading = false;
+    }
   }
 
 }

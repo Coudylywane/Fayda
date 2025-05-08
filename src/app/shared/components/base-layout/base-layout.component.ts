@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, NavController } from '@ionic/angular';
 import { Store } from '@ngrx/store';
@@ -19,10 +19,10 @@ import { TabsService } from 'src/app/features/tabs/services/tabs.service';
 export class BaseLayoutComponent implements OnInit, OnDestroy {
   @Input() title: string = 'Page Title';
   @Input() showBackButton: boolean = true;
-  @Input() showFooter: boolean = true;
+  @Input() iconEnd: string = '';
   @Input() headerClass: string = '';
   @Input() contentClass: string = '';
-  @Input() footerClass: string = '';
+  @Output() buttonClick = new EventEmitter<void>();
   @Input() colorName: ColorKey = 'surface';
   @Input() textColorName: ColorKey = 'text';
   @Input() lightColor?: ColorKey;
@@ -45,12 +45,16 @@ export class BaseLayoutComponent implements OnInit, OnDestroy {
   }
 
   goBack(tab:string) {
-    this.location.replaceState("/home");
-      this.navigationService.setActiveTab(tab);
+    // this.location.replaceState("/home");
+    this.navigationService.setActiveTab(tab);
   }
 
   ngOnDestroy(): void {
     this.themeSub?.unsubscribe();
+  }
+
+  onClick(): void {
+      this.buttonClick.emit();
   }
 
   private updateBackgroundClass(theme: ThemeMode) {

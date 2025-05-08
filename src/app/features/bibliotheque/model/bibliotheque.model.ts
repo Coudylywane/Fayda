@@ -1,5 +1,6 @@
 // Interface pour les Tafsirs
 export interface Tafsir {
+  id: number;
   title: string;
   author: string;
   ayahCount: number;

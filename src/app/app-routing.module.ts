@@ -31,7 +31,11 @@ const routes: Routes = [
   {
     path: 'bibliotheque/lire-ouvrage/:id',
     loadChildren: () => import('./features/bibliotheque/pages/lire-ouvrage/lire-ouvrage.module').then( m => m.LireOuvragePageModule)
-  }
+  },
+  {
+    path: 'bibliotheque/detail-tafsir/:id',
+    loadChildren: () => import('./features/bibliotheque/pages/detail-tafsir/detail-tafsir.module').then( m => m.DetailTafsirPageModule)
+  },
 ];
 
 @NgModule({

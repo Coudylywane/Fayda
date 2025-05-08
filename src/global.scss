@@ -44,15 +44,29 @@
   width: 100%;
 }
 
-/* Pour masquer la barre de défilement */
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
+/* cacher le scroll de Ion-content */
+ion-content::part(scroll),
+.ion-content-scroll-host {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
 
-.hide-scrollbar {
-  -ms-overflow-style: none;  /* IE et Edge */
-  scrollbar-width: none;  /* Firefox */
+ion-content::part(scroll)::-webkit-scrollbar,
+.ion-content-scroll-host::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
+
+/* cacher le scrollbar d'une div */
+.hide-scrollbar {
+  scrollbar-width: none; /* Pour Firefox */
+  -ms-overflow-style: none; /* Pour Internet Explorer et Edge */
+  &::-webkit-scrollbar {
+    display: none; /* Pour Chrome, Safari et Opera */
+  }
+}
+
 
 // À ajouter dans votre fichier global.scss ou dans un fichier séparé qui sera importé
 // Ce sont des styles globaux pour Ionic, pas du CSS personnalisé dans vos composants
@@ -82,4 +96,12 @@
 
 ion-content {
   --background: #f3f4f6 !important;
+}
+
+/* Approche 3: Modifier les styles des inputs avec le focus */
+ion-input:focus-within, 
+ion-textarea:focus-within, 
+ion-select:focus-within {
+  --highlight-color-focused: transparent;
+  --highlight-height: 0;
 }

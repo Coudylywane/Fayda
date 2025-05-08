@@ -3,14 +3,13 @@ import { IonicModule, Platform } from '@ionic/angular';
 import * as pdfjsLib from 'pdfjs-dist';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonComponent } from "../../../../shared/components/button/button.component";
 import { IconButtonComponent } from "../../../../shared/components/icon-button/icon-button.component";
 
 @Component({
   selector: 'app-pdf-viewer',
   templateUrl: './pdf-viewer.component.html',
   styleUrls: ['./pdf-viewer.component.scss'],
-  imports: [IonicModule, CommonModule, FormsModule, ButtonComponent, IconButtonComponent],
+  imports: [IonicModule, CommonModule, FormsModule, IconButtonComponent],
 })
 export class PdfViewerComponent implements OnInit, OnDestroy {
   @Input() pdfSrc!: string;

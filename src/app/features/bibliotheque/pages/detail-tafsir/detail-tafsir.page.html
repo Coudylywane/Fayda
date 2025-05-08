@@ -1,0 +1,51 @@
+<!-- detail-tafsir.page.html -->
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button slot="icon-only" (click)="goBack()" class="!text-green-700" text="Retour"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="font-bold text-center text-black">Les Secrets de {{ surah.name }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" class="!text-green-700" name="ellipsis-horizontal"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-gray-100">
+  <!-- Contenu principal -->
+  <div class="flex flex-col items-center px-4 py-6">
+    <!-- Carte avec le texte arabe -->
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-sm mb-6">
+      <div class="p-6">
+        <!-- Titre en arabe -->
+        <h2 class="text-center text-2xl font-bold text-green-700 mb-4 font-arabic">{{ surah.nameArabic }}</h2>
+        
+        <!-- Ornement décoratif -->
+        <div class="flex justify-center mb-6">
+          <div class="text-green-700 text-xl">❁❁❁</div>
+        </div>
+        
+        <!-- Versets de la sourate -->
+        <div class="space-y-4">
+          <div *ngFor="let verse of surah.verses" class="text-center">
+            <p class="text-xl font-arabic"><span class="inline-block border border-gray-300 rounded-full w-6 h-6 text-center text-sm mr-2 leading-6">{{ verse.number }}</span>{{ verse.arabic }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Explication et Tafsir -->
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-sm p-6">
+      <h3 class="text-lg font-semibold text-gray-800 mb-3">This Surah is called</h3>
+      
+      <div class="space-y-4 text-gray-700">
+        <p *ngFor="let paragraph of surah.description" class="leading-relaxed">
+          {{ paragraph }}
+        </p>
+      </div>
+    </div>
+  </div>
+</ion-content>

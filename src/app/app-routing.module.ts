@@ -1,28 +1,25 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-
+import { LoginPage } from './features/auth/login/login.page';
+import { RegisterPage } from './features/auth/register/register.page';  // Importer le composant autonome RegisterPage
 
 const routes: Routes = [
   {
     path: 'home',
-    loadChildren: () => import('./features/home/home.module').then( m => m.HomePageModule)
+    loadChildren: () => import('./features/home/home.module').then(m => m.HomePageModule)
   },
   {
     path: '',
-    redirectTo: 'tabs/home',
+    redirectTo: 'login',
     pathMatch: 'full'
   },
   {
-    path: 'login',
-    loadChildren: () => import('./features/auth/login/login.module').then( m => m.LoginPageModule)
-  },
-  {
     path: 'register',
-    loadChildren: () => import('./features/auth/register/register.module').then( m => m.RegisterPageModule)
+    component: RegisterPage  // Utiliser directement RegisterPage en tant que composant autonome
   },
   {
     path: 'tabs',
-    loadChildren: () => import('./features/tabs-layout/tabs-layout.module').then( m => m.TabsLayoutPageModule)
+    loadChildren: () => import('./features/tabs-layout/tabs-layout.module').then(m => m.TabsLayoutPageModule)
   },
   {
     path: 'infos/detail-infos',

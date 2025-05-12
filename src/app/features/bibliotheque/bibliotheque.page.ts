@@ -21,8 +21,12 @@ export class BibliothequePage implements OnInit {
     private router: Router
   ) { }
 
-  goToDetail(bookId: number) {
+  goToDetailOuvrage(bookId: number) {
     this.router.navigate(['tabs/bibliotheque/detail-ouvrage', bookId]);
+  }
+
+  goToTafsirDetail(tafsirId: number) {
+    this.router.navigate(['bibliotheque/detail-tafsir', tafsirId]); 
   }
   
   ngOnInit() {
@@ -33,31 +37,36 @@ export class BibliothequePage implements OnInit {
         title: 'Les secrets de Al Fatiha',
         author: 'El Hadj Ibrahima Niass',
         ayahCount: 7,
-        number: 22
+        number: 22,
+        id: 1
       },
       {
         title: 'Les secrets de Al Fatiha',
         author: 'El Hadj Ibrahima Niass',
         ayahCount: 7,
-        number: 22
+        number: 22,
+        id: 2
       },
       {
         title: 'Les secrets de Al Fatiha',
         author: 'El Hadj Ibrahima Niass',
         ayahCount: 7,
-        number: 22
+        number: 22,
+        id: 3
       },
       {
         title: 'Les secrets de Al Fatiha',
         author: 'El Hadj Ibrahima Niass',
         ayahCount: 7,
-        number: 22
+        number: 22,
+        id: 4
       },
       {
         title: 'Les secrets de Al Fatiha',
         author: 'El Hadj Ibrahima Niass',
         ayahCount: 7,
-        number: 22
+        number: 22,
+        id: 5
       }
     ];
     

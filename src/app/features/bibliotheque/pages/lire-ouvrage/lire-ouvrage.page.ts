@@ -39,7 +39,7 @@ export class LireOuvragePage implements OnInit {
 
   goBack() {
     this.router.navigate(['tabs/bibliotheque/detail-ouvrage', this.book?.id]);
-    this.navigationService.setActiveTabWithoutNavigation('bibliotheque',);
+    this.navigationService.setActiveTabWithoutNavigation('bibliotheque');
   }
 
   async loadDocument() {

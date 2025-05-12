@@ -25,7 +25,7 @@
       <div class="mt-6" *ngIf="activeTab === 'tafsirs'">
         <div class="md:grid md:grid-cols-2 md:gap-4">
           <ng-container *ngFor="let tafsir of tafsirs">
-            <div
+            <div (click)="goToTafsirDetail(tafsir.id)"
               class="mx-4 mb-4 bg-white rounded-2xl shadow-md overflow-hidden transform transition-transform hover:translate-y-px">
               <div class="flex justify-between items-center p-4 md:m-0">
                 <div>
@@ -40,27 +40,11 @@
       </div>
 
       <!-- Liste des Ouvrages (visible quand l'onglet Ouvrages est actif) -->
-      <!-- <div class="mt-6" *ngIf="activeTab === 'ouvrages'">
-        <div class="md:grid md:grid-cols-2 md:gap-4">
-          <ng-container *ngFor="let ouvrage of ouvrages">
-            <div
-              class="mx-4 mb-4 bg-white rounded-2xl shadow-md overflow-hidden transform transition-transform hover:translate-y-px">
-              <div class="flex justify-between items-center p-4">
-                <div>
-                  <h3 class="text-lg font-bold text-gray-800">{{ ouvrage.title }}</h3>
-                  <p class="text-gray-500">{{ ouvrage.author }} - {{ ouvrage.pageCount }} pages</p>
-                </div>
-                <div class="text-2xl font-bold text-green-700">{{ ouvrage.number }}</div>
-              </div>
-            </div>
-          </ng-container>
-        </div>
-      </div> -->
       <div class="grid grid-cols-2 md:grid-cols-5 gap-4 p-4 overflow-y-auto" *ngIf="activeTab === 'ouvrages'">
         <div 
           *ngFor="let book of books" 
           class="bg-white rounded-lg overflow-hidden cursor-pointer"
-          (click)="goToDetail(book.id)"
+          (click)="goToDetailOuvrage(book.id)"
         >
           <div class="rounded-xl">
             <img 

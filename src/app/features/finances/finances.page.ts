@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CampaignData } from './model/finances.type';
 import { DetailFondsService } from './services/detail-fonds.service';
+import { ModalController } from '@ionic/angular';
+import { ContributionStoryComponent } from './components/contribution-story/contribution-story.component';
 
 @Component({
   selector: 'app-finances',
@@ -14,7 +16,7 @@ export class FinancesPage implements OnInit {
   showBalanceAmount = false;
   zakatProgress = 75; // Pourcentage pour le cercle de progression
 
-  constructor(private detailFondsService: DetailFondsService) { }
+  constructor(private detailFondsService: DetailFondsService, private modalController: ModalController) { }
 
   toggleContributionVisibility() {
     this.showContributionAmount = !this.showContributionAmount;
@@ -118,4 +120,15 @@ export class FinancesPage implements OnInit {
 
     this.detailFondsService.openCampaignModal(campaignData);
   }
+
+  async openContributionStory() {
+      const modal = await this.modalController.create({
+        component: ContributionStoryComponent,
+        initialBreakpoint: 0.2,
+        breakpoints: [0, 0.4, 0.6, 0.9],
+        cssClass: 'comment-modal'
+      });
+  
+      return await modal.present();
+    }
 }

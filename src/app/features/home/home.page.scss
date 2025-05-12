@@ -1,27 +1,34 @@
-#container {
-  text-align: center;
-
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+/* Solution globale pour tous les inputs */
+ion-input {
+  --highlight-color-focused: transparent !important;  /* Supprime la couleur de la ligne de focus */
+  --highlight-height: 0;  /* Supprime la ligne de focus */
+  --border-color-focused: transparent !important;  /* Pour les inputs avec bordure */
+  --padding-start: 0;  /* Ajustez selon vos besoins */
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+/* Pour les inputs avec outline */
+ion-input.has-focus {
+  --highlight-color-focused: transparent !important;  /* Supprime la couleur de la ligne de focus */
+  box-shadow: none !important;  /* Supprime toute ombre lors du focus */
+  outline: none !important;  /* Supprime l'outline du navigateur */
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-
-  color: #8c8c8c;
-
-  margin: 0;
+/* Pour les champs de type item */
+ion-item {
+  --highlight-color-focused: transparent;  /* Supprime la surbrillance du focus */
+  --highlight-height: 0;  /* Hauteur de la surbrillance à 0 */
+  --highlight-color-valid: transparent;  /* Supprime la surbrillance de validation */
+  --highlight-color-invalid: transparent;  /* Supprime la surbrillance d'erreur */
 }
 
-#container a {
-  text-decoration: none;
+/* Pour supprimer l'outline du navigateur sur tous les inputs */
+input:focus, 
+textarea:focus,
+ion-input:focus {
+  outline: none !important;
+}
+
+/* Pour cibler spécifiquement l'effet de surbrillance dans le shadow DOM */
+::slotted(ion-input.has-focus) {
+  --highlight-color-focused: transparent !important;
 }

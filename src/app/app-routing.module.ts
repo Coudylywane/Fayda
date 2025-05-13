@@ -43,11 +43,8 @@ const routes: Routes = [
   },   {
     path: 'base-layout-admin',
     loadChildren: () => import('./Admin/base-layout-admin/base-layout-admin.module').then( m => m.BaseLayoutAdminPageModule)
-  },
-   {
-    path: 'utilisateurs',
-    loadChildren: () => import('./Admin/pages/utilisateurs/utilisateurs.module').then( m => m.UtilisateursPageModule)
-  },
+  }
+
  
 ];
 

@@ -10,7 +10,7 @@ const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        loadChildren: () => import('../admin-dashboard/admin-dashboard.module').then(m => m.AdminDashboardPageModule)
+        loadChildren: () => import('../pages/admin-dashboard/admin-dashboard.module').then(m => m.AdminDashboardPageModule)
       },
       // {
       //   path: 'utilisateurs',
@@ -20,6 +20,10 @@ const routes: Routes = [
       //   path: 'cotisations',
       //   loadChildren: () => import('../bibliotheque/bibliotheque.module').then(m => m.BibliothequePageModule)
       // },
+      {
+        path: 'dahira',
+        loadChildren: () => import('../pages/dahira/dahira.module').then( m => m.DahiraPageModule)
+      },
       // {
       //   path: 'projets',
       //   loadChildren: () => import('../profile/profile.module').then(m => m.ProfilePageModule)

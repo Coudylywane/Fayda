@@ -12,6 +12,10 @@ const routes: Routes = [
         path: 'dashboard',
         loadChildren: () => import('../pages/admin-dashboard/admin-dashboard.module').then(m => m.AdminDashboardPageModule)
       },
+      {
+        path: 'utilisateurs',
+        loadChildren: () => import('../pages/utilisateurs/utilisateurs.module').then(m => m.UtilisateursPageModule)
+      },
       // {
       //   path: 'utilisateurs',
       //   loadChildren: () => import('../infos/infos.module').then(m => m.InfosPageModule)
@@ -57,4 +61,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class BaseLayoutAdminPageRoutingModule {}
+export class BaseLayoutAdminPageRoutingModule { }

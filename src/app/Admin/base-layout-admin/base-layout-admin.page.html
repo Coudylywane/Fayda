@@ -29,16 +29,11 @@
         </svg>
         <span class="">Utilisateurs</span>
       </a>
-
-      <a (click)="navigate('dahira')"
-        [ngClass]="{'hover:bg-gray-700 cursor-pointer opacity-80 transition-colors mb-1': !isActive('dahira'), 'bg-green-600 text-white opacity-100': isActive('dahira')}"
-        class="flex items-center px-3 py-3 p-2 font-semibold rounded">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-        </svg>
-        <span class="">Dahira</span>
+      <a (click)="navigate('utilisateurs')" [ngClass]="{'hover:bg-gray-700 cursor-pointer opacity-80': !isActive('utilisateurs'), 'text-green-600 opacity-100 font-bold': isActive('utilisateurs')}" class="flex items-center space-x-2  p-2 rounded">
+        <div class="h-4 w-4 flex">
+          <i class="fas fa-money-bill-wave"></i>
+        </div>
+        <span class="pl-2">Cotisations</span>
       </a>
 
       <a (click)="navigate('projets')"
@@ -51,16 +46,9 @@
         </svg>
         <span class="">Projets</span>
       </a>
-
-      <a (click)="navigate('ressources')"
-        [ngClass]="{'hover:bg-gray-700 cursor-pointer opacity-80 transition-colors mb-1': !isActive('ressources'), 'bg-green-600 text-white opacity-100': isActive('ressources')}"
-        class="flex items-center px-3 py-3 p-2 font-semibold rounded">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 " fill="none" viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-        </svg>
-        <span class="">Ressources</span>
+      <a (click)="navigate('utilisateurs')" [ngClass]="{'hover:bg-gray-700 cursor-pointer opacity-80': !isActive('utilisateurs'), 'text-green-600 opacity-100 font-bold': isActive('utilisateurs')}" class="flex items-center space-x-2  p-2 rounded">
+        <i class="fas fa-book h-4 w-4"></i>
+        <span class="pl-2">Ressources</span>
       </a>
       <a (click)="navigate('demandes')"
         [ngClass]="{'hover:bg-gray-700 cursor-pointer opacity-80 transition-colors mb-1': !isActive('demandes'), 'bg-green-600 text-white opacity-100': isActive('demandes')}"
@@ -76,17 +64,22 @@
             [ngClass]="{'text-green-600 bg-white': isActive('demandes'), 'text-white bg-green-600': !isActive('demandes')}"
             class="text-xs px-2.5 py-1 rounded-full">2</span>
         </div>
+        <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">2</span>
+      </a> -->
+      <!-- <a href="/tourisme" class="flex items-center space-x-2 hover:bg-gray-700 p-2 rounded">
+        <i class="fas fa-compass"></i>
+        <span class="pl-2">Tourisme spirituel</span>
+      </a> -->
+      <a (click)="navigate('utilisateurs')" [ngClass]="{'hover:bg-gray-700 cursor-pointer opacity-80': !isActive('utilisateurs'), 'text-green-600 opacity-100 font-bold': isActive('utilisateurs')}" class="flex items-center space-x-2  p-2 rounded">
+        <i class="fas fa-chart-bar h-4 w-4"></i>
+        <span class="pl-2">Statistiques</span>
       </a>
-
-      <a (click)="navigate('statistiques')"
-        [ngClass]="{'hover:bg-gray-700 cursor-pointer opacity-80 transition-colors mb-1': !isActive('statistiques'), 'bg-green-600 text-white opacity-100': isActive('statistiques')}"
-        class="flex items-center px-3 py-3 p-2 font-semibold rounded">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 " fill="none" viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-        <span class="">Statistiques</span>
+      <a (click)="navigate('utilisateurs')" [ngClass]="{'hover:bg-gray-700 cursor-pointer opacity-80': !isActive('utilisateurs'), 'text-green-600 opacity-100 font-bold': isActive('utilisateurs')}" class="flex items-center space-x-2  p-2 rounded">
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-lock h-4 w-4"></i>
+          <span class="pl-2">Demandes</span>
+        </div>
+        <span class="bg-green-600 text-white font-bold text-xs px-2.5 py-1 rounded-full">2</span>
       </a>
     </nav>
 

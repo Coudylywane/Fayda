@@ -1,0 +1,77 @@
+<div class="flex h-screen bg-gray-100">
+
+  <!-- Menu latéral -->
+  <aside class="w-64 bg-gray-800 text-white flex flex-col">
+    <div class="w-56 text-center py-8 mx-auto text-2xl font-bold text-[#EFD8A3] border-b border-gray-700">
+      Faydah
+    </div>
+    <nav class="flex-1 p-4 space-y-2">
+      <a (click)="navigate('dashboard')" [ngClass]="{'hover:bg-gray-700 cursor-pointer opacity-80': !isActive('dashboard'), 'text-green-600 opacity-100 font-bold': isActive('dashboard')}" class="flex items-center space-x-2  p-2 rounded">
+        <div class="h-4 w-4 flex">
+          <i class="fas fa-th-large w-full"></i>
+        </div>
+        <span class="pl-2">Dashbord</span>
+      </a>
+      <a (click)="navigate('utilisateurs')" [ngClass]="{'hover:bg-gray-700 cursor-pointer opacity-80': !isActive('utilisateurs'), 'text-green-600 opacity-100 font-bold': isActive('utilisateurs')}" class="flex items-center space-x-2  p-2 rounded">
+        <div class="h-4 w-4 flex">
+          <i class="fas fa-users w-full"></i>
+        </div>
+        <span class="pl-2">Utilisateurs</span>
+      </a>
+      <a (click)="navigate('cotisations')" [ngClass]="{'hover:bg-gray-700 cursor-pointer opacity-80': !isActive('cotisations'), 'text-green-600 opacity-100 font-bold': isActive('cotisations')}" class="flex items-center space-x-2  p-2 rounded">
+        <div class="h-4 w-4 flex">
+          <i class="fas fa-money-bill-wave"></i>
+        </div>
+        <span class="pl-2">Cotisations</span>
+      </a>
+      <a (click)="navigate('projets')" [ngClass]="{'hover:bg-gray-700 cursor-pointer opacity-80': !isActive('projet'), 'text-green-600 opacity-100 font-bold': isActive('utilisateurs')}" class="flex items-center space-x-2  p-2 rounded">
+        <i class="fas fa-briefcase h-4 w-4"></i>
+        <span class="pl-2">Projets</span>
+      </a>
+      <a (click)="navigate('ressources')" [ngClass]="{'hover:bg-gray-700 cursor-pointer opacity-80': !isActive('ressources'), 'text-green-600 opacity-100 font-bold': isActive('utilisateurs')}" class="flex items-center space-x-2  p-2 rounded">
+        <i class="fas fa-book h-4 w-4"></i>
+        <span class="pl-2">Ressources</span>
+      </a>
+      <!-- <a href="/discussions" class="flex items-center justify-between hover:bg-gray-700 p-2 rounded">
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-comments"></i>
+          <span class="pl-2">Discussions</span>
+        </div>
+        <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">2</span>
+      </a> -->
+      <!-- <a href="/tourisme" class="flex items-center space-x-2 hover:bg-gray-700 p-2 rounded">
+        <i class="fas fa-compass"></i>
+        <span class="pl-2">Tourisme spirituel</span>
+      </a> -->
+      <a (click)="navigate('statistiques')" [ngClass]="{'hover:bg-gray-700 cursor-pointer opacity-80': !isActive('statistiques'), 'text-green-600 opacity-100 font-bold': isActive('utilisateurs')}" class="flex items-center space-x-2  p-2 rounded">
+        <i class="fas fa-chart-bar h-4 w-4"></i>
+        <span class="pl-2">Statistiques</span>
+      </a>
+      <a (click)="navigate('demande')" [ngClass]="{'hover:bg-gray-700 cursor-pointer opacity-80': !isActive('demande'), 'text-green-600 opacity-100 font-bold': isActive('utilisateurs')}" class="flex items-center space-x-2  p-2 rounded">
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-lock h-4 w-4"></i>
+          <span class="pl-2">Demandes</span>
+        </div>
+        <span class="bg-green-600 text-white font-bold text-xs px-2.5 py-1 rounded-full">2</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Contenu principal -->
+  <main class="flex-1 overflow-y-auto text-black">
+    <!-- En-tête -->
+    <header class="bg-white shadow p-4 flex items-center justify-between">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+      <button class="text-gray-500 focus:outline-none md:hidden">
+        <i class="fas fa-bars"></i>
+      </button>
+      <h1 class="text-xl font-semibold">{{subtitle}}</h1>
+    </header>
+
+    <!-- Contenu -->
+    <div class="">
+      <!-- Router outlet pour l'affichage des pages -->
+    <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

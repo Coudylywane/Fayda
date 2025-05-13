@@ -1,115 +1,49 @@
-<div class="flex h-screen bg-white">
-
-  <!-- Menu latéral -->
-  <aside class="w-64 bg-gray-800 text-white flex flex-col">
-    <div class="p-4 text-2xl font-bold border-b border-gray-700">
-      Faydah
+<!-- Contenu -->
+<div class="p-6 space-y-6">
+  <!-- Statistiques -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+    <div class="bg-white p-4 rounded shadow text-center">
+      <i class="fas fa-users text-blue-500 text-3xl mb-2"></i>
+      <h2 class="text-lg font-semibold">Disciples</h2>
+      <p class="text-2xl">438</p>
     </div>
-    <nav class="flex-1 p-4 space-y-2">
-      <a href="/admin-dashboard" class="flex items-center space-x-2 hover:bg-gray-700 p-2 rounded">
-        <i class="fas fa-th-large"></i>
-        <span>Tableau de bord</span>
-      </a>
-      <a href="/admin/utilisateurs" class="flex items-center space-x-2 hover:bg-gray-700 p-2 rounded">
-        <i class="fas fa-users"></i>
-        <span>Utilisateurs</span>
-      </a>
-      <a href="/cotisations" class="flex items-center space-x-2 hover:bg-gray-700 p-2 rounded">
-        <i class="fas fa-money-bill-wave"></i>
-        <span>Cotisations</span>
-      </a>
-      <a href="/projets" class="flex items-center space-x-2 hover:bg-gray-700 p-2 rounded">
-        <i class="fas fa-briefcase"></i>
-        <span>Projets</span>
-      </a>
-      <a href="/ressources" class="flex items-center space-x-2 hover:bg-gray-700 p-2 rounded">
-        <i class="fas fa-book"></i>
-        <span>Ressources</span>
-      </a>
-      <a href="/discussions" class="flex items-center justify-between hover:bg-gray-700 p-2 rounded">
-        <div class="flex items-center space-x-2">
-          <i class="fas fa-comments"></i>
-          <span>Discussions</span>
-        </div>
-        <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">2</span>
-      </a>
-      <a href="/tourisme" class="flex items-center space-x-2 hover:bg-gray-700 p-2 rounded">
-        <i class="fas fa-compass"></i>
-        <span>Tourisme spirituel</span>
-      </a>
-      <a href="/statistiques" class="flex items-center space-x-2 hover:bg-gray-700 p-2 rounded">
-        <i class="fas fa-chart-bar"></i>
-        <span>Statistiques</span>
-      </a>
-      <a href="/demandes" class="flex items-center justify-between hover:bg-gray-700 p-2 rounded">
-        <div class="flex items-center space-x-2">
-          <i class="fas fa-lock"></i>
-          <span>Demandes</span>
-        </div>
-        <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">2</span>
-      </a>
-    </nav>
-  </aside>
-
-  <!-- Contenu principal -->
-  <main class="flex-1 overflow-y-auto text-black">
-    <!-- En-tête -->
-    <header class="bg-white shadow p-4 flex items-center justify-between">
-      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-      <button class="text-gray-500 focus:outline-none md:hidden">
-        <i class="fas fa-bars"></i>
-      </button>
-      <h1 class="text-xl font-semibold">Tableau de bord</h1>
-    </header>
-
-    <!-- Contenu -->
-    <div class="p-6 space-y-6">
-      <!-- Statistiques -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-        <div class="bg-white p-4 rounded shadow text-center">
-          <i class="fas fa-users text-blue-500 text-3xl mb-2"></i>
-          <h2 class="text-lg font-semibold">Disciples</h2>
-          <p class="text-2xl">438</p>
-        </div>
-        <div class="bg-white p-4 rounded shadow text-center">
-          <i class="fas fa-users-cog text-purple-500 text-3xl mb-2"></i>
-          <h2 class="text-lg font-semibold">Dahiras</h2>
-          <p class="text-2xl">28</p>
-        </div>
-        <div class="bg-white p-4 rounded shadow text-center">
-          <i class="fas fa-user-tie text-gray-500 text-3xl mb-2"></i>
-          <h2 class="text-lg font-semibold">Mouqadam</h2>
-          <p class="text-2xl">12</p>
-        </div>
-        <div class="bg-white p-4 rounded shadow text-center">
-          <i class="fas fa-coins text-green-500 text-3xl mb-2"></i>
-          <h2 class="text-lg font-semibold">Cotisations</h2>
-          <p class="text-2xl">15 000 XOF</p>
-        </div>
-        <div class="bg-white p-4 rounded shadow text-center">
-          <i class="fas fa-briefcase text-yellow-500 text-3xl mb-2"></i>
-          <h2 class="text-lg font-semibold">Projets</h2>
-          <p class="text-2xl">12</p>
-        </div>
-      </div>
-
-      <!-- Graphiques -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white p-4 rounded shadow h-64">
-          <h2 class="text-lg font-semibold mb-2">Cotisations mensuelles</h2>
-          <canvas id="monthlyChart" class="w-full h-64"></canvas>
-        </div>
-        <div class="bg-white p-4 rounded shadow">
-          <h2 class="text-lg font-semibold mb-2">Avancement des projets</h2>
-          <p>En cours de développement...</p>
-        </div>
-      </div>
-
-      <!-- Répartition géographique -->
-      <div class="bg-white p-4 rounded shadow">
-        <h2 class="text-lg font-semibold mb-2">Répartition géographique des utilisateurs</h2>
-        <p>À intégrer avec Map ou données géographiques</p>
-      </div>
+    <div class="bg-white p-4 rounded shadow text-center">
+      <i class="fas fa-users-cog text-purple-500 text-3xl mb-2"></i>
+      <h2 class="text-lg font-semibold">Dahiras</h2>
+      <p class="text-2xl">28</p>
     </div>
-  </main>
+    <div class="bg-white p-4 rounded shadow text-center">
+      <i class="fas fa-user-tie text-gray-500 text-3xl mb-2"></i>
+      <h2 class="text-lg font-semibold">Mouqadam</h2>
+      <p class="text-2xl">12</p>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-center">
+      <i class="fas fa-coins text-green-500 text-3xl mb-2"></i>
+      <h2 class="text-lg font-semibold">Cotisations</h2>
+      <p class="text-2xl">15 000 XOF</p>
+    </div>
+    <div class="bg-white p-4 rounded shadow text-center">
+      <i class="fas fa-briefcase text-yellow-500 text-3xl mb-2"></i>
+      <h2 class="text-lg font-semibold">Projets</h2>
+      <p class="text-2xl">12</p>
+    </div>
+  </div>
+
+  <!-- Graphiques -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white p-4 rounded shadow h-64">
+      <h2 class="text-lg font-semibold mb-2">Cotisations mensuelles</h2>
+      <canvas id="monthlyChart" class="w-full h-64"></canvas>
+    </div>
+    <div class="bg-white p-4 rounded shadow">
+      <h2 class="text-lg font-semibold mb-2">Avancement des projets</h2>
+      <p>En cours de développement...</p>
+    </div>
+  </div>
+
+  <!-- Répartition géographique -->
+  <div class="bg-white p-4 rounded shadow">
+    <h2 class="text-lg font-semibold mb-2">Répartition géographique des utilisateurs</h2>
+    <p>À intégrer avec Map ou données géographiques</p>
+  </div>
 </div>

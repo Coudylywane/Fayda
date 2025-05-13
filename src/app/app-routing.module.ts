@@ -15,7 +15,7 @@ const routes: Routes = [
   },
   {
     path: 'register',
-    component: RegisterPage  // Utiliser directement RegisterPage en tant que composant autonome
+    component: RegisterPage
   },
   {
     path: 'tabs',
@@ -30,8 +30,8 @@ const routes: Routes = [
     component: LoginPage
   },
   {
-    path: 'admin-dashboard',
-    loadChildren: () => import('./Admin/admin-dashboard/admin-dashboard.module').then( m => m.AdminDashboardPageModule)
+    path: 'admin',
+    loadChildren: () => import('./Admin/base-layout-admin/base-layout-admin.module').then( m => m.BaseLayoutAdminPageModule)
   },
   {
     path: 'bibliotheque/lire-ouvrage/:id',
@@ -40,7 +40,11 @@ const routes: Routes = [
   {
     path: 'bibliotheque/detail-tafsir/:id',
     loadChildren: () => import('./features/bibliotheque/pages/detail-tafsir/detail-tafsir.module').then( m => m.DetailTafsirPageModule)
-  },  
+  },   {
+    path: 'base-layout-admin',
+    loadChildren: () => import('./Admin/base-layout-admin/base-layout-admin.module').then( m => m.BaseLayoutAdminPageModule)
+  },
+ 
 ];
 
 @NgModule({

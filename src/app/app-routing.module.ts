@@ -23,7 +23,19 @@ const routes: Routes = [
   },
   {
     path: 'infos/detail-infos',
-    loadChildren: () => import('./features/infos/pages/detail-infos/detail-infos.module').then( m => m.DetailInfosPageModule)
+    loadChildren: () => import('./features/infos/pages/detail-infos/detail-infos.module').then(m => m.DetailInfosPageModule)
+  },
+  {
+    path: 'login',
+    component: LoginPage
+  },
+  {
+    path: 'admin-dashboard',
+    loadChildren: () => import('./Admin/admin-dashboard/admin-dashboard.module').then( m => m.AdminDashboardPageModule)
+  },
+  {
+    path: 'admin/utilisateurs',
+    loadChildren: () => import('./Admin/utilisateurs/utilisateurs.module').then( m => m.UtilisateursPageModule)
   },
   {
     path: 'bibliotheque/lire-ouvrage/:id',
@@ -32,7 +44,7 @@ const routes: Routes = [
   {
     path: 'bibliotheque/detail-tafsir/:id',
     loadChildren: () => import('./features/bibliotheque/pages/detail-tafsir/detail-tafsir.module').then( m => m.DetailTafsirPageModule)
-  },
+  },  
 ];
 
 @NgModule({

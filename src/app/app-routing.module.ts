@@ -34,10 +34,6 @@ const routes: Routes = [
     loadChildren: () => import('./Admin/admin-dashboard/admin-dashboard.module').then( m => m.AdminDashboardPageModule)
   },
   {
-    path: 'admin/utilisateurs',
-    loadChildren: () => import('./Admin/utilisateurs/utilisateurs.module').then( m => m.UtilisateursPageModule)
-  },
-  {
     path: 'bibliotheque/lire-ouvrage/:id',
     loadChildren: () => import('./features/bibliotheque/pages/lire-ouvrage/lire-ouvrage.module').then( m => m.LireOuvragePageModule)
   },

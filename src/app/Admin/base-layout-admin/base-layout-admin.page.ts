@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnInit } from '@angular/core';
 import { BaseLayoutAdminService } from './base-layout-admin.service';
 import { ModalController } from '@ionic/angular';
 import { DetailProfilModalComponent } from './components/detail-profil-modal/detail-profil-modal.component';
@@ -12,9 +12,22 @@ import { DetailProfilModalComponent } from './components/detail-profil-modal/det
 export class BaseLayoutAdminPage implements OnInit {
   @Input() title: string = 'Dashboard';
   @Input() subtitle: string = 'Tableau de bord';
+  showTooltip = false;
 
   activeTab: string = 'dashboard';
   isSidebarOpen = true;
+
+  toggleTooltip() {
+    this.showTooltip = !this.showTooltip;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.tooltip-container') && this.showTooltip) {
+      this.showTooltip = false;
+    }
+  }
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;

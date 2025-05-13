@@ -135,7 +135,7 @@
           </button>
         </div>
 
-        <div class="flex items-center cursor-pointer ml-3" (click)="openProfileDetail()">
+        <!-- <div class="flex items-center cursor-pointer ml-3" (click)="openProfileDetail()">
           <div class="h-9 w-9 rounded-full overflow-hidden">
             <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile" class="h-full w-full object-cover">
           </div>
@@ -149,6 +149,90 @@
               d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
               clip-rule="evenodd" />
           </svg>
+        </div> -->
+        <!-- Tooltip Container -->
+        <div class="tooltip-container relative inline-block max-w-xs">
+          <!-- Trigger -->
+          <div
+            class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-xl shadow-xs cursor-pointer0"
+            (click)="toggleTooltip()">
+            <img class="w-9 h-9 rounded-full"
+            src="https://randomuser.me/api/portraits/men/32.jpg"
+              alt="Avatar">
+
+            <div class="flex-1">
+              <h4 class="text-sm font-semibold text-gray-800 ">
+                Amanda Harvey
+              </h4>
+              <p class="text-sm text-gray-500">
+                Admin
+              </p>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-green-500" viewBox="0 0 20 20"
+            fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+              clip-rule="evenodd" />
+          </svg>
+          </div>
+
+          <!-- Tooltip Content -->
+          <div
+            class="absolute z-10 w-full max-w-xs mt-2 transition-all duration-300 transform bg-white border border-gray-100 rounded-xl shadow-md dark:bg-neutral-800 "
+            [class]="showTooltip ? 'opacity-100 visible scale-100' : 'opacity-0 invisible scale-95'">
+            <!-- Arrow -->
+            <div
+              class="absolute -top-2 right-4 w-4 h-4 rotate-45 bg-white border-t border-l border-gray-200 dark:bg-neutral-800 ">
+            </div>
+
+            <!-- Header -->
+            <div class="flex items-center gap-3 p-4 border-b border-gray-200 ">
+              <img class="w-10 h-10 rounded-full ring-2 ring-white"
+              src="https://randomuser.me/api/portraits/men/32.jpg"
+                alt="Avatar">
+              <div class="flex-1">
+                <h4 class="font-semibold text-gray-800 dark:text-white">
+                  Amanda Harvey
+                  <span
+                    class="inline-flex items-center px-1.5 py-0.5 ml-0.5 text-xs font-medium bg-gray-800 text-white rounded-md dark:bg-white dark:text-neutral-800">
+                    ADMIN
+                  </span>
+                </h4>
+                <p class="text-sm text-gray-500 ">
+                  Storyteller
+                </p>
+              </div>
+            </div>
+
+            <!-- List -->
+            <ul class="p-4 space-y-2">
+              <li class="flex items-center gap-3 text-sm text-gray-800 ">
+                <ion-icon name="business-outline" class="w-4 h-4 text-gray-600 "></ion-icon>
+                Pixeel Ltd.
+              </li>
+              <li class="flex items-center gap-3 text-sm text-gray-800 ">
+                <ion-icon name="phone-portrait-outline" class="w-4 h-4 text-gray-600 "></ion-icon>
+                (892) 312-5483
+              </li>
+              <li class="flex items-center gap-3 text-sm text-gray-800 ">
+                <ion-icon name="mail-outline" class="w-4 h-4 text-gray-600 "></ion-icon>
+                amandaemail.com
+              </li>
+            </ul>
+
+            <!-- Footer -->
+            <div class="flex items-center justify-between p-3 bg-gray-100 dark:bg-neutral-800 rounded-b-xl">
+              <a href="#"
+                class="flex items-center gap-1 text-xs text-gray-500 hover:text-blue-600  dark:hover:text-white">
+                <ion-icon name="flag-outline" class="w-3 h-3"></ion-icon>
+                Flag
+              </a>
+              <div size="small"
+                class="px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-full hover:bg-blue-700">
+                Follow
+            </div>
+            </div>
+          </div>
         </div>
       </div>
     </header>

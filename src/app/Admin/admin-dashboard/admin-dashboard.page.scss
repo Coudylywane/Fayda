@@ -1,19 +1,4 @@
-.dashboard-content {
-  ion-card {
-    text-align: center;
-    ion-card-title {
-      font-size: 1.2em;
-      margin-bottom: 8px;
-    }
-
-    ion-text {
-      font-size: 1.5em;
-      font-weight: bold;
-    }
+main {
+    flex: 1;
+    overflow-y: auto;
   }
-
-  canvas {
-    width: 100% !important;
-    height: auto !important;
-  }
-}

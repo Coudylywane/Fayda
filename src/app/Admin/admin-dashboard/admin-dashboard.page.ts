@@ -1,59 +1,45 @@
-import { Component, AfterViewInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';  // Importation d'IonicModule
-import { Router } from '@angular/router';  // Importation du Router pour la navigation
+import { Component, OnInit } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
-
-Chart.register(...registerables);
 
 @Component({
   selector: 'app-admin-dashboard',
   templateUrl: './admin-dashboard.page.html',
   styleUrls: ['./admin-dashboard.page.scss'],
-  standalone: true,  // Si tu utilises un composant autonome
-  imports: [IonicModule],  // Ajout de IonicModule pour inclure les composants Ionic
+  standalone: false
 })
-export class AdminDashboardPage implements AfterViewInit {
+export class AdminDashboardPage implements OnInit {
+  constructor() {
+    Chart.register(...registerables); // Enregistrer les composants de Chart.js
+  }
 
-  constructor(private router: Router) {}  // Injection du Router
-
-  ngAfterViewInit() {
+  ngOnInit() {
     this.loadMonthlyChart();
   }
 
-  loadMonthlyChart(): void {
-    const canvas = document.getElementById('monthlyChart') as HTMLCanvasElement;
-
-    if (!canvas) {
-      console.error('Canvas element #monthlyChart not found');
-      return;
-    }
-
-    const ctx = canvas.getContext('2d');
-
-    if (!ctx) {
-      console.error('2D context not available on canvas');
-      return;
-    }
-
+  loadMonthlyChart() {
+    const ctx = document.getElementById('monthlyChart') as HTMLCanvasElement;
     new Chart(ctx, {
-      type: 'bar',
+      type: 'bar', // Type de graphique (barres)
       data: {
-        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août'],
-        datasets: [{
-          label: 'Cotisations',
-          data: [60, 40, 30, 20, 100, 90, 70, 50],
-          backgroundColor: '#4b572d',
-        }]
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], // Mois
+        datasets: [
+          {
+            label: 'Cotisations',
+            data: [500, 700, 800, 600, 900, 1000], // Données
+            backgroundColor: 'rgba(54, 162, 235, 0.5)', // Couleur des barres
+            borderColor: 'rgba(54, 162, 235, 1)', // Couleur des bordures
+            borderWidth: 1,
+          },
+        ],
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,
-      }
+        plugins: {
+          legend: {
+            display: true,
+          },
+        },
+      },
     });
-  }
-
-  // Fonction pour la navigation vers la page Utilisateurs
-  navigateToUtilisateurs() {
-    this.router.navigate(['/admin/utilisateurs']);
   }
 }

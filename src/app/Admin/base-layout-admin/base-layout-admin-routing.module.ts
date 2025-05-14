@@ -44,10 +44,10 @@ const routes: Routes = [
       //   path: 'statistiques',
       //   loadChildren: () => import('../finances/finances.module').then( m => m.FinancesPageModule)
       // },
-      // {
-      //   path: 'demandes',
-      //   loadChildren: () => import('../finances/finances.module').then( m => m.FinancesPageModule)
-      // },
+      {
+        path: 'demandes',
+        loadChildren: () => import('../pages/demandes/demandes.module').then( m => m.DemandesPageModule)
+      },
       {
         path: '',
         redirectTo: 'dashboard',

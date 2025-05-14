@@ -28,6 +28,10 @@ const routes: Routes = [
         path: 'dahira',
         loadChildren: () => import('../pages/dahira/dahira.module').then( m => m.DahiraPageModule)
       },
+      {
+    path: 'ressources',
+    loadChildren: () => import('../pages/ressources/ressources.module').then(m => m.RessourcesPageModule)
+  },
       // {
       //   path: 'projets',
       //   loadChildren: () => import('../profile/profile.module').then(m => m.ProfilePageModule)

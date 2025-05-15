@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
-import { Resource } from '../../models/resource.model';
+import { Resource } from '../../pages/ressources/models/resource.model';
 
 @Component({
   selector: 'app-add-resource-modal',

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Resource } from '../../models/resource.model';
+import { Resource } from '../../pages/ressources/models/resource.model';
 
 @Component({
   selector: 'app-resource-card',

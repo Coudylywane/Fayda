@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { ResourceService } from '../../services/resource.service';
-import { Resource } from '../../models/resource.model';
+import { Resource } from './models/resource.model';
 import { AddResourceModalComponent } from '../../components/add-resource-modal/add-resource-modal.component';
 
 @Component({

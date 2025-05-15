@@ -17,10 +17,6 @@ const routes: Routes = [
         loadChildren: () => import('../pages/utilisateurs/utilisateurs.module').then(m => m.UtilisateursPageModule)
       },
       // {
-      //   path: 'utilisateurs',
-      //   loadChildren: () => import('../infos/infos.module').then(m => m.InfosPageModule)
-      // },
-      // {
       //   path: 'cotisations',
       //   loadChildren: () => import('../bibliotheque/bibliotheque.module').then(m => m.BibliothequePageModule)
       // },
@@ -32,10 +28,10 @@ const routes: Routes = [
         path: 'projets',
         loadChildren: () => import('../pages/projets/projets.module').then(m => m.ProjetsPageModule)
       },
-      // {
-      //   path: 'ressources',
-      //   loadChildren: () => import('../finances/finances.module').then( m => m.FinancesPageModule)
-      // },
+      {
+        path: 'ressources',
+        loadChildren: () => import('../pages/ressources/ressources.module').then(m => m.RessourcesPageModule)
+      },
       // {
       //   path: 'tourisme',
       //   loadChildren: () => import('../profile/profile.module').then(m => m.ProfilePageModule)

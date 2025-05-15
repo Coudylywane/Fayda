@@ -42,9 +42,6 @@ const routes: Routes = [
     loadChildren: () => import('./features/bibliotheque/pages/detail-tafsir/detail-tafsir.module').then( m => m.DetailTafsirPageModule)
   },
 
-
-
-
  
 ];
 

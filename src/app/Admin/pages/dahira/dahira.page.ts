@@ -38,7 +38,7 @@ export class DahiraPage implements OnInit {
   searchSubject = new Subject<string>();
   
   constructor(
-  private confettiService: ConfettiService,
+    private confettiService: ConfettiService,
     private dahiraService: DahiraService,
     private router: Router
   ) {}

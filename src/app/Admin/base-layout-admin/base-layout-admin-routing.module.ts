@@ -32,10 +32,10 @@ const routes: Routes = [
         path: 'ressources',
         loadChildren: () => import('../pages/ressources/ressources.module').then(m => m.RessourcesPageModule)
       },
-      // {
-      //   path: 'tourisme',
-      //   loadChildren: () => import('../profile/profile.module').then(m => m.ProfilePageModule)
-      // },
+      {
+        path: 'tourisme',
+        loadChildren: () => import('../pages/tourisme/tourisme.module').then(m => m.TourismePageModule)
+      },
       // {
       //   path: 'statistiques',
       //   loadChildren: () => import('../finances/finances.module').then( m => m.FinancesPageModule)

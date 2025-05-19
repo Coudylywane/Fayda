@@ -49,7 +49,7 @@ export class DahiraDetailsComponent implements OnInit {
       this.loadDahiraDetails();
       this.loadDahiraMembers();
     } else {
-      this.router.navigate(['/dahiras']);
+      this.router.navigate(['admin/dahiras']);
     }
   }
 
@@ -63,7 +63,7 @@ export class DahiraDetailsComponent implements OnInit {
       error: (error) => {
         console.error('Erreur lors du chargement des détails du dahira', error);
         this.loading = false;
-        this.router.navigate(['/dahiras']);
+        this.router.navigate(['admin/dahiras']);
       }
     });
   }

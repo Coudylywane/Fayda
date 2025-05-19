@@ -99,7 +99,7 @@
       (click)="viewDetails(event)">
       <!-- Image de l'événement -->
       <div class="relative h-48 w-full">
-        <img [src]="event.image" [alt]="event.title" class="w-full h-full object-cover">
+        <img title="{{ event.title }}" [src]="event.image" [alt]="event.title" class="w-full h-full object-cover">
         <span [ngClass]="{
             'bg-blue-500': event.category === 'Religieux',
             'bg-purple-500': event.category === 'Culturel',

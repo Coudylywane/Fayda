@@ -50,11 +50,15 @@ const routes: Routes = [
       },
       {
         path: 'maps',
-        loadChildren: () => import('../pages/maps/maps.module').then( m => m.MapsPageModule)
+        loadChildren: () => import('../pages/maps/maps.module').then(m => m.MapsPageModule)
       },
       {
         path: 'logs',
-        loadChildren: () => import('../pages/logs/logs.module').then( m => m.LogsPageModule)
+        loadChildren: () => import('../pages/logs/logs.module').then(m => m.LogsPageModule)
+      },
+      {
+        path: 'discussions',
+        loadChildren: () => import('../pages/discussions/discussions.module').then(m => m.DiscussionsPageModule)
       },
       {
         path: '',

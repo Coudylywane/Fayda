@@ -53,6 +53,10 @@ const routes: Routes = [
         loadChildren: () => import('../pages/maps/maps.module').then( m => m.MapsPageModule)
       },
       {
+        path: 'logs',
+        loadChildren: () => import('../pages/logs/logs.module').then( m => m.LogsPageModule)
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'

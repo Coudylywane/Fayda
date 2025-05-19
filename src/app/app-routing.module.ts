@@ -40,7 +40,11 @@ const routes: Routes = [
   {
     path: 'bibliotheque/detail-tafsir/:id',
     loadChildren: () => import('./features/bibliotheque/pages/detail-tafsir/detail-tafsir.module').then( m => m.DetailTafsirPageModule)
+  },  {
+    path: 'logs',
+    loadChildren: () => import('./Admin/pages/logs/logs.module').then( m => m.LogsPageModule)
   },
+
 
  
 ];

@@ -40,15 +40,15 @@ export class StatCardsComponent  implements OnInit {
       icon: 'users' 
     },
     { 
-      title: 'Cotisations', 
-      value: '15 000 XOF', 
+      title: 'Levée des fonds',
+      value: '1 500 000 XOF', 
       change: '+8%', 
       colorClass: 'text-blue-500', 
       iconColorClass: 'bg-blue-100',
       icon: 'cash' 
     },
     { 
-      title: 'Levée des fonds', 
+      title: 'Tourisme spirituel', 
       value: '12', 
       change: '', 
       colorClass: 'text-gray-800', 

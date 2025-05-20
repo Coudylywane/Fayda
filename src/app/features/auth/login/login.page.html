@@ -1,27 +1,47 @@
-<ion-content class="login-page">
-  <div class="background-image"></div>
+<div class="relative w-full h-screen text-white font-sans">
+  <!-- Image de fond avec filtre -->
+  <div class="absolute inset-0 bg-cover bg-center brightness-50" style="background-image: url('/assets/images/background.jpg');"></div>
 
-  <div class="content-wrapper">
-    <img src="assets/images/faydah-logo.png" alt="Faydah" class="logo" />
+  <!-- Contenu centré -->
+  <div class="relative z-10 flex flex-col justify-center h-full px-8">
 
-    <ion-item lines="none" class="input-item">
-      <ion-label position="floating" class="input-label">Identifiant</ion-label>
-      <ion-input [(ngModel)]="email" class="input-text" type="text"></ion-input>
-    </ion-item>
-    
-    <ion-item lines="none" class="input-item">
-      <ion-label position="floating" class="input-label">Mot de passe</ion-label>
-      <ion-input [(ngModel)]="password" class="input-text" type="password"></ion-input>
-    </ion-item>
+    <!-- Logo texte -->
+    <h1 class="text-5xl text-yellow-400 font-bold text-center mb-12 tracking-wide font-serif">faydah</h1>
 
-    <div class="submit-button" (click)="login()">
-      <ion-icon name="arrow-forward-outline"></ion-icon>
+    <!-- Champ Identifiant -->
+    <div class="mb-6">
+      <label class="block text-sm mb-1">Identifiant</label>
+      <input [(ngModel)]="email"
+             type="text"
+             class="bg-transparent w-full text-white placeholder-white border-0 border-b border-yellow-400 pb-1 focus:outline-none focus:ring-0 focus:border-yellow-400"
+             placeholder="Entrez votre identifiant" />
     </div>
 
-    <div class="register-text">
+    <!-- Champ Mot de passe -->
+    <div class="mb-6">
+      <label class="block text-sm mb-1">Mot de passe</label>
+      <input [(ngModel)]="password"
+             type="password"
+             class="bg-transparent w-full text-white placeholder-white border-0 border-b border-yellow-400 pb-1 focus:outline-none focus:ring-0 focus:border-yellow-400"
+             placeholder="Entrez votre mot de passe" />
+    </div>
+
+    <!-- Bouton d'envoi -->
+    <div class="flex justify-end mb-6">
+      <button (click)="login()" class="w-12 h-12 text-yellow-400 flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+             viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Lien d'inscription -->
+    <div class="text-center text-sm text-gray-300">
       <p>Pas encore inscrit ?</p>
-      <!-- Remplace ion-router-link par ion-button avec routerLink -->
-      <ion-button routerLink="/register" class="register-link" fill="clear">Crée un compte ici</ion-button>
+      <a routerLink="/register" class="text-yellow-400 underline font-medium hover:text-yellow-300 transition-colors">
+        Crée un compte ici
+      </a>
     </div>
   </div>
-</ion-content>
+</div>

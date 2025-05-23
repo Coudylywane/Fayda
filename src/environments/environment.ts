@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  googleMapsApiKey: 'AIzaSyAi4asA9e9Gzb40h_mW23urmj403x1euy8'
+  apiUrl: 'http://89.47.51.6:8787/api/v1/'
 };
 
 /*

@@ -1,11 +1,41 @@
-html, body {
-  height: 100%;
-  margin: 0;
-  overflow: hidden; /* empêche le body de scroll, pour que le scroll soit dans la div */
-}
+    :host {
+      --color-primary-green: #215a2e;
+      --color-dark-green: #1e4620;
+      --color-light-green: #2e7d32;
+    }
+    
+    .bg-primary-green {
+      background-color: var(--color-primary-green);
+    }
+    
+    .bg-dark-green {
+      background-color: var(--color-dark-green);
+    }
+    
+    .bg-light-green {
+      background-color: var(--color-light-green);
+    }
+    
+    .border-light-green {
+      border-color: var(--color-light-green);
+    }
+    
+    .focus\\:border-light-green:focus {
+      border-color: var(--color-light-green);
+    }
+    
+    .hover\\:bg-light-green:hover {
+      background-color: var(--color-light-green);
+    }
+    
+    .hover\\:bg-dark-green:hover {
+      background-color: var(--color-dark-green);
+    }
+    
+    .focus\\:ring-light-green:focus {
+      --tw-ring-color: var(--color-light-green);
+    }
 
-.min-h-screen, .h-screen {
-  height: 100vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* scroll fluide sur iOS */
-}
+    .date-input::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+    }

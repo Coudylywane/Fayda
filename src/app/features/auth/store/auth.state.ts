@@ -1,5 +1,7 @@
+import { User } from "../models/user.model";
+
 export interface AuthState {
-    user: any | null;
+    user: User | null;
     loading: boolean;
     error: string | null;
 }

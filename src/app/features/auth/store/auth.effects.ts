@@ -4,6 +4,7 @@ import { from, of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import * as AuthActions from './auth.actions';
 import {AuthApi} from '../services/auth.api';
+import { User } from '../models/user.model';
 
 @Injectable()
 export class AuthEffects {
@@ -15,10 +16,12 @@ export class AuthEffects {
             mergeMap((action) =>
                 from(AuthApi.login(action.email, action.password)).pipe(
                     map((response) => {
+                        console.log('Login success:', response.data);
+                        
                         // Stocker le token après succès
-                        if (response.data.token) {
-                            localStorage.setItem('auth_token', response.data.token);
-                        }
+                        // if (response.data.token) {
+                        //     localStorage.setItem('auth_token', response.data.token);
+                        // }
                         return AuthActions.loginSuccess({ user: response.data });
                     }),
                     catchError((error) => {
@@ -38,7 +41,8 @@ export class AuthEffects {
                 from(AuthApi.register(action.userData)).pipe(
                     map((response) => {
                         console.log('Registration success:', response.data);
-                        return AuthActions.registerSuccess({ user: response.data.response });
+                    
+                        return AuthActions.registerSuccess({ user: response.data.data });
                     }),
                     catchError((error) => {
                         console.error('Registration error:', error);

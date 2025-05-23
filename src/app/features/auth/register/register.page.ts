@@ -6,6 +6,8 @@ import { IonicModule } from '@ionic/angular';
 import { AuthService } from '../services/auth.service';
 import { AppState } from 'src/app/store/app.state';
 import { Store } from '@ngrx/store';
+import { ConfettiService } from 'src/app/Admin/services/confetti.service';
+import { selectAuthState } from '../store/auth.selectors';
 
 @Component({
   selector: 'app-register',
@@ -19,7 +21,7 @@ import { Store } from '@ngrx/store';
   ],
 })
 export class RegisterPage {
-  private destroyRef = inject(DestroyRef);
+  // private destroyRef = inject(DestroyRef);
   maxDate = new Date().toISOString();
   registerForm: FormGroup;
   selectedGender: string = 'male';
@@ -33,15 +35,19 @@ export class RegisterPage {
     private router: Router,
     private route: ActivatedRoute,
     private authService: AuthService,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private confettiService: ConfettiService,
   ) {
     this.registerForm = this.createForm();
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || 'login';
 
-    this.store.select(state => state.auth).subscribe(authState => {
+    this.store.select(selectAuthState).subscribe(authState => {
       this.isLoading = authState.loading;
       this.registerError = authState.error ?? '';
+      console.log("Auth state:", authState);
+      
       if (authState.user) {
+        this.startConfetti();
         this.router.navigate(['/login']);
       }
     });
@@ -55,6 +61,10 @@ export class RegisterPage {
     //       this.router.navigate(['/login']);
     //     }
     //   });
+  }
+
+  startConfetti() {
+    this.confettiService.triggerConfetti();
   }
 
   private createForm(): FormGroup {
@@ -112,7 +122,7 @@ export class RegisterPage {
   private prepareFormData(): any {
     return {
       ...this.registerForm.value,
-      userIdKeycloak: "",
+      // userIdKeycloak: "a2",
       location: {
         nationality: this.registerForm.value.nationality,
         country: this.registerForm.value.country,

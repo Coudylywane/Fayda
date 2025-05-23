@@ -14,15 +14,16 @@ export class AuthEffects {
         this.actions$.pipe(
             ofType(AuthActions.login),
             mergeMap((action) =>
-                from(AuthApi.login(action.email, action.password)).pipe(
+                from(AuthApi.login(action.login)).pipe(
                     map((response) => {
                         console.log('Login success:', response.data);
                         
                         // Stocker le token après succès
-                        // if (response.data.token) {
-                        //     localStorage.setItem('auth_token', response.data.token);
-                        // }
-                        return AuthActions.loginSuccess({ user: response.data });
+                        if (response.data?.data?.access_token) {
+                            localStorage.setItem('auth_token', response.data.data.access_token);
+                            console.log('Token:', response.data.data.access_token);
+                        }
+                        return AuthActions.loginSuccess({ token: response.data.data });
                     }),
                     catchError((error) => {
                         console.error('Login error:', error);

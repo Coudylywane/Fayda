@@ -13,6 +13,10 @@ export interface User {
     location: LocationInfo,
     active: boolean,
     updatedAt: string,
+    dahira?: Dahira;
+    mouqadam?: User;
+    disciples?: User[];
+    roles?: string[];
 }
 
 
@@ -34,19 +38,20 @@ export interface User {
 // }
 
 export interface LocationInfo {
-  locationInfoId: string;
-  address?: string;
-  city?: string;
-  country?: string;
-  postalCode?: string;
-  latitude?: number;
-  longitude?: number;
+    locationInfoId: string;
+    address?: string;
+    city?: string;
+    country?: string;
+    nationality: string;
+    postalCode?: string;
+    latitude?: number;
+    longitude?: number;
 }
 
 
 export interface Dahira {
-  dahiraId: string;
-  name: string;
-  description?: string;
-  location?: string;
+    dahiraId: string;
+    name: string;
+    description?: string;
+    location?: string;
 }

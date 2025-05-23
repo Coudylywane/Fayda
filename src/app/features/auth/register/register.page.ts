@@ -8,6 +8,7 @@ import { AppState } from 'src/app/store/app.state';
 import { Store } from '@ngrx/store';
 import { ConfettiService } from 'src/app/Admin/services/confetti.service';
 import { selectAuthState } from '../store/auth.selectors';
+import { Register } from '../models/auth.model';
 
 @Component({
   selector: 'app-register',
@@ -119,10 +120,9 @@ export class RegisterPage {
 }
 
 
-  private prepareFormData(): any {
+  private prepareFormData(): Register {
     return {
       ...this.registerForm.value,
-      // userIdKeycloak: "a2",
       location: {
         nationality: this.registerForm.value.nationality,
         country: this.registerForm.value.country,
@@ -132,14 +132,6 @@ export class RegisterPage {
       }
     };
   }
-
-  // private autoLoginAfterRegistration(): void {
-  //   const { email, password } = this.registerForm.value;
-  //   this.authService.login(email, password).subscribe(loginResult => {
-  //     const redirectUrl = loginResult.isAdmin ? '/admin/dashboard' : this.returnUrl;
-  //     this.router.navigate([redirectUrl]);
-  //   });
-  // }
 
   private markFormAsTouched(): void {
     Object.keys(this.registerForm.controls).forEach(key => {

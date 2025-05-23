@@ -1,11 +1,12 @@
 import axios from 'axios';
+import { Login, Register } from '../models/auth.model';
 
 export class AuthApi {
-    static login(email: string, password: string) {
-        return axios.post('auth/login', { email, password });
+    static login(login: Login) {
+        return axios.post('auth/login', { username: login.username, password: login.password });
     }
 
-    static register(userData: any) {
+    static register(userData: Register) {
         return axios.post('users', userData);
     }
 

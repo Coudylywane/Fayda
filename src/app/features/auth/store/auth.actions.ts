@@ -1,14 +1,15 @@
 import { createAction, props } from '@ngrx/store';
 import { User } from '../models/user.model';
+import { Login, Register, Token } from '../models/auth.model';
 
 export const login = createAction(
   '[Auth] Login',
-  props<{ email: string; password: string }>()
+  props<{ login: Login }>()
 );
 
 export const loginSuccess = createAction(
   '[Auth] Login Success',
-  props<{ user: User }>()
+  props<{ token: Token }>()
 );
 
 export const loginFailure = createAction(
@@ -18,7 +19,7 @@ export const loginFailure = createAction(
 
 export const register = createAction(
   '[Auth] Register',
-  props<{ userData: any }>()
+  props<{ userData: Register }>()
 );
 
 export const registerSuccess = createAction(

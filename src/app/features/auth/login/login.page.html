@@ -17,12 +17,12 @@
       <form class="space-y-6" [formGroup]="loginForm" (ngSubmit)="login()">
         <!-- Champ Email -->
         <div class="mb-4">
-          <label for="email" class="block text-sm font-medium text-gray-300 mb-1">Identifiant</label>
+          <label for="username" class="block text-sm font-medium text-gray-300 mb-1">Identifiant</label>
           <div class="relative">
-            <input id="email" type="email" formControlName="email"
+            <input id="username1" type="username" formControlName="username"
               class="bg-transparent w-full text-white placeholder-gray-400 border-0 border-b border-primary pb-2 focus:outline-none focus:ring-0 focus:border-primary transition-colors"
-              placeholder="email@exemple.com"
-              [ngClass]="{'!border-red-500': loginForm.get('email')?.invalid && loginForm.get('email')?.touched}" />
+              placeholder="username"
+              [ngClass]="{'!border-red-500': loginForm.get('username')?.invalid && loginForm.get('username')?.touched}" />
             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
@@ -31,10 +31,10 @@
               </svg>
             </div>
           </div>
-          <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+          <div *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
             class="text-red-500 text-sm mt-1">
-            <span *ngIf="loginForm.get('email')?.errors?.['required']">Identifiant requis</span>
-            <span *ngIf="loginForm.get('email')?.errors?.['email']">Format d'email invalide</span>
+            <span *ngIf="loginForm.get('username')?.errors?.['required']">Identifiant requis</span>
+            <span *ngIf="loginForm.get('username')?.errors?.['minlength']">Le nom d'utilisateur doit contenir au moins 3 caractères</span>
           </div>
         </div>
 
@@ -107,12 +107,12 @@
       <form class="space-y-6 px-4" [formGroup]="loginForm" (ngSubmit)="login()">
         <!-- Champ Email -->
         <div class="mb-4">
-          <label for="email" class="block text-sm font-medium text-gray-300 mb-1">Identifiant</label>
+          <label for="username" class="block text-sm font-medium text-gray-300 mb-1">Identifiant</label>
           <div class="relative">
-            <input id="email" type="email" formControlName="email"
+            <input id="username" type="username" formControlName="username"
               class="bg-transparent w-full text-white placeholder-gray-400 border-0 border-b border-primary pb-2 focus:outline-none focus:ring-0 focus:border-primary transition-colors"
-              placeholder="email@exemple.com"
-              [ngClass]="{'!border-red-500': loginForm.get('email')?.invalid && loginForm.get('email')?.touched}" />
+              placeholder="username"
+              [ngClass]="{'!border-red-500': loginForm.get('username')?.invalid && loginForm.get('username')?.touched}" />
             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
@@ -121,10 +121,10 @@
               </svg>
             </div>
           </div>
-          <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+          <div *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
             class="text-red-500 text-sm mt-1">
-            <span *ngIf="loginForm.get('email')?.errors?.['required']">Identifiant requis</span>
-            <span *ngIf="loginForm.get('email')?.errors?.['email']">Format d'email invalide</span>
+            <span *ngIf="loginForm.get('username')?.errors?.['required']">Identifiant requis</span>
+            <span *ngIf="loginForm.get('username')?.errors?.['minlength']">Le nom d'utilisateur doit contenir au moins 3 caractères</span>
           </div>
         </div>
 
@@ -132,7 +132,7 @@
         <div class="mb-4">
           <label for="password" class="block text-sm font-medium text-gray-300 mb-1">Mot de passe</label>
           <div class="relative mb-6">
-            <input id="password" formControlName="password"
+            <input id="password2" formControlName="password"
               class="bg-transparent w-full text-white placeholder-gray-400 border-0 border-b border-primary pb-2 focus:outline-none focus:ring-0 focus:border-primary transition-colors"
               placeholder="••••••••" [type]="hidePassword ? 'password' : 'text'"
               [ngClass]="{'!border-red-500': loginForm.get('password')?.invalid && loginForm.get('password')?.touched}" />

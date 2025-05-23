@@ -5,6 +5,7 @@ import axios from 'axios';
 import * as AuthActions from '../store/auth.actions';
 import { Actions } from '@ngrx/effects';
 import { selectCurrentUser } from "../store/auth.selectors";
+import { Login, Register } from "../models/auth.model";
 
 @Injectable({
   providedIn: "root",
@@ -21,11 +22,11 @@ export class AuthService {
   }
 
   // Les méthodes suivantes déclenchent les actions NgRx
-  login(email: string, password: string) {
-    this.store.dispatch(AuthActions.login({ email, password }));
+  login(login: Login) {
+    this.store.dispatch(AuthActions.login({ login }));
   }
 
-  register(userData: any) {
+  register(userData: Register) {
     this.store.dispatch(AuthActions.register({ userData }));
   }
 

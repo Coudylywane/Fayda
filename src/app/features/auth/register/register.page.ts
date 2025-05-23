@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { finalize } from 'rxjs/operators';
 import { IonicModule } from '@ionic/angular';
 import { AuthService } from '../services/auth.service';
+import { AppState } from 'src/app/store/app.state';
+import { Store } from '@ngrx/store';
 
 @Component({
   selector: 'app-register',
@@ -18,7 +19,8 @@ import { AuthService } from '../services/auth.service';
   ],
 })
 export class RegisterPage {
-   maxDate = new Date().toISOString();
+  private destroyRef = inject(DestroyRef);
+  maxDate = new Date().toISOString();
   registerForm: FormGroup;
   selectedGender: string = 'male';
   showPassword = false;
@@ -30,51 +32,87 @@ export class RegisterPage {
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
-    private authService: AuthService
+    private authService: AuthService,
+    private store: Store<AppState>
   ) {
     this.registerForm = this.createForm();
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || 'login';
+
+    this.store.select(state => state.auth).subscribe(authState => {
+      this.isLoading = authState.loading;
+      this.registerError = authState.error ?? '';
+      if (authState.user) {
+        this.router.navigate(['/login']);
+      }
+    });
+
+    // this.store.select(selectAuthState)
+    //   .pipe(takeUntilDestroyed(this.destroyRef))
+    //   .subscribe(authState => {
+    //     this.isLoading = authState.loading;
+    //     this.registerError = authState.error ?? '';
+    //     if (authState.user) {
+    //       this.router.navigate(['/login']);
+    //     }
+    //   });
   }
 
   private createForm(): FormGroup {
     return this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      username: ['', [Validators.required, Validators.minLength(3)]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      phoneNumber: ['', [Validators.required, Validators.pattern(/^[0-9+\-\s()]{8,20}$/)]],
+      firstName: ['Epl', Validators.required],
+      lastName: ['EPL', Validators.required],
+      email: ['dr@epl', [Validators.required, Validators.email]],
+      username: ['Epl', [Validators.required, Validators.minLength(3)]],
+      password: ['password', [Validators.required, Validators.minLength(6)]],
+      phoneNumber: ['12345678', [Validators.required, Validators.pattern(/^[0-9+\-\s()]{8,20}$/)]],
       gender: ['male', Validators.required],
-      dateOfBirth: ['', Validators.required],
-      nationality: ['', Validators.required],
-      country: ['', Validators.required],
-      region: ['', Validators.required],
-      department: [''],
-      address: ['']
+      dateOfBirth: ['1990-01-01', Validators.required],
+      nationality: ['American', Validators.required],
+      country: ['USA', Validators.required],
+      region: ['California', Validators.required],
+      department: ['Engineering'],
+      address: ['123 Main St']
     });
   }
 
-  register() {
-    if (this.registerForm.valid) {
-      this.isLoading = true;
-      this.registerError = "";
+  // register() {
+  //   if (this.registerForm.valid) {
+  //     this.isLoading = true;
+  //     this.registerError = "";
 
-      const formData = this.prepareFormData();
+  //     const formData = this.prepareFormData();
 
-      this.authService.register(formData)
-        .pipe(finalize(() => this.isLoading = false))
-        .subscribe({
-          next: (result) => this.handleRegistrationResult(result),
-          error: (error) => this.handleRegistrationError(error)
-        });
-    } else {
-      this.markFormAsTouched();
-    }
+  //     this.authService.register(formData)
+  //       .pipe(finalize(() => this.isLoading = false))
+  //       .subscribe({
+  //         next: (result) => this.handleRegistrationResult(result),
+  //         error: (error) => this.handleRegistrationError(error)
+  //       });
+  //   } else {
+  //     this.markFormAsTouched();
+  //   }
+  // }
+
+
+ register() {
+  if (this.registerForm.valid) {
+    const formData = this.prepareFormData();
+    console.log("Form data:", formData);
+    
+    // Dispatcher l'action sans subscription directe
+    this.authService.register(formData);
+    
+    // L'état sera mis à jour via le store et la subscription dans le constructor
+  } else {
+    this.markFormAsTouched();
   }
+}
+
 
   private prepareFormData(): any {
     return {
       ...this.registerForm.value,
+      userIdKeycloak: "",
       location: {
         nationality: this.registerForm.value.nationality,
         country: this.registerForm.value.country,
@@ -85,14 +123,6 @@ export class RegisterPage {
     };
   }
 
-  private handleRegistrationResult(result: any): void {
-    if (result.success) {
-      this.router.navigate(['/login']);
-    } else {
-      this.registerError = result.message || "Erreur lors de l'inscription";
-    }
-  }
-
   // private autoLoginAfterRegistration(): void {
   //   const { email, password } = this.registerForm.value;
   //   this.authService.login(email, password).subscribe(loginResult => {
@@ -100,11 +130,6 @@ export class RegisterPage {
   //     this.router.navigate([redirectUrl]);
   //   });
   // }
-
-  private handleRegistrationError(error: any): void {
-    console.error("Erreur d'inscription", error);
-    this.registerError = "Une erreur est survenue lors de l'inscription";
-  }
 
   private markFormAsTouched(): void {
     Object.keys(this.registerForm.controls).forEach(key => {
@@ -128,8 +153,8 @@ export class RegisterPage {
   }
 
   getInputClass(fieldName: string): string {
-    return this.isFieldInvalid(fieldName) 
-      ? 'border-b border-red-500' 
+    return this.isFieldInvalid(fieldName)
+      ? 'border-b border-red-500'
       : 'border-b border-white focus:border-light-green';
   }
 
@@ -141,7 +166,7 @@ export class RegisterPage {
     if (field.errors['email']) return 'Email invalide';
     if (field.errors['minlength']) return `Minimum ${field.errors['minlength'].requiredLength} caractères`;
     if (field.errors['pattern']) return 'Format invalide';
-    
+
     return '';
   }
 

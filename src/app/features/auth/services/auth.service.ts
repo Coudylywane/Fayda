@@ -1,7 +1,10 @@
 import { Injectable } from "@angular/core"
 import { BehaviorSubject, type Observable, of } from "rxjs"
-import { delay, tap } from "rxjs/operators"
-import { User } from "../models/user.model"
+import { Store } from '@ngrx/store';
+import axios from 'axios';
+import * as AuthActions from '../store/auth.actions';
+import { Actions } from '@ngrx/effects';
+import { selectCurrentUser } from "../store/auth.selectors";
 
 @Injectable({
   providedIn: "root",
@@ -10,47 +13,27 @@ export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken())
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable()
 
-  constructor() { }
-
-  register(userData: User): Observable<{ success: boolean, message?: string }> {
-    return of({
-      success: true,
-      message: 'Inscription réussie'
-    }).pipe(
-      delay(1000),
-      tap(response => {
-        if (response.success) {
-          // Simulation de stockage
-          console.log('User registered:', userData);
-        }
-      })
-    );
+  constructor(private store: Store) {
+    // Écouter les changements d'état d'authentification
+    this.store.select(selectCurrentUser).subscribe(user => {
+      this.isAuthenticatedSubject.next(!!user);
+    });
   }
 
-  // Dans auth.service.ts
-  login(email: string, password: string): Observable<{ success: boolean, isAdmin?: boolean }> {
-    // Simulation d'authentification
-    const isAdmin = email === 'admin@at.sn' && password === 'password';
-    const isUser = email === 'user@at.sn' && password === 'password';
-
-    return of({
-      success: isAdmin || isUser,
-      isAdmin: isAdmin
-    }).pipe(
-      delay(1000),
-      tap(result => {
-        if (result.success) {
-          localStorage.setItem('auth_token', 'fake-jwt-token');
-          localStorage.setItem('is_admin', String(result.isAdmin)); // Stocker le statut admin
-          this.isAuthenticatedSubject.next(true);
-        }
-      })
-    );
+  // Les méthodes suivantes déclenchent les actions NgRx
+  login(email: string, password: string) {
+    this.store.dispatch(AuthActions.login({ email, password }));
   }
 
-  logout(): void {
-    localStorage.removeItem("auth_token")
-    this.isAuthenticatedSubject.next(false)
+  register(userData: any) {
+    this.store.dispatch(AuthActions.register({ userData }));
+  }
+
+  logout() {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('is_admin');
+    this.isAuthenticatedSubject.next(false);
+    this.store.dispatch(AuthActions.logout());
   }
 
   private hasToken(): boolean {

@@ -6,6 +6,8 @@ import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/store/app.state';
 
 @Component({
   selector: 'app-login',
@@ -26,6 +28,7 @@ export class LoginPage {
     private router: Router,
     private route: ActivatedRoute,
     private authService: AuthService,
+    private store: Store<AppState>
   ) {
     this.loginForm = this.fb.group({
       email: ["", [Validators.required, Validators.email]],
@@ -51,21 +54,21 @@ export class LoginPage {
 
       const { email, password } = this.loginForm.value
 
-      this.authService.login(email, password).pipe(finalize(() => this.isLoading = false)).subscribe({
-        next: (result) => {
-          if (result.success) {
-            // Redirection différente selon le type d'utilisateur
-            const redirectUrl = result.isAdmin ? 'admin/dashboard' : 'tabs/home';
-            this.router.navigate([redirectUrl]);
-          } else {
-            this.loginError = "Identifiant ou mot de passe incorrect";
-          }
-        },
-        error: (error) => {
-          console.error("Erreur de connexion", error);
-          this.loginError = "Une erreur est survenue lors de la connexion";
-        }
-      });
+      // this.authService.login(email, password).pipe(finalize(() => this.isLoading = false)).subscribe({
+      //   next: (result) => {
+      //     if (result.success) {
+      //       // Redirection différente selon le type d'utilisateur
+      //       const redirectUrl = result.isAdmin ? 'admin/dashboard' : 'tabs/home';
+      //       this.router.navigate([redirectUrl]);
+      //     } else {
+      //       this.loginError = "Identifiant ou mot de passe incorrect";
+      //     }
+      //   },
+      //   error: (error) => {
+      //     console.error("Erreur de connexion", error);
+      //     this.loginError = "Une erreur est survenue lors de la connexion";
+      //   }
+      // });
     } else {
       // Marquer tous les champs comme touchés pour afficher les erreurs
       Object.keys(this.loginForm.controls).forEach((key) => {

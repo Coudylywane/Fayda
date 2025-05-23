@@ -28,7 +28,7 @@
       </div>
 
       <!-- Formulaire -->
-      <form [formGroup]="registerForm" novalidate>
+      <form [formGroup]="registerForm" novalidate (ngSubmit)="register()">
         <div class="space-y-4">
           <!-- Prénom -->
           <div class="mb-4">
@@ -263,8 +263,7 @@
         <!-- Bouton de soumission -->
         <div class="flex flex-col items-center mt-8 space-y-4">
           <button 
-            type="button" 
-            (click)="register()"
+            type="submit" 
             [disabled]="registerForm.invalid || isLoading"
             class="w-14 h-14 mx-auto rounded-full bg-primary enabled:hover:bg-yellow-400 text-gray-900 shadow-lg flex items-center justify-center transition-transform hover:scale-105
             disabled:opacity-50 disabled:cursor-not-allowed">
@@ -275,7 +274,7 @@
             </ion-icon>
           </button>
           
-          <div *ngIf="registerError" class="text-red-300 text-center mt-2">
+          <div *ngIf="registerError" class="bg-red-500/10 border border-red-500/80 text-red-300 p-3 rounded mb-6 text-sm">
             {{ registerError }}
           </div>
           

@@ -4,7 +4,7 @@
 * @copyright 2025
 */
 
-import { NgModule } from '@angular/core';
+import { provideAppInitializer, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
@@ -12,11 +12,12 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
-import { themeReducer } from './store/theme.reducer';
 import { IonicStorageModule } from '@ionic/storage-angular';
-import { provideHttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { EffectsModule } from '@ngrx/effects';
+import { authReducer } from './features/auth/store/auth.reducer';
+import { AuthEffects } from './features/auth/store/auth.effects';
+import { axiosInitializer } from './store/axios-initializer';
 
 @NgModule({
   declarations: [AppComponent],
@@ -26,14 +27,15 @@ import { EffectsModule } from '@ngrx/effects';
     AppRoutingModule,
     SharedModule,
     FormsModule,
-    StoreModule.forRoot({ theme: themeReducer }),
+    StoreModule.forRoot({ auth: authReducer }),
     IonicStorageModule.forRoot(),
-    EffectsModule.forRoot([]),
+    EffectsModule.forRoot([AuthEffects]),
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    provideHttpClient(),
+    provideAppInitializer(axiosInitializer()),
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+}

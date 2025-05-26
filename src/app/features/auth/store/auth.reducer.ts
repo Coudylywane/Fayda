@@ -4,14 +4,15 @@ import { initialState } from './auth.state';
 
 export const authReducer = createReducer(
     initialState,
-    on(AuthActions.login, AuthActions.register, (state) => ({
+    on(AuthActions.login, AuthActions.register, AuthActions.loadUserFromToken, (state) => ({
         ...state,
         loading: true,
         error: null
     })),
-    on(AuthActions.loginSuccess, (state, { token }) => ({
+    on(AuthActions.loginSuccess, (state, { token, user }) => ({
         ...state,
         token,
+        user,
         loading: false
     })),
     on(AuthActions.registerSuccess, (state, { user }) => ({
@@ -19,7 +20,7 @@ export const authReducer = createReducer(
         user,
         loading: false
     })),
-    on(AuthActions.loginFailure, AuthActions.registerFailure, (state, { error }) => ({
+    on(AuthActions.loginFailure, AuthActions.registerFailure, AuthActions.loadUserFromTokenFailure,(state, { error }) => ({
         ...state,
         error,
         loading: false
@@ -35,5 +36,12 @@ export const authReducer = createReducer(
         ...state,
         error,
         loading: false
-    }))
+    })),
+    on(AuthActions.loadUserFromTokenSuccess, (state, { token, user }) => ({
+        ...state,
+        // token,
+        user,
+        loading: false,
+        error: null
+    })),
 );

@@ -1,9 +1,7 @@
 import { Injectable } from "@angular/core"
 import { BehaviorSubject, type Observable, of } from "rxjs"
 import { Store } from '@ngrx/store';
-import axios from 'axios';
 import * as AuthActions from '../store/auth.actions';
-import { Actions } from '@ngrx/effects';
 import { selectCurrentUser } from "../store/auth.selectors";
 import { Login, Register } from "../models/auth.model";
 
@@ -14,12 +12,29 @@ export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken())
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable()
 
-  constructor(private store: Store) {
+constructor(private store: Store, ) {
     // Écouter les changements d'état d'authentification
     this.store.select(selectCurrentUser).subscribe(user => {
-      this.isAuthenticatedSubject.next(!!user);
+      this.isAuthenticatedSubject.next(!!user?.active);
     });
+
+    //Charger automatiquement l'utilisateur si un token existe
+    // this.initializeAuthState();
   }
+
+  // Initialiser l'état d'authentification
+  private initializeAuthState(): void {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      console.log('Token trouvé au démarrage, chargement des informations utilisateur...');
+      this.store.dispatch(AuthActions.loadUserFromToken());
+    }
+  }
+
+  setAuthenticatedState(isAuthenticated: boolean): void {
+    this.isAuthenticatedSubject.next(isAuthenticated);
+  }
+
 
   // Les méthodes suivantes déclenchent les actions NgRx
   login(login: Login) {
@@ -31,8 +46,6 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('is_admin');
     this.isAuthenticatedSubject.next(false);
     this.store.dispatch(AuthActions.logout());
   }
@@ -42,7 +55,12 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return this.hasToken()
+    if (!this.hasToken()) {
+      this.isAuthenticatedSubject.next(false);
+      return false;
+    }
+    
+    return this.hasToken();
   }
 
   isAdmin(): boolean {

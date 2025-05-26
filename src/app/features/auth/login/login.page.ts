@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, Subject, Subscription, takeUntil } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/store/app.state';
@@ -25,6 +25,7 @@ export class LoginPage {
   loginError = ""
   isLoading = false
   returnUrl: string
+  private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
@@ -35,30 +36,34 @@ export class LoginPage {
     private confettiService: ConfettiService,
   ) {
     this.loginForm = this.fb.group({
-      username: ["Epl", [Validators.required, Validators.minLength(3)]],
-      password: ["password", [Validators.required, Validators.minLength(6)]],
+      username: ["dolnick", [Validators.required, Validators.minLength(3)]],
+      password: ["user123", [Validators.required, Validators.minLength(4)]],
     })
 
     // Récupérer l'URL de retour des paramètres de requête ou définir la valeur par défaut
     this.returnUrl = this.route.snapshot.queryParams["returnUrl"] || "register"
 
     // Rediriger si déjà connecté
-    if (this.authService.isLoggedIn()) {
-      const redirectUrl = this.authService.isAdmin()
-        ? '/admin/dashboard'
-        : 'tabs/home';
-      this.router.navigate([redirectUrl]);
-    }
-    this.store.select(selectAuthState).subscribe(authState => {
-          this.isLoading = authState.loading;
-          this.loginError = authState.error ?? '';
-          console.log("Auth state:", authState);
-          
-          if (authState.token?.access_token) {
-            this.confettiService.triggerConfetti();
-            this.router.navigate(['tabs/home']);
-          }
-        });
+    // if (this.authService.isLoggedIn()) {
+    //   const redirectUrl = 'tabs/home';
+    //   this.router.navigate([redirectUrl]);
+    // }
+
+    this.store.select(selectAuthState).pipe(takeUntil(this.destroy$)).subscribe(authState => {
+      this.isLoading = authState.loading;
+      this.loginError = authState.error ?? '';
+      console.log("Auth state:", authState);
+      const isAuthenticated = !!authState.user && authState.user.active === true;
+      this.authService.setAuthenticatedState(isAuthenticated);
+
+      if (isAuthenticated) {
+        this.confettiService.triggerConfetti();
+        this.router.navigate(['tabs/home']);
+        console.log("Redirection vers la page d'accueil", isAuthenticated);
+      }else{
+        this.router.navigate(['login']);
+      }
+    });
   }
 
   login() {
@@ -88,5 +93,10 @@ export class LoginPage {
     Object.keys(this.loginForm.controls).forEach(key => {
       this.loginForm.get(key)?.markAsTouched();
     });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

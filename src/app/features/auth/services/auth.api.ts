@@ -13,4 +13,8 @@ export class AuthApi {
     static logout() {
         return axios.post('auth/logout');
     }
+
+    static getUserInfo(id: string) {
+        return axios.get(`users/keycloak/${id}`);
+    }
 }

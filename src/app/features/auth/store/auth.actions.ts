@@ -9,7 +9,7 @@ export const login = createAction(
 
 export const loginSuccess = createAction(
   '[Auth] Login Success',
-  props<{ token: Token }>()
+  props<{ token: Token, user: User }>()
 );
 
 export const loginFailure = createAction(
@@ -38,5 +38,19 @@ export const logoutSuccess = createAction('[Auth] Logout Success');
 
 export const logoutFailure = createAction(
   '[Auth] Logout Failure',
+  props<{ error: string }>()
+);
+
+export const loadUserFromToken = createAction(
+  '[Auth] Load User From Token'
+);
+
+export const loadUserFromTokenSuccess = createAction(
+  '[Auth] Load User From Token Success',
+  props<{ token: string, user: User }>()
+);
+
+export const loadUserFromTokenFailure = createAction(
+  '[Auth] Load User From Token Failure',
   props<{ error: string }>()
 );

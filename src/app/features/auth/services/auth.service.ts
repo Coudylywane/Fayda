@@ -3,7 +3,7 @@ import { BehaviorSubject, type Observable, of } from "rxjs"
 import { Store } from '@ngrx/store';
 import * as AuthActions from '../store/auth.actions';
 import { selectCurrentUser } from "../store/auth.selectors";
-import { Login, Register } from "../models/auth.model";
+import { Login, Register, Token } from "../models/auth.model";
 
 @Injectable({
   providedIn: "root",
@@ -24,7 +24,7 @@ constructor(private store: Store, ) {
 
   // Initialiser l'état d'authentification
   private initializeAuthState(): void {
-    const token = localStorage.getItem('auth_token');
+    const token: Token = JSON.parse(localStorage.getItem('auth_token') || '{}');
     if (token) {
       console.log('Token trouvé au démarrage, chargement des informations utilisateur...');
       this.store.dispatch(AuthActions.loadUserFromToken());
@@ -51,7 +51,7 @@ constructor(private store: Store, ) {
   }
 
   private hasToken(): boolean {
-    return !!localStorage.getItem("auth_token")
+    return !!JSON.parse(localStorage.getItem("auth_token") || '{}');
   }
 
   isLoggedIn(): boolean {

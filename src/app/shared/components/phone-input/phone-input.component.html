@@ -1,0 +1,43 @@
+<!-- phone-input.component.html -->
+<div class="relative flex items-center">
+  <!-- Sélecteur de pays -->
+  <div class="relative text-gray-800">
+    <div 
+      (click)="toggleCountrySelect()"
+      class="flex items-center cursor-pointer h-12 p-2 border border-gray-300 rounded-l-lg bg-white hover:bg-gray-50"
+    >
+      <img [src]="selectedCountry.flag" class="w-6 h-4 mr-2">
+      <span class="text-sm">{{ selectedCountry.dialCode }}</span>
+      <svg class="w-4 h-4 ml-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+      </svg>
+    </div>
+
+    <!-- Liste des pays -->
+    <div 
+      *ngIf="isCountrySelectOpen"
+      (appClickOutside)="close()"
+      class="absolute z-10 mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+    >
+      <div 
+        *ngFor="let country of countries"
+        (click)="$event.stopPropagation()"
+        class="flex items-center p-2 hover:bg-green-50 cursor-pointer"
+        [class.bg-green-100]="country.code === selectedCountry.code"
+      >
+        <img [src]="country.flag" class="w-6 h-4 mr-3">
+        <span class="text-sm flex-grow">{{ country.name }}</span>
+        <span class="text-sm text-gray-500">{{ country.dialCode }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Champ de saisie -->
+  <input
+    type="tel"
+    [(ngModel)]="phoneNumber"
+    (ngModelChange)="onPhoneNumberChange()"
+    [placeholder]="placeholder"
+    class="flex-grow p-2 border h-12 text-gray-800 border-gray-300 rounded-r-lg focus:border-green-500 focus:outline-none focus:ring-0 flex"
+  >
+</div>

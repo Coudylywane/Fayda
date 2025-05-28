@@ -47,10 +47,39 @@ export const loadUserFromToken = createAction(
 
 export const loadUserFromTokenSuccess = createAction(
   '[Auth] Load User From Token Success',
-  props<{ token: string, user: User }>()
+  props<{ token: Token, user: User }>()
 );
 
 export const loadUserFromTokenFailure = createAction(
   '[Auth] Load User From Token Failure',
   props<{ error: string }>()
+);
+
+// actions pour le refresh token
+export const refreshToken = createAction(
+  '[Auth] Refresh Token',
+  props<{ refreshToken: string }>()
+);
+
+export const refreshTokenSuccess = createAction(
+  '[Auth] Refresh Token Success',
+  props<{ token: Token }>()
+);
+
+export const refreshTokenFailure = createAction(
+  '[Auth] Refresh Token Failure',
+  props<{ error: string }>()
+);
+
+export const setToken = createAction(
+  '[Auth] Set Token',
+  props<{ token: Token }>()
+);
+
+export const checkTokenExpiration = createAction(
+  '[Auth] Check Token Expiration'
+);
+
+export const tokenExpired = createAction(
+  '[Auth] Token Expired'
 );

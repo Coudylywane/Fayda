@@ -6,11 +6,15 @@ export interface AuthState {
     loading: boolean;
     error: string | null;
     token: Token | null;
+    refreshing?: boolean;
+    isAuthenticated: boolean;
 }
 
 export const initialState: AuthState = {
-    user: null,
-    loading: false,
-    error: null,    
-    token: null
+  token: null,
+  user: null,
+  loading: false,
+  refreshing: undefined,
+  error: null,
+  isAuthenticated: false
 };

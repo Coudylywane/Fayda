@@ -9,14 +9,17 @@
 </ion-header>
 
 <ion-content class="bg-gray-100">
-  <div class="md:container md:mx-auto md:px-4">
+  <div class="md:container md:mx-auto md:px-4" *ngIf="user">
     <!-- Profile section -->
     <div class="flex flex-col items-center px-6 pb-6 pt-6 mb-3">
-      <div class="mb-2 h-20 w-20 overflow-hidden rounded-full border-4 border-white shadow-lg">
-        <img src="assets/images/1.png" alt="Baye Ahmadou NDIAYE" class="h-full w-full object-cover" />
+      <div class="mb-2 h-20 w-20 overflow-hidden rounded-full border-4 border-white shadow-lg bg-gray-200">
+        <!-- <img src="assets/images/1.png" alt="Baye Ahmadou NDIAYE" class="h-full w-full object-cover" /> -->
+         <div class="h-full w-full flex items-center justify-center text-2xl font-bold text-gray-700">
+           {{ getUserInitials() }}
+         </div>
       </div>
-      <h2 class="mt-2 text-center text-xl font-bold text-gray-900">Baye Ahmadou<br/>NDIAYE</h2>
-      <p class="text-center text-sm text-gray-600">Président Association Cheikh Al Islam</p>
+      <h2 class="mt-2 text-center text-xl font-bold text-gray-900">{{ getUserFullName() }}</h2>
+      <p class="text-center text-sm text-gray-600">{{ getUserEmail() }}</p>
     </div>
   
     <!-- Personal Information Section -->
@@ -26,22 +29,22 @@
       <div class="space-y-3">
         <div class="flex items-center">
           <ion-icon name="call" class="mr-3 text-gray-500 text-lg"></ion-icon>
-          <span class="text-sm text-gray-700">77 300 94 23</span>
+          <span class="text-sm text-gray-700">{{ user.phoneNumber}}</span>
         </div>
         
         <div class="flex items-center">
           <ion-icon name="mail" class="mr-3 text-gray-500 text-lg"></ion-icon>
-          <span class="text-sm text-gray-700">{{"bayeahmadou@gmail.com"}}</span>
+          <span class="text-sm text-gray-700">{{user.email}}</span>
         </div>
         
         <div class="flex items-center">
           <ion-icon name="home" class="mr-3 text-gray-500 text-lg"></ion-icon>
-          <span class="text-sm text-gray-700">86, Avenue Lamine Gueye</span>
+          <span class="text-sm text-gray-700">{{ user.location.address }}</span>
         </div>
         
         <div class="flex items-center">
           <ion-icon name="location" class="mr-3 text-gray-500 text-lg"></ion-icon>
-          <span class="text-sm text-gray-700">Dakar - Sénégal</span>
+          <span class="text-sm text-gray-700">{{ user.location.region }} - {{ user.location.country }}</span>
         </div>
       </div>
     </div>

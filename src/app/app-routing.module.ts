@@ -3,6 +3,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { LoginPage } from './features/auth/login/login.page';
 import { RegisterPage } from './features/auth/register/register.page';  // Importer le composant autonome RegisterPage
 import { AuthGuard } from './features/auth/guards/auth.guard';
+import { GuestGuard } from './features/auth/guards/guest.guard';
 
 const routes: Routes = [
   {
@@ -16,7 +17,8 @@ const routes: Routes = [
   },
   {
     path: 'register',
-    component: RegisterPage
+    component: RegisterPage,
+    canActivate: [GuestGuard]
   },
   {
     path: 'tabs',
@@ -29,7 +31,8 @@ const routes: Routes = [
   },
   {
     path: 'login',
-    component: LoginPage
+    component: LoginPage,
+    canActivate: [GuestGuard] // Utiliser le guard GuestGuard pour empêcher l'accès aux utilisateurs connectés
   },
   {
     path: 'admin',

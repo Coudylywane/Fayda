@@ -6,6 +6,7 @@ import * as AuthActions from './auth.actions';
 import { AuthApi } from '../services/auth.api';
 import { jwtDecode } from "jwt-decode";
 import { User } from '../models/user.model';
+import { Token } from '../models/auth.model';
 
 @Injectable()
 export class AuthEffects {
@@ -16,24 +17,27 @@ login$ = createEffect(() =>
         ofType(AuthActions.login),
         mergeMap((action) =>
             from(AuthApi.login(action.login)).pipe(
-                mergeMap((response) => { // ✅ Utiliser mergeMap au lieu de map
-                    const token = response.data?.data?.access_token;
+                mergeMap((response) => {
+                    const token: Token = response.data?.data;
                     console.log('Login success:', response.data);
 
                     // Stocker le token après succès
                     if (token) {
-                        localStorage.setItem('auth_token', token);
+                        //Stocker le Json Web Token (JWT) dans le localStorage
+                        localStorage.setItem('auth_token', JSON.stringify(token));
                         console.log('Token:', token);
                         // ✅ Décodage du token pour extraire "sub"
-                        const decoded = jwtDecode(token);
+                        const decoded: any = jwtDecode(token.access_token);
                         const userId = decoded.sub;
+                        const roles =  decoded?.realm_access.roles;
 
-                        console.log('User ID (from token):', userId);
+                        console.log('Token decoded:', roles);
                         // 🔁 Appel API pour récupérer les détails de l'utilisateur
                         return from(AuthApi.getUserInfo(userId!)).pipe(
                             map((userDetailsResponse) => {
                                 const user = userDetailsResponse.data.data;
-                                return AuthActions.loginSuccess({ token: response.data.data, user });
+                                user.roles = roles; // Ajouter les rôles à l'utilisateur
+                                return AuthActions.loginSuccess({ token, user });
                             }),
                             catchError((error) => {
                                 console.error('Erreur lors de la récupération du profil utilisateur :', error);
@@ -98,15 +102,15 @@ login$ = createEffect(() =>
         this.actions$.pipe(
             ofType(AuthActions.loadUserFromToken),
             mergeMap(() => {
-                const token = localStorage.getItem('auth_token');
-                
+                const token: Token = JSON.parse(localStorage.getItem('auth_token') || '{}');
+
                 if (!token) {
                     return of(AuthActions.loadUserFromTokenFailure({ error: 'Aucun token trouvé' }));
                 }
 
                 try {
                     // Décoder le token pour vérifier sa validité et récupérer l'userId
-                    const decoded: any = jwtDecode(token);
+                    const decoded: any = jwtDecode(token.access_token);
                     const userId = decoded.sub;
                     const now = Date.now() / 1000;
 
@@ -114,7 +118,6 @@ login$ = createEffect(() =>
                     if (decoded.exp && decoded.exp < now) {
                         console.log('Token expiré');
                         localStorage.removeItem('auth_token');
-                        localStorage.removeItem('is_admin');
                         return of(AuthActions.loadUserFromTokenFailure({ error: 'Token expiré' }));
                     }
 

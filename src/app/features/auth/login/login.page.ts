@@ -11,13 +11,22 @@ import { AppState } from 'src/app/store/app.state';
 import { Login } from '../models/auth.model';
 import { selectAuthState } from '../store/auth.selectors';
 import { ConfettiService } from 'src/app/Admin/services/confetti.service';
+import { SelectorComponent } from "../../../shared/components/selector/selector.component";
+import { PhoneInputComponent } from 'src/app/shared/components/phone-input/phone-input.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
-  imports: [CommonModule, FormsModule, IonicModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, 
+    FormsModule, 
+    IonicModule, 
+    RouterModule, 
+    ReactiveFormsModule, 
+    SelectorComponent,
+    PhoneInputComponent,
+  ],
 })
 export class LoginPage {
   loginForm: FormGroup
@@ -26,6 +35,39 @@ export class LoginPage {
   isLoading = false
   returnUrl: string
   private destroy$ = new Subject<void>();
+
+    selectOptions = [
+    { 
+      value: 'fr', 
+      label: 'Français', 
+      flag: 'https://flagcdn.com/w20/fr.png',
+      badge: 'Recommandé'
+    },
+    { 
+      value: 'en', 
+      label: 'Anglais', 
+      icon: 'fas fa-language text-blue-500'
+    },
+    { 
+      value: 'es', 
+      label: 'Espagnol', 
+      flag: 'https://flagcdn.com/w20/es.png'
+    },
+    { 
+      value: 'de', 
+      label: 'Allemand', 
+      icon: 'fas fa-star text-yellow-500',
+      badge: 'Nouveau'
+    }
+  ];
+
+  selectedValue: any;
+  selectedCountry: any;
+
+  onSelectChange(value: any) {
+    this.selectedValue = value;
+    console.log('Valeur sélectionnée :', value);
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -66,10 +108,18 @@ export class LoginPage {
     });
   }
 
+    // Gestionnaire d'événement pour le changement de pays
+  onCountryChange(country: any) {
+    this.selectedCountry = country;
+    console.log('Pays changé :', country);
+    
+    // Vous pouvez aussi mettre à jour la logique de validation ici
+    // this.updatePhoneValidation();
+  }
+
+
   login() {
     if (this.loginForm.valid) {
-      console.log("Login form value:", this.loginForm.value);
-      // const { username, password } = this.loginForm.value
       this.authService.login(this.loginForm.value as Login);
     } else {
       // Marquer tous les champs comme touchés pour afficher les erreurs

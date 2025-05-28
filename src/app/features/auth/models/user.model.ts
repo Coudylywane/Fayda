@@ -40,7 +40,7 @@ export interface User {
 export interface LocationInfo {
     locationInfoId: string;
     address?: string;
-    city?: string;
+    region?: string;
     country?: string;
     nationality: string;
     postalCode?: string;

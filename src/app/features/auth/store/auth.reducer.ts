@@ -6,12 +6,13 @@ export const authReducer = createReducer(
     initialState,
     on(AuthActions.login, AuthActions.register, AuthActions.loadUserFromToken, (state) => ({
         ...state,
-        loading: true,
+        loading: true,        
         error: null
     })),
     on(AuthActions.loginSuccess, (state, { token, user }) => ({
         ...state,
         token,
+        isAuthenticated: true,
         user,
         loading: false
     })),
@@ -20,9 +21,10 @@ export const authReducer = createReducer(
         user,
         loading: false
     })),
-    on(AuthActions.loginFailure, AuthActions.registerFailure, AuthActions.loadUserFromTokenFailure,(state, { error }) => ({
+    on(AuthActions.loginFailure, AuthActions.registerFailure, AuthActions.loadUserFromTokenFailure, (state, { error }) => ({
         ...state,
         error,
+        isAuthenticated: false,
         loading: false
     })),
     on(AuthActions.logout, (state) => ({
@@ -43,5 +45,42 @@ export const authReducer = createReducer(
         user,
         loading: false,
         error: null
+    })),
+    on(AuthActions.refreshToken, state => ({
+        ...state,
+        isRefreshing: true,
+        error: null
+    })),
+
+    on(AuthActions.refreshTokenSuccess, (state, { token }) => ({
+        ...state,
+        token,
+        isRefreshing: false,
+        isAuthenticated: true,
+        error: null
+    })),
+
+    on(AuthActions.refreshTokenFailure, (state, { error }) => ({
+        ...state,
+        isRefreshing: false,
+        error,
+        isAuthenticated: false,
+        token: null,
+        user: null
+    })),
+
+    // Set token action (utilisée par l'intercepteur)
+    on(AuthActions.setToken, (state, { token }) => ({
+        ...state,
+        token,
+        isAuthenticated: true
+    })),
+
+    // Token expiration
+    on(AuthActions.tokenExpired, state => ({
+        ...state,
+        isAuthenticated: false,
+        token: null,
+        user: null
     })),
 );

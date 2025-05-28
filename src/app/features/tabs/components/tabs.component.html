@@ -11,7 +11,7 @@
         <ion-icon name="home" class="text-2xl"></ion-icon>
         <span class="text-xs">Accueil</span>
       </a>
-      <a (click)="navigate('infos')" class="flex-1 flex flex-col items-center justify-center py-2"
+      <a (click)="navigate('infos')" class="flex-1 flex flex-col items-center justify-center py-2" *ngIf="hideVisisteurTab()"
         [class.opacity-100]="isActive('infos')" [class.opacity-60]="!isActive('infos')">
         <ion-icon name="information-circle" class="text-2xl"></ion-icon>
         <span class="text-xs">Infos</span>
@@ -26,7 +26,7 @@
         <ion-icon name="settings" class="text-2xl"></ion-icon>
         <span class="text-xs">Settings</span>
       </a> -->
-      <a (click)="navigate('finances')" 
+      <a (click)="navigate('finances')" *ngIf="hideVisisteurTab()"
            class="flex-1 flex flex-col items-center justify-center py-2"
            [class.opacity-100]="isActive('finances')"
            [class.opacity-60]="!isActive('finances')">

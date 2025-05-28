@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { TabsLayoutPage } from './tabs-layout.page';
+import { RoleGuard } from '../auth/guards/role.guard';
 
 const routes: Routes = [
   {
@@ -14,7 +15,8 @@ const routes: Routes = [
       },
       {
         path: 'infos',
-        loadChildren: () => import('../infos/infos.module').then(m => m.InfosPageModule)
+        loadChildren: () => import('../infos/infos.module').then(m => m.InfosPageModule),
+        canActivate: [RoleGuard]
       },
       {
         path: 'bibliotheque',
@@ -26,7 +28,8 @@ const routes: Routes = [
       },
       {
         path: 'finances',
-        loadChildren: () => import('../finances/finances.module').then( m => m.FinancesPageModule)
+        loadChildren: () => import('../finances/finances.module').then( m => m.FinancesPageModule),
+        canActivate: [RoleGuard]
       },
       {
         path: '',

@@ -56,10 +56,7 @@ export class TabsComponent implements OnInit {
     // Vérifier les roles de l'utilisateur est connecté si c'est un visiteur
     if (!this.user?.roles) {
       return true;
-    }
-
-    console.log(!this.user.roles.some((element: string) => element === 'FAYDA_ROLE_USER'));
-    
+    }    
 
     return !this.user.roles.some((element: string) => element === 'FAYDA_ROLE_USER');
   }

@@ -9,23 +9,27 @@ export const authReducer = createReducer(
         loading: true,        
         error: null
     })),
-    on(AuthActions.loginSuccess, (state, { token, user }) => ({
+    on(AuthActions.loginSuccess, (state, { token, user, isAdmin, message }) => ({
         ...state,
         token,
         isAuthenticated: true,
         user,
-        loading: false
+        loading: false,
+        isAdmin,
+        message
     })),
-    on(AuthActions.registerSuccess, (state, { user }) => ({
+    on(AuthActions.registerSuccess, (state, { user, message }) => ({
         ...state,
         user,
-        loading: false
+        loading: false,
+        message
     })),
     on(AuthActions.loginFailure, AuthActions.registerFailure, AuthActions.loadUserFromTokenFailure, (state, { error }) => ({
         ...state,
         error,
         isAuthenticated: false,
-        loading: false
+        loading: false,
+        message: null
     })),
     on(AuthActions.logout, (state) => ({
         ...state,

@@ -8,6 +8,8 @@ export interface AuthState {
     token: Token | null;
     refreshing?: boolean;
     isAuthenticated: boolean;
+    isAdmin: boolean;
+    message: string | null;
 }
 
 export const initialState: AuthState = {
@@ -16,5 +18,7 @@ export const initialState: AuthState = {
   loading: false,
   refreshing: undefined,
   error: null,
-  isAuthenticated: false
+  isAuthenticated: false,
+  isAdmin: false,
+  message: null
 };

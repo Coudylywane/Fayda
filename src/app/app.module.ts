@@ -18,6 +18,8 @@ import { EffectsModule } from '@ngrx/effects';
 import { authReducer } from './features/auth/store/auth.reducer';
 import { AuthEffects } from './features/auth/store/auth.effects';
 import { axiosInitializer } from './store/axios-initializer';
+import { ToastComponent } from './shared/components/toast/toast.component';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [AppComponent],
@@ -30,10 +32,12 @@ import { axiosInitializer } from './store/axios-initializer';
     StoreModule.forRoot({ auth: authReducer }),
     IonicStorageModule.forRoot(),
     EffectsModule.forRoot([AuthEffects]),
+    ToastComponent
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideAppInitializer(axiosInitializer()),
+    provideAnimations()
   ],
   bootstrap: [AppComponent],
 })

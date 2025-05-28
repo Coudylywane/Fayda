@@ -12,52 +12,54 @@ import { Token } from '../models/auth.model';
 export class AuthEffects {
     constructor(private actions$: Actions) { }
 
-login$ = createEffect(() =>
-    this.actions$.pipe(
-        ofType(AuthActions.login),
-        mergeMap((action) =>
-            from(AuthApi.login(action.login)).pipe(
-                mergeMap((response) => {
-                    const token: Token = response.data?.data;
-                    console.log('Login success:', response.data);
+    login$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(AuthActions.login),
+            mergeMap((action) =>
+                from(AuthApi.login(action.login)).pipe(
+                    mergeMap((response) => {
+                        const token: Token = response.data?.data;
+                        console.log('Login success:', response.data);
 
-                    // Stocker le token après succès
-                    if (token) {
-                        //Stocker le Json Web Token (JWT) dans le localStorage
-                        localStorage.setItem('auth_token', JSON.stringify(token));
-                        console.log('Token:', token);
-                        // ✅ Décodage du token pour extraire "sub"
-                        const decoded: any = jwtDecode(token.access_token);
-                        const userId = decoded.sub;
-                        const roles =  decoded?.realm_access.roles;
+                        // Stocker le token après succès
+                        if (token) {
+                            //Stocker le Json Web Token (JWT) dans le localStorage
+                            localStorage.setItem('auth_token', JSON.stringify(token));
+                            console.log('Token:', token);
+                            // ✅ Décodage du token pour extraire "sub"
+                            const decoded: any = jwtDecode(token.access_token);
+                            const userId = decoded.sub;
+                            const roles = decoded?.realm_access.roles;
 
-                        console.log('Token decoded:', roles);
-                        // 🔁 Appel API pour récupérer les détails de l'utilisateur
-                        return from(AuthApi.getUserInfo(userId!)).pipe(
-                            map((userDetailsResponse) => {
-                                const user = userDetailsResponse.data.data;
-                                user.roles = roles; // Ajouter les rôles à l'utilisateur
-                                return AuthActions.loginSuccess({ token, user });
-                            }),
-                            catchError((error) => {
-                                console.error('Erreur lors de la récupération du profil utilisateur :', error);
-                                const errorMessage = error.response?.data?.message || 'Erreur lors de la récupération des informations utilisateur';
-                                return of(AuthActions.loginFailure({ error: errorMessage }));
-                            })
-                        );
-                    }
-                    // En cas d'absence de token
-                    return of(AuthActions.loginFailure({ error: 'Token manquant après la connexion' }));
-                }),
-                catchError((error) => {
-                    console.error('Login error:', error);
-                    const errorMessage = error.response?.data?.message || error.message || 'Erreur de connexion';
-                    return of(AuthActions.loginFailure({ error: errorMessage }));
-                })
+                            console.log('Token decoded:', roles);
+                            // 🔁 Appel API pour récupérer les détails de l'utilisateur
+                            return from(AuthApi.getUserInfo(userId!)).pipe(
+                                map((userDetailsResponse) => {
+                                    const user: User = userDetailsResponse.data.data;
+                                    user.roles = roles; // Ajouter les rôles à l'utilisateur
+                                    const isAdmin: boolean = user.roles!.includes('FAYDA_ROLE_ADMIN');
+                                    const messageLogin = isAdmin ? 'Connexion réussie en tant qu\'administrateur' : 'Connexion réussie en tant qu\'utilisateur';
+                                    return AuthActions.loginSuccess({ token, user, isAdmin, message: messageLogin });
+                                }),
+                                catchError((error) => {
+                                    console.error('Erreur lors de la récupération du profil utilisateur :', error);
+                                    const errorMessage = error.response?.data?.message || 'Erreur lors de la récupération des informations utilisateur';
+                                    return of(AuthActions.loginFailure({ error: errorMessage }));
+                                })
+                            );
+                        }
+                        // En cas d'absence de token
+                        return of(AuthActions.loginFailure({ error: 'Token manquant après la connexion' }));
+                    }),
+                    catchError((error) => {
+                        console.error('Login error:', error);
+                        const errorMessage = error.response?.data?.message || error.message || 'Erreur de connexion';
+                        return of(AuthActions.loginFailure({ error: errorMessage }));
+                    })
+                )
             )
         )
-    )
-);
+    );
 
     register$ = createEffect(() =>
         this.actions$.pipe(
@@ -66,8 +68,8 @@ login$ = createEffect(() =>
                 from(AuthApi.register(action.userData)).pipe(
                     map((response) => {
                         console.log('Registration success:', response.data);
-
-                        return AuthActions.registerSuccess({ user: response.data.data });
+                        const messageCreate = response.data.message || 'Inscription réussie';
+                        return AuthActions.registerSuccess({ user: response.data.data, message: messageCreate });
                     }),
                     catchError((error) => {
                         console.error('Registration error:', error);
@@ -96,7 +98,7 @@ login$ = createEffect(() =>
             )
         )
     );
-    
+
     // pour charger l'utilisateur depuis le token existant
     loadUserFromToken$ = createEffect(() =>
         this.actions$.pipe(
@@ -122,7 +124,7 @@ login$ = createEffect(() =>
                     }
 
                     console.log('Chargement des informations utilisateur depuis le token existant...');
-                    
+
                     // Récupérer les informations de l'utilisateur
                     return from(AuthApi.getUserInfo(userId)).pipe(
                         map((userDetailsResponse) => {

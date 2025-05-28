@@ -9,7 +9,7 @@ export const login = createAction(
 
 export const loginSuccess = createAction(
   '[Auth] Login Success',
-  props<{ token: Token, user: User }>()
+  props<{ token: Token, user: User, isAdmin: boolean, message: string }>()
 );
 
 export const loginFailure = createAction(
@@ -24,7 +24,7 @@ export const register = createAction(
 
 export const registerSuccess = createAction(
   '[Auth] Register Success',
-  props<{ user: User }>()
+  props<{ user: User, message: string }>()
 );
 
 export const registerFailure = createAction(

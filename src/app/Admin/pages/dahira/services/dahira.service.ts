@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { Dahira, DahiraMember, MemberRole } from '../models/dahira.model';
@@ -22,7 +21,7 @@ export class DahiraService {
     updatedAt: new Date()
   }));
 
-  constructor(private http: HttpClient) {
+  constructor() {
     // Initialiser avec les données mockées
     this.dahirasSubject.next(this.mockDahiras);
   }

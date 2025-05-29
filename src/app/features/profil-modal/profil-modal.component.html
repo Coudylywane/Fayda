@@ -96,7 +96,7 @@
       <!-- <ion-button expand="block" shape="round" fill="outline" color="danger" class="font-medium">
         SE DÉCONNECTER
       </ion-button> -->
-      <app-button fontWeight="normal" text="SE DÉCONNECTER" size="md" radius="md" iconEnd="log-out" variant="light" color="danger" width="full" (buttonClick)="logout()">
+      <app-button [isLoading]="isLoading" fontWeight="normal" text="SE DÉCONNECTER" size="md" radius="md" iconEnd="log-out" variant="light" color="danger" width="full" (buttonClick)="logout()">
       </app-button>
     </div>
   </div>

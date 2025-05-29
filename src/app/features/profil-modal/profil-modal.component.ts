@@ -9,8 +9,10 @@ import { Router } from '@angular/router';
 import { AppState } from 'src/app/store/app.state';
 import { Store } from '@ngrx/store';
 import { selectAuthState, selectCurrentUser } from '../auth/store/auth.selectors';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { User } from '../auth/models/user.model';
+import { ToastService } from 'src/app/shared/components/toast/toast.service';
+import { ConfettiService } from 'src/app/Admin/services/confetti.service';
 
 @Component({
   selector: 'app-profil-modal',
@@ -19,11 +21,14 @@ import { User } from '../auth/models/user.model';
   imports: [IonicModule, CommonModule, IconButtonComponent, ButtonComponent],
 })
 export class ProfilModalComponent implements OnInit, OnDestroy {
-  
+
   // Observable pour les données utilisateur
-  user$: Observable<User | null>;
   user: User | null = null;
-  
+  logoutAttempted = false;
+  logoutError: string = '';
+  isLoading = false;
+
+
   // Subject pour gérer la désinscription
   private destroy$ = new Subject<void>();
 
@@ -33,18 +38,38 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private store: Store<AppState>,
-  ) { 
-    // Récupérer l'observable des données utilisateur
-    this.user$ = this.store.select(selectCurrentUser);
+    private confettiService: ConfettiService,
+    private toast: ToastService
+  ) {
   }
 
   ngOnInit(): void {
+    this.store.select(selectAuthState).pipe(
+      takeUntil(this.destroy$),
+    ).subscribe(authState => {
+      this.isLoading = authState.loading;
+    });
+
+
     // S'abonner aux données utilisateur
-    this.user$.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(user => {
-      this.user = user;
-      console.log('Données utilisateur:', user);
+    this.store.select(selectAuthState).pipe(
+      takeUntil(this.destroy$),
+      filter(authState => !authState.loading)
+    ).subscribe(authState => {
+      this.logoutError = authState.error ?? '';
+      this.user = authState.user;
+
+      if (this.logoutAttempted && !authState.isAuthenticated) {
+        this.dismiss();
+        // this.confettiService.triggerConfetti();
+        this.toast.showSuccess('Vous êtes déconnecté');
+        this.router.navigate(['/login']);
+      }else if (this.logoutAttempted && this.logoutError) {
+        this.toast.showError(this.logoutError);
+        this.logoutAttempted = false;
+      }
+      console.log('Données utilisateur:', authState.user);
+
     });
   }
 
@@ -66,7 +91,7 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
   }
 
   openActivities() {
-    console.log('Ouverture des activités'); 
+    console.log('Ouverture des activités');
     // Implémentation pour ouvrir les activités
   }
 
@@ -77,32 +102,28 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
 
   async logout() {
     await this.authService.logout();
-    
-    // Utiliser takeUntil pour éviter les fuites mémoire
-    if (!this.user) {
-      console.log('Déconnexion réussie');
-      this.router.navigate(['/login']);
-    }
 
-    this.dismiss();
+    this.logoutAttempted = true;
+    console.log('Déconnexion réussie');
+    // this.dismiss();
   }
 
   // Méthodes utilitaires pour le template
   getUserInitials(): string {
     if (!this.user) return '';
-    
-    const firstName = this.user.firstName ||  '';
+
+    const firstName = this.user.firstName || '';
     const lastName = this.user.lastName || '';
-    
+
     return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
   }
 
   getUserFullName(): string {
     if (!this.user) return 'Utilisateur';
-    
+
     const firstName = this.user.firstName || '';
     const lastName = this.user.lastName || '';
-    
+
     return `${firstName} ${lastName}`.trim() || this.user.username || 'Utilisateur';
   }
 

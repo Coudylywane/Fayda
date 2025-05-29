@@ -43,11 +43,11 @@ export class ToastComponent implements OnInit, OnDestroy {
   getToastClasses(type: string): string {
     switch(type) {
       case 'success':
-        return 'bg-white border-l-4 border-emerald-700 text-green-500';
+        return 'bg-white border-l-4 border-green-500 text-green-500';
       case 'warning':
         return 'bg-white border-l-4 border-amber-500 text-amber-500';
       case 'error':
-        return 'bg-white border-l-4 border-red-600 text-red-600';
+        return 'bg-white border-l-4 border-red-600 text-red-500';
       default:
         return '';
     }
@@ -60,7 +60,7 @@ export class ToastComponent implements OnInit, OnDestroy {
       case 'warning':
         return 'bg-amber-500/20';
       case 'error':
-        return 'bg-red-600/20';
+        return 'bg-red-500/20';
       default:
         return '';
     }
@@ -80,7 +80,7 @@ export class ToastComponent implements OnInit, OnDestroy {
   }
 
   getCloseButtonClasses(): string {
-        return 'bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700';
+        return 'bg-red-100/80 text-red-300 hover:bg-red-200 hover:text-red-300';
   }
 
   removeToast(id: string) {

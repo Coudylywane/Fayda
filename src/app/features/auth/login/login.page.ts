@@ -110,8 +110,6 @@ export class LoginPage {
     ).subscribe(authState => {
       this.loginError = authState.error ?? '';
 
-      console.log("Auth state:", authState);
-
       // Gérer la redirection après une tentative de login
       if (this.loginAttempted) {
         if (authState.isAuthenticated) {
@@ -120,7 +118,7 @@ export class LoginPage {
           setTimeout(() => {
             this.confettiService.triggerConfetti();
             this.router.navigate([this.returnUrl]);
-          }, 1000); // 1 seconde Délai pour voir le toast et les confettis
+          }, 750); // 750 ms Délai pour voir le toast et les confettis
           console.log("Redirection vers:", this.returnUrl);
         } else if (!authState.isAuthenticated && authState.error) {
           // Échec de login

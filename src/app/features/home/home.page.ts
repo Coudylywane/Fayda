@@ -92,4 +92,8 @@ export class HomePage {
       });
       return await modal.present();
     }
+
+  navigateTo(url: string){
+    this.router.navigate([url]);
+  }
 }

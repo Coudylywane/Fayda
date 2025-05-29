@@ -20,6 +20,8 @@ import { AuthEffects } from './features/auth/store/auth.effects';
 import { axiosInitializer } from './store/axios-initializer';
 import { ToastComponent } from './shared/components/toast/toast.component';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { DahiraEffects } from './features/dahiras/store/dahira.effects';
+import { dahiraReducer } from './features/dahiras/store/dahira.reducers';
 
 @NgModule({
   declarations: [AppComponent],
@@ -29,9 +31,9 @@ import { provideAnimations } from '@angular/platform-browser/animations';
     AppRoutingModule,
     SharedModule,
     FormsModule,
-    StoreModule.forRoot({ auth: authReducer }),
+    StoreModule.forRoot({ auth: authReducer, dahira: dahiraReducer }),
     IonicStorageModule.forRoot(),
-    EffectsModule.forRoot([AuthEffects]),
+    EffectsModule.forRoot([AuthEffects, DahiraEffects]),
     ToastComponent
   ],
   providers: [

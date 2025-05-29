@@ -8,10 +8,14 @@ export const dahiraReducer = createReducer(
     ...state,
     loading: true
     })),
-  on(DahiraActions.loadDahirasSuccess, (state, { dahiras }) => ({
+  on(DahiraActions.loadDahirasSuccess, (state, { dahiras, currentPage, totalPages, size, totalElements  }) => ({
     ...state,
     loading: false,
-    dahiras
+    dahiras,
+    currentPage,
+    totalPages,
+    size,
+    totalElements
   })),
   on(DahiraActions.loadDahirasFailure, (state, { error }) => ({
     ...state,

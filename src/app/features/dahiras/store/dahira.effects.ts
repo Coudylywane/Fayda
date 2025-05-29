@@ -18,12 +18,13 @@ export class DahiraEffects {
                 from(DahiraApiService.getPaginatedDahiras(action.page, action.size)).pipe(
                     mergeMap((response) => {
                         console.log("resultat Dahiras: ", response.data.data);
+                        const {currentPage, totalElements, size, totalPages} = response.data.data;
 
-                        return of(DahiraActions.loadDahirasSuccess({ dahiras: response.data.data }));
+                        return of(DahiraActions.loadDahirasSuccess({ dahiras: response.data.data.content, currentPage, totalElements, size, totalPages }));
                     }),
                     catchError((error) => {
-                        console.error('Login error:', error);
                         const errorMessage = error.response?.data?.message || error.message || 'Erreur de récupération';
+                        console.error('Login error:', error);
                         return of(DahiraActions.loadDahirasFailure({ error: errorMessage }));
                     })
                 )

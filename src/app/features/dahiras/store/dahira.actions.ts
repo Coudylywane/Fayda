@@ -8,7 +8,7 @@ export const loadDahiras = createAction(
 
 export const loadDahirasSuccess = createAction(
   '[Dahira] Load Dahiras Success',
-  props<{ dahiras: Dahira[] }>()
+  props<{ dahiras: Dahira[]; size: number; totalPages: number; currentPage: number; totalElements: number }>()
 );
 
 export const loadDahirasFailure = createAction(

@@ -1,4 +1,7 @@
 <div class="h-full flex flex-col">
-  <router-outlet></router-outlet>
+  <div class="flex-1 pb-20">
+    <!-- Router outlet pour l'affichage des pages -->
+    <router-outlet></router-outlet>
+  </div>
   <app-tabs *ngIf="hideTabs"></app-tabs>
 </div>

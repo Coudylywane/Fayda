@@ -12,11 +12,6 @@ import { DahiraService } from './services/dahira.service';
   standalone: false
 })
 export class DahiraPage implements OnInit {
-
-  
-  startConfetti() {
-    this.confettiService.triggerConfetti();
-  }
   dahiras: Dahira[] = [];
   totalItems: number = 0;
   currentPage: number = 1;

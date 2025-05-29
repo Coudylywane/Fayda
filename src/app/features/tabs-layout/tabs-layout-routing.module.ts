@@ -28,8 +28,12 @@ const routes: Routes = [
       },
       {
         path: 'finances',
-        loadChildren: () => import('../finances/finances.module').then( m => m.FinancesPageModule),
+        loadChildren: () => import('../finances/finances.module').then(m => m.FinancesPageModule),
         canActivate: [RoleGuard]
+      },
+      {
+        path: 'dahiras',
+        loadChildren: () => import('../dahiras/dahiras.module').then(m => m.DahirasPageModule)
       },
       {
         path: '',
@@ -45,4 +49,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class TabsLayoutPageRoutingModule {}
+export class TabsLayoutPageRoutingModule { }

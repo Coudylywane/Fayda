@@ -1,3 +1,5 @@
+import { Dahira } from "../../dahiras/models/dahira.model";
+
 export interface User {
     userId: string,
     firstName: string,
@@ -19,23 +21,11 @@ export interface User {
     roles?: string[];
 }
 
-
-// export interface User {
-//   userId: string;
-//   firstName: string;
-//   lastName: string;
-//   email: string;
-//   userIdKeycloak: string;
-//   phoneNumber: string;
-//   gender: string;
-//   dateOfBirth: Date | string;
-//   locationInfo?: LocationInfo;
-//   dahira?: Dahira;
-//   mouqadam?: User;
-//   disciples?: User[];
-//   roles: string[];
-//   isActive: boolean;
-// }
+export enum UserRole {
+    DISCIPLE = 'DISCIPLE',
+    MOUKHADAM = 'MOUKHADAM',
+    RESPONSIBLE = 'RESPONSIBLE'
+}
 
 export interface LocationInfo {
     locationInfoId: string;
@@ -46,12 +36,4 @@ export interface LocationInfo {
     postalCode?: string;
     latitude?: number;
     longitude?: number;
-}
-
-
-export interface Dahira {
-    dahiraId: string;
-    name: string;
-    description?: string;
-    location?: string;
 }

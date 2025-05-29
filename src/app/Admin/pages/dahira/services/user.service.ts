@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { User } from '../models/user.model';
 
@@ -21,7 +20,7 @@ export class UserService {
     updatedAt: new Date()
   }));
 
-  constructor(private http: HttpClient) {}
+  constructor() {}
 
   // Obtenir tous les utilisateurs sans Dahira (pour l'ajout de membres)
   getUsersWithoutDahira(search: string = ''): Observable<User[]> {

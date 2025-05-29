@@ -12,7 +12,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'dahiras',
     pathMatch: 'full'
   },
   {
@@ -22,7 +22,7 @@ const routes: Routes = [
   },
   {
     path: 'tabs',
-    canActivate: [AuthGuard],
+    // canActivate: [AuthGuard],
     loadChildren: () => import('./features/tabs-layout/tabs-layout.module').then(m => m.TabsLayoutPageModule)
   },
   {
@@ -50,6 +50,7 @@ const routes: Routes = [
     path: 'admin-login',
     loadChildren: () => import('./Admin/pages/admin-login/admin-login.module').then( m => m.AdminLoginPageModule)
   },
+
 
 
  

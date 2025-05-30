@@ -65,7 +65,11 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
         this.toast.showSuccess('Vous êtes déconnecté');
         this.router.navigate(['/login']);
       }else if (this.logoutAttempted && this.logoutError) {
+        console.log('Déconnexion echec');
         this.toast.showError(this.logoutError);
+        this.logoutAttempted = false;
+      }else{
+        console.log('rien');
         this.logoutAttempted = false;
       }
       console.log('Données utilisateur:', authState.user);
@@ -104,7 +108,7 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
     await this.authService.logout();
 
     this.logoutAttempted = true;
-    console.log('Déconnexion réussie');
+    console.log('Déconnexion encours');
     // this.dismiss();
   }
 

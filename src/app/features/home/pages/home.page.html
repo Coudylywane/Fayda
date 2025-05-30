@@ -12,7 +12,7 @@
 
     <div class="md:container md:mx-auto px-2 pb-16 ">
       <!-- Search Bar Container -->
-      <div class="px-4 py-2 transition-all duration-500" [ngClass]="{'hidden': !searchExpanded}">
+      <div class="px-4 py-2 active:bg-white/30 transition-all duration-500" [ngClass]="{'hidden': !searchExpanded}">
         <div class="flex items-center bg-white rounded-full px-3 border border-gray-300">
           <ion-input placeholder="Rechercher" class="text-gray-800 custom-input " [(ngModel)]="searchQuery"></ion-input>
           <ion-button fill="clear" size="small" (click)="toggleSearch()" class="text-gray-500 p-0">
@@ -66,28 +66,51 @@
           </div>
 
           <!-- Category Buttons -->
-           <div class="relative">
-             <div
-               class="grid grid-cols-4 bg-black/90 text-white text-center rounded-lg my-2 text-xs max-w-lg mx-auto">
-               <div class="p-3 border-r border-white/20 flex flex-col items-center justify-between">
-                 <ion-icon name="bookmark-outline" class="text-lg mb-1"></ion-icon>
-                 <span class="!text-xs">Mes favoris</span>
-               </div>
-               <div class="p-3 border-r border-white/20 flex flex-col items-center justify-between">
-                 <ion-icon name="wallet-outline" class="text-lg mb-1"></ion-icon>
-                 <span class="!text-xs md text-md">Mes contributions</span>
-               </div>
-               <div class="p-3 border-r border-white/20 flex flex-col items-center justify-between" (click)="navigateTo('tabs/dahiras')">
-                 <ion-icon name="people-outline" class="text-lg mb-1"></ion-icon>
-                 <span class="!text-xs md text-md">Dahira</span>
-               </div>
-               <div class="p-3 flex flex-col items-center justify-between">
-                 <ion-icon name="book-outline" class="text-lg mb-1"></ion-icon>
-                 <span class="!text-xs md text-md">Mes ouvrages</span>
-               </div>
+          <div class="relative">
+            <div class="grid grid-cols-5 bg-black/90 text-white text-center rounded-lg my-2 text-xs max-w-lg mx-auto">
+              <!-- Favoris -->
+              <div
+                class="p-3 border-r border-white/20 flex flex-col items-center justify-between cursor-pointer hover:bg-white/10 active:bg-white/30 transition"
+                (click)="navigateTo('tabs/favoris')">
+                <ion-icon name="bookmark-outline" class="text-lg mb-1"></ion-icon>
+                <span class="!text-xs">Mes favoris</span>
               </div>
-              <hr class="absolute -bottom-[2px] right-0 left-0 h-1 rounded-sm max-w-[150px] md:max-w-[200px] mx-auto bg-yellow-500 border-0">
-           </div>
+
+              <!-- Contributions -->
+              <div
+                class="p-3 border-r border-white/20 flex flex-col items-center justify-between cursor-pointer hover:bg-white/10 active:bg-white/30 transition"
+                (click)="navigateTo('tabs/contributions')">
+                <ion-icon name="wallet-outline" class="text-lg mb-1"></ion-icon>
+                <span class="!text-xs md text-md">Mes contributions</span>
+              </div>
+
+              <!-- Profil -->
+              <div
+                class="p-3 border-r border-white/20 flex flex-col items-center justify-between cursor-pointer hover:bg-white/10 active:bg-white/30 transition"
+                (click)="navigateTo('tabs/profil')">
+                <ion-icon name="person-circle-outline" class="text-lg mb-1"></ion-icon>
+                <span class="!text-xs md text-md">Moukhadam</span>
+              </div>
+
+              <!-- Dahira -->
+              <div
+                class="p-3 border-r border-white/20 flex flex-col items-center justify-between cursor-pointer hover:bg-white/10 active:bg-white/30 transition"
+                (click)="navigateTo('tabs/dahiras')">
+                <ion-icon name="people-outline" class="text-lg mb-1"></ion-icon>
+                <span class="!text-xs md text-md">Dahira</span>
+              </div>
+
+              <!-- Ouvrages -->
+              <div class="p-3 flex flex-col items-center justify-between cursor-pointer hover:bg-white/10 active:bg-white/30 transition"
+                (click)="navigateTo('tabs/ouvrages')">
+                <ion-icon name="book-outline" class="text-lg mb-1"></ion-icon>
+                <span class="!text-xs md text-md">Mes ouvrages</span>
+              </div>
+            </div>
+
+            <hr
+              class="absolute -bottom-[2px] right-0 left-0 h-1 rounded-sm max-w-[150px] md:max-w-[200px] mx-auto bg-yellow-500 border-0">
+          </div>
         </div>
 
         <!-- Citations Section -->

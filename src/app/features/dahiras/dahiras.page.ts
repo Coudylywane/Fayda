@@ -14,7 +14,7 @@ import { ToastService } from 'src/app/shared/components/toast/toast.service';
   standalone: false
 })
 export class DahirasPage implements OnInit {
- // Données originales du serveur
+  // Données originales du serveur
   allDahiras: Dahira[] = [];
   // Données affichées (après filtrage)
   dahiras: Dahira[] = [];
@@ -35,7 +35,7 @@ export class DahirasPage implements OnInit {
 
   // Pour la recherche avec debounce
   private searchSubject = new Subject<string>();
-  
+
   // Pagination côté client
   filteredDahiras: Dahira[] = [];
   totalFilteredItems: number = 0;
@@ -44,7 +44,7 @@ export class DahirasPage implements OnInit {
     private dahiraService: DahiraService,
     private router: Router,
     private store: Store,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     console.log("Initialisation DahirasPage");
@@ -58,7 +58,7 @@ export class DahirasPage implements OnInit {
     ).subscribe(dahiraState => {
       this.loading = dahiraState.loading;
       this.error = dahiraState.error;
-      
+
       // Stocker toutes les données du serveur
       if (dahiraState.dahiras && dahiraState.dahiras.length > 0) {
         this.allDahiras = [...dahiraState.dahiras];
@@ -82,8 +82,6 @@ export class DahirasPage implements OnInit {
    * Charge toutes les dahiras du serveur
    */
   private loadAllDahiras(): void {
-    // Charger une grande quantité pour avoir toutes les données
-    // Vous pouvez ajuster cette valeur selon vos besoins
     this.dahiraService.getDahirasPagined(1, 12);
   }
 
@@ -96,7 +94,7 @@ export class DahirasPage implements OnInit {
     // Appliquer la recherche
     if (this.searchTerm && this.searchTerm.length > 0) {
       const searchLower = this.searchTerm.toLowerCase().trim();
-      filtered = filtered.filter(dahira => 
+      filtered = filtered.filter(dahira =>
         dahira.dahiraName.toLowerCase().includes(searchLower) ||
         dahira.email.toLowerCase().includes(searchLower) ||
         dahira.phoneNumber.includes(searchLower) ||
@@ -125,7 +123,7 @@ export class DahirasPage implements OnInit {
   private applyPagination(): void {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
-    
+
     this.dahiras = this.filteredDahiras.slice(startIndex, endIndex);
     this.totalItems = this.totalFilteredItems;
   }
@@ -138,7 +136,7 @@ export class DahirasPage implements OnInit {
 
     // Exemple de filtres (adaptez selon vos besoins)
     if (filters.region) {
-      filtered = filtered.filter(d => 
+      filtered = filtered.filter(d =>
         d.location?.region?.toLowerCase().includes(filters.region.toLowerCase())
       );
     }
@@ -223,21 +221,21 @@ export class DahirasPage implements OnInit {
     const totalPages = this.getTotalPages();
     const current = this.currentPage;
     const pages: number[] = [];
-    
+
     // Toujours afficher au maximum 5 pages
     const maxVisible = 5;
     let start = Math.max(1, current - Math.floor(maxVisible / 2));
     let end = Math.min(totalPages, start + maxVisible - 1);
-    
+
     // Ajuster le début si on est proche de la fin
     if (end - start + 1 < maxVisible) {
       start = Math.max(1, end - maxVisible + 1);
     }
-    
+
     for (let i = start; i <= end; i++) {
       pages.push(i);
     }
-    
+
     return pages;
   }
 
@@ -258,15 +256,8 @@ export class DahirasPage implements OnInit {
   /**
    * Navigue vers les détails d'un dahira
    */
-  viewDahiraDetails(dahira: Dahira): void {
-    this.router.navigate(['tabs/dahira/detail', dahira.dahiraId]);
-  }
-
-  /**
-   * Gère le clic sur une carte
-   */
   onCardClick(dahira: Dahira): void {
-    this.viewDahiraDetails(dahira);
+    this.router.navigate(['tabs/dahiras/detail', dahira.dahiraId]);
   }
 
   ngOnDestroy(): void {

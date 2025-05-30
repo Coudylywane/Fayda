@@ -2,49 +2,48 @@
 <ion-header class="ion-no-border">
   <ion-toolbar class="bg-gray-100" style="--background: #f3f4f6 !important">
     <ion-buttons slot="start">
-      <app-icon-button size="sm" fontSize="xl" radius="md"  icon="close" variant="transparent" color="danger" animation="pulse" width="md" (buttonClick)="dismiss()">
+      <app-icon-button size="sm" fontSize="xl" radius="md" icon="close" variant="transparent" color="danger" animation="pulse" width="md" (buttonClick)="dismiss()">
       </app-icon-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="bg-gray-100">
-  <div class="md:container md:mx-auto md:px-4" *ngIf="user">
+  <div class="md:container md:mx-auto md:px-4" *ngIf="user || true">
     <!-- Profile section -->
     <div class="flex flex-col items-center px-6 pb-6 pt-6 mb-3">
       <div class="mb-2 h-20 w-20 overflow-hidden rounded-full border-4 border-white shadow-lg bg-gray-200">
-        <!-- <img src="assets/images/1.png" alt="Baye Ahmadou NDIAYE" class="h-full w-full object-cover" /> -->
-         <div class="h-full w-full flex items-center justify-center text-2xl font-bold text-gray-700">
-           {{ getUserInitials() }}
-         </div>
+        <div class="h-full w-full flex items-center justify-center text-2xl font-bold text-gray-700">
+          {{ getUserInitials() }}
+        </div>
       </div>
       <h2 class="mt-2 text-center text-xl font-bold text-gray-900">{{ getUserFullName() }}</h2>
       <p class="text-center text-sm text-gray-600">{{ getUserEmail() }}</p>
     </div>
   
-    <!-- Personal Information Section -->
+    <!-- Personal Information Section (non cliquable) -->
     <div class="px-6 py-4 bg-white rounded-xl shadow-sm mx-3 mb-3">
       <h3 class="mb-3 text-sm font-bold text-gray-900">Informations personnelles</h3>
       
-      <div class="space-y-3">
-        <div class="flex items-center">
+      <div class="">
+        <div class="flex items-center p-2.5">
           <ion-icon name="call" class="mr-3 text-gray-500 text-lg"></ion-icon>
-          <span class="text-sm text-gray-700">{{ user.phoneNumber}}</span>
+          <span class="text-sm text-gray-700">{{ user?.phoneNumber}}</span>
         </div>
         
-        <div class="flex items-center">
+        <div class="flex items-center p-2.5">
           <ion-icon name="mail" class="mr-3 text-gray-500 text-lg"></ion-icon>
-          <span class="text-sm text-gray-700">{{user.email}}</span>
+          <span class="text-sm text-gray-700">{{user?.email}}</span>
         </div>
         
-        <div class="flex items-center">
+        <div class="flex items-center p-2.5">
           <ion-icon name="home" class="mr-3 text-gray-500 text-lg"></ion-icon>
-          <span class="text-sm text-gray-700">{{ user.location.address }}</span>
+          <span class="text-sm text-gray-700">{{ user?.location?.address }}</span>
         </div>
         
-        <div class="flex items-center">
+        <div class="flex items-center p-2.5">
           <ion-icon name="location" class="mr-3 text-gray-500 text-lg"></ion-icon>
-          <span class="text-sm text-gray-700">{{ user.location.region }} - {{ user.location.country }}</span>
+          <span class="text-sm text-gray-700">{{ user?.location?.region }} - {{ user?.location?.country }}</span>
         </div>
       </div>
     </div>
@@ -53,15 +52,37 @@
     <div class="px-6 py-4 bg-white rounded-xl shadow-sm mx-3 mb-3">
       <h3 class="mb-3 text-sm font-bold text-gray-900">Mon compte</h3>
       
-      <div class="space-y-3">
-        <div class="flex items-center">
+      <div class="">
+        <div class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="card" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Méthodes de paiement</span>
         </div>
         
-        <div class="flex items-center">
+        <div class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="pulse" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Activités</span>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Demande Section -->
+    <div class="px-6 py-4 bg-white rounded-xl shadow-sm mx-3 mb-3">
+      <h3 class="mb-3 text-sm font-bold text-gray-900">Demandes</h3>
+      
+      <div class="">
+        <div class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+          <ion-icon name="person" class="mr-3 text-gray-500 text-lg"></ion-icon>
+          <span class="text-sm text-gray-700">Devenir disciple</span>
+        </div>
+        
+        <div class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+          <ion-icon name="person-circle" class="mr-3 text-gray-500 text-lg"></ion-icon>
+          <span class="text-sm text-gray-700">Devenir Moukhadam</span>
+        </div>
+        
+        <div (click)="navigateTo('demandes')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+          <ion-icon name="receipt" class="mr-3 text-gray-500 text-lg"></ion-icon>
+          <span class="text-sm text-gray-700">Mes demandes</span>
         </div>
       </div>
     </div>
@@ -70,13 +91,13 @@
     <div class="px-6 py-4 bg-white rounded-xl shadow-sm mx-3 mb-3">
       <h3 class="mb-3 text-sm font-bold text-gray-900">Activités de la Faydah</h3>
       
-      <div class="space-y-3">
-        <div class="flex items-center">
+      <div class="">
+        <div class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="people" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Dahira Cheikh Al Islam</span>
         </div>
         
-        <div class="flex items-center">
+        <div class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="map" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Kaolack - Sénégal</span>
         </div>
@@ -85,17 +106,11 @@
   
     <!-- Password and Logout buttons -->
     <div class="px-6 py-4 mx-3 mb-3">
-      <!-- <button class="mb-4 w-full py-2 text-center text-sm text-gray-600 hover:text-gray-800">
-        Changer mon mot de passe
-      </button> -->
       <div class="mb-4">
         <app-button fontWeight="normal" text="Changer mon mot de passe" size="sm" radius="md" variant="transparent" color="light" width="full">
         </app-button>
       </div>
       
-      <!-- <ion-button expand="block" shape="round" fill="outline" color="danger" class="font-medium">
-        SE DÉCONNECTER
-      </ion-button> -->
       <app-button [isLoading]="isLoading" fontWeight="normal" text="SE DÉCONNECTER" size="md" radius="md" iconEnd="log-out" variant="light" color="danger" width="full" (buttonClick)="logout()">
       </app-button>
     </div>

@@ -1,7 +1,9 @@
 <div class="h-full flex flex-col">
-  <div class="flex-1 pb-20">
+  <ion-content class="flex-1">
     <!-- Router outlet pour l'affichage des pages -->
     <router-outlet></router-outlet>
-  </div>
-  <app-tabs *ngIf="hideTabs"></app-tabs>
+  </ion-content>
+  <ion-footer *ngIf="hideTabs">
+    <app-tabs></app-tabs>
+  </ion-footer>
 </div>

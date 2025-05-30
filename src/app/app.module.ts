@@ -22,6 +22,8 @@ import { ToastComponent } from './shared/components/toast/toast.component';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { DahiraEffects } from './features/dahiras/store/dahira.effects';
 import { dahiraReducer } from './features/dahiras/store/dahira.reducers';
+import { requestReducer } from './features/demandes/store/request.reducers';
+import { RequestEffects } from './features/demandes/store/request.effects';
 
 @NgModule({
   declarations: [AppComponent],
@@ -31,9 +33,9 @@ import { dahiraReducer } from './features/dahiras/store/dahira.reducers';
     AppRoutingModule,
     SharedModule,
     FormsModule,
-    StoreModule.forRoot({ auth: authReducer, dahira: dahiraReducer }),
+    StoreModule.forRoot({ auth: authReducer, dahira: dahiraReducer, request: requestReducer }),
     IonicStorageModule.forRoot(),
-    EffectsModule.forRoot([AuthEffects, DahiraEffects]),
+    EffectsModule.forRoot([AuthEffects, DahiraEffects, RequestEffects]),
     ToastComponent
   ],
   providers: [

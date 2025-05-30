@@ -7,7 +7,12 @@ const routes: Routes = [
   {
     path: '',
     component: DahirasPage
+  },
+  {
+    path: 'detail/:id',
+    loadChildren: () => import('./pages/detail-dahira/detail-dahira.module').then( m => m.DetailDahiraPageModule)
   }
+
 ];
 
 @NgModule({

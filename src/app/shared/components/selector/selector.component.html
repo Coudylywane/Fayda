@@ -7,10 +7,10 @@
       >
         <div class="flex items-center">
           <span *ngIf="selectedOption?.icon" class="mr-4">
-            <i [class]="selectedOption.icon"></i>
+            <i [class]="selectedOption?.icon"></i>
           </span>
           <span *ngIf="selectedOption?.flag" class="mr-4">
-            <img [src]="selectedOption.flag" class="w-5 h-5 object-contain">
+            <img [src]="selectedOption?.flag" class="w-5 h-5 object-contain">
           </span>
           <span class="text-gray-700 truncate">
             {{ selectedOption?.label || placeholder }}

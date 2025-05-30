@@ -60,7 +60,7 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
       this.user = authState.user;
 
       if (this.logoutAttempted && !authState.isAuthenticated) {
-        this.dismiss();
+        this.modalCtrl.dismiss();
         // this.confettiService.triggerConfetti();
         this.toast.showSuccess('Vous êtes déconnecté');
         this.router.navigate(['/login']);
@@ -106,6 +106,12 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
     this.logoutAttempted = true;
     console.log('Déconnexion réussie');
     // this.dismiss();
+  }
+
+  async navigateTo(url: string){
+    if(await this.router.navigate([url])){
+      this.modalCtrl.dismiss();
+    }
   }
 
   // Méthodes utilitaires pour le template

@@ -23,7 +23,7 @@ export interface User {
 
 export enum UserRole {
     DISCIPLE = 'FAYDA_ROLE_DISCIPLE',
-    MOUKHADAM = 'FAYDA_ROLE_MOUKHADAM',
+    MOUKHADAM = 'FAYDA_ROLE_MOUQADAM',
     ADMIN = 'FAYDA_ROLE_ADMIN',
     VISITEUR = 'FAYDA_ROLE_USER'
 }

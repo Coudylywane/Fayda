@@ -6,17 +6,22 @@ import { ProfilModalComponent } from '../../profil-modal/profil-modal.component'
 import { AppState } from 'src/app/store/app.state';
 import { Store } from '@ngrx/store';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { User } from '../../auth/models/user.model';
+import { User, UserRole } from '../../auth/models/user.model';
 import { selectCurrentUser } from '../../auth/store/auth.selectors';
 import { CommonModule } from '@angular/common';
+import { PrimaryRoleVisibilityDirective } from '../../auth/directives/primary-role-visibility.directive';
+import { RoleHideDirective } from '../../auth/directives/role-hide.directive';
+import { RoleVisibilityDirective } from '../../auth/directives/role-visibility.directive';
 
 @Component({
   selector: 'app-tabs',
   templateUrl: './tabs.component.html',
   styleUrls: ['./tabs.component.scss'],
-  imports: [IonicModule, RouterModule, CommonModule]
+  imports: [IonicModule, RouterModule, CommonModule,
+    RoleVisibilityDirective]
 })
 export class TabsComponent implements OnInit {
+  UserRole = UserRole;
 
   // Observable pour les données utilisateur
   user$: Observable<User | null>;
@@ -50,15 +55,6 @@ export class TabsComponent implements OnInit {
     // Nettoyer les abonnements
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  hideVisisteurTab(): boolean {
-    // Vérifier les roles de l'utilisateur est connecté si c'est un visiteur
-    if (!this.user?.roles) {
-      return true;
-    }    
-
-    return !this.user.roles.some((element: string) => element === 'FAYDA_ROLE_USER');
   }
 
   navigate(tab: string) {

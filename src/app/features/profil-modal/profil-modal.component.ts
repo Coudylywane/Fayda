@@ -10,17 +10,27 @@ import { AppState } from 'src/app/store/app.state';
 import { Store } from '@ngrx/store';
 import { selectAuthState, selectCurrentUser } from '../auth/store/auth.selectors';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
-import { User } from '../auth/models/user.model';
+import { User, UserRole } from '../auth/models/user.model';
 import { ToastService } from 'src/app/shared/components/toast/toast.service';
 import { ConfettiService } from 'src/app/Admin/services/confetti.service';
+import { PrimaryRoleVisibilityDirective } from '../auth/directives/primary-role-visibility.directive';
+import { RoleHideDirective } from '../auth/directives/role-hide.directive';
+import { RoleVisibilityDirective } from '../auth/directives/role-visibility.directive';
 
 @Component({
   selector: 'app-profil-modal',
   templateUrl: './profil-modal.component.html',
   styleUrls: ['./profil-modal.component.scss'],
-  imports: [IonicModule, CommonModule, IconButtonComponent, ButtonComponent],
+  imports: [IonicModule, 
+    CommonModule, 
+    IconButtonComponent, 
+    ButtonComponent,
+    RoleVisibilityDirective,
+    RoleHideDirective,
+    PrimaryRoleVisibilityDirective],
 })
 export class ProfilModalComponent implements OnInit, OnDestroy {
+  UserRole = UserRole;
 
   // Observable pour les données utilisateur
   user: User | null = null;
@@ -39,7 +49,7 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
     private router: Router,
     private store: Store<AppState>,
     private confettiService: ConfettiService,
-    private toast: ToastService
+    private toast: ToastService,
   ) {
   }
 

@@ -1,27 +1,41 @@
-import { inject, Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { selectAuthState } from '../store/auth.selectors';
-import { map, Observable, take } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { CanActivate, ActivatedRouteSnapshot, Router } from '@angular/router';
+import { Observable, map } from 'rxjs';
+import { UserRoleService } from '../services/user-role.service';
+import { UserRole } from '../models/user.model';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class RoleGuard implements CanActivate {
-    private router = inject(Router);
-    private store = inject(Store);
 
-    canActivate(): Observable<boolean> {
-        return this.store.select(selectAuthState).pipe(
-            take(1),
-            map(authState => {
-                if (authState.user!.roles?.includes('FAYDA_ROLE_USER')) {
-                    // Si l'utilisateur a le rôle 'FAYDA_ROLE_USER', rediriger vers la page d'accueil
-                    this.router.navigate(['tabs/home']);
-                    return false;
-                }
-                return true;
-            })
-        );
+  constructor(
+    private userRoleService: UserRoleService,
+    private router: Router
+  ) {}
+
+  canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
+    const requiredRoles = route.data['roles'] as UserRole[];
+    const requireAllRoles = route.data['requireAllRoles'] as boolean || false;
+    
+    if (!requiredRoles || requiredRoles.length === 0) {
+      return this.userRoleService.currentUser$.pipe(
+        map(user => !!user)
+      );
     }
+
+    const roleCheck$ = requireAllRoles 
+      ? this.userRoleService.hasAllRoles(requiredRoles)
+      : this.userRoleService.hasAnyRole(requiredRoles);
+
+    return roleCheck$.pipe(
+      map(hasRequiredRoles => {
+        if (!hasRequiredRoles) {
+          this.router.navigate(['tabs/home']);
+          return false;
+        }
+        return true;
+      })
+    );
+  }
 }

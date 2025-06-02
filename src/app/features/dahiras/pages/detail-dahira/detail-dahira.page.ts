@@ -8,6 +8,8 @@ import { Location } from '@angular/common';
 import { DahiraApiService } from '../../services/dahira-api.service';
 import { selectCurrentUser } from 'src/app/features/auth/store/auth.selectors';
 import { Dahira } from '../../models/dahira.model';
+import { RequestApiService } from 'src/app/features/demandes/services/request.api';
+import { Request, RequestType, Status } from 'src/app/features/demandes/models/request.model';
 
 @Component({
   selector: 'app-detail-dahira',
@@ -17,12 +19,15 @@ import { Dahira } from '../../models/dahira.model';
 })
 export class DetailDahiraPage implements OnInit, OnDestroy {
   dahira: Dahira | null = null;
+  requests: Request[] | [] = [];
   dahiraId: string = '';
   loading: boolean = false;
   error: string | null = null;
   membershipRequested: boolean = false;
   requestingMembership: boolean = false;
   userId!: string;
+  requestType = RequestType;
+  status = Status;
 
   private destroy$ = new Subject<void>();
 
@@ -30,7 +35,6 @@ export class DetailDahiraPage implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private location: Location,
-    // private dahiraService: ,
     private toastService: ToastService,
     private store: Store
   ) { }
@@ -49,6 +53,7 @@ export class DetailDahiraPage implements OnInit, OnDestroy {
       this.dahiraId = params['id'];
       if (this.dahiraId) {
         this.loadDahiraDetails();
+        this.DetailRequest();
         this.checkMembershipStatus();
       }
     });
@@ -75,6 +80,33 @@ export class DetailDahiraPage implements OnInit, OnDestroy {
       this.toastService.showError(this.error!);
     }
   }
+
+  /**
+ * Charge les demandes par type Adhésion dahira
+ */
+  private async DetailRequest(): Promise<void> {
+    this.loading = true;
+    this.error = null;
+    console.log("load details dahira");
+
+
+    try {
+      const response = await RequestApiService.getRequest(this.userId);
+      console.log("ldetails demande join_dahira", response);
+      this.requests = [...response.data.data];
+    } catch (error: any) {
+      console.error('Erreur lors du chargement des demandes:', error);
+      this.error = error.response?.data?.message || 'Impossible de charger les détails du dahira';
+      this.toastService.showError(this.error!);
+    }
+  }
+
+  requestCheck(type: Status): boolean {
+    return this.requests.some(request =>
+      request.targetDahiraName === this.dahira?.dahiraName && request.approvalStatus === type
+    );
+  }
+
 
   /**
    * Vérifie si l'utilisateur a déjà fait une demande d'adhésion

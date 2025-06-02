@@ -168,7 +168,7 @@
           </div>
 
           <!-- Message de confirmation si demande déjà envoyée -->
-          <div *ngIf="membershipRequested" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div *ngIf="requestCheck(status.PENDING)" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
             <div class="flex items-center justify-center">
               <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -179,7 +179,7 @@
           </div>
 
           <!-- Bouton devenir membre -->
-          <div *ngIf="!membershipRequested">
+          <div *ngIf="!requestCheck(status.PENDING) && !requestCheck(status.APPROVED)">
             <button (click)="requestMembership()" [disabled]="requestingMembership"
               class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-xl hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-4 focus:ring-green-300 transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
 

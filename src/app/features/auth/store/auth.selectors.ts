@@ -32,3 +32,8 @@ export const selectIsAdmin = createSelector(
   selectAuthState,
   (state) => state.isAdmin
 );
+
+export const selectUserRoles = createSelector(
+    selectCurrentUser,
+    (user) => user?.roles || []
+);

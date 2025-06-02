@@ -19,6 +19,21 @@
       </div>
       <h2 class="mt-2 text-center text-xl font-bold text-gray-900">{{ getUserFullName() }}</h2>
       <p class="text-center text-sm text-gray-600">{{ getUserEmail() }}</p>
+      <!-- <p class="text-center text-sm text-gray-600">Rôles: {{ (userRoles$ | async)?.join(', ') }}</p>
+      <p class="text-center text-sm text-gray-600">Rôle principal: {{ primaryRole$ | async }}</p> -->
+      
+      <!-- Badge de rôle principal -->
+      <div class="mt-2">
+        <div *appShowForPrimaryRole="UserRole.MOUKHADAM" class="px-3 py-1 bg-amber-100 text-amber-600 text-xs font-medium rounded-full">
+          Moukhadam
+        </div>
+        <div *appShowForPrimaryRole="UserRole.DISCIPLE" class="px-3 py-1 bg-green-100 text-green-600 text-xs font-medium rounded-full">
+          Disciple
+        </div>
+        <div *appShowForPrimaryRole="UserRole.VISITEUR" class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
+          Visiteur
+        </div>
+      </div>
     </div>
   
     <!-- Personal Information Section (non cliquable) -->
@@ -49,7 +64,7 @@
     </div>
   
     <!-- Account Section -->
-    <div class="px-6 py-4 bg-white rounded-xl shadow-sm mx-3 mb-3">
+    <div class="px-6 py-4 bg-white rounded-xl shadow-sm mx-3 mb-3" *appHideForRole="UserRole.VISITEUR">
       <h3 class="mb-3 text-sm font-bold text-gray-900">Mon compte</h3>
       
       <div class="">
@@ -64,22 +79,76 @@
         </div>
       </div>
     </div>
+
+    <!-- Section Administration (Admin uniquement) -->
+    <div *appShowForRole="UserRole.ADMIN" class="px-6 py-4 bg-white rounded-xl shadow-sm mx-3 mb-3">
+      <h3 class="mb-3 text-sm font-bold text-gray-900">Administration</h3>
+      
+      <div class="">
+        <div class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+          <ion-icon name="people" class="mr-3 text-red-500 text-lg"></ion-icon>
+          <span class="text-sm text-gray-700">Gérer les utilisateurs</span>
+        </div>
+        
+        <div class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+          <ion-icon name="settings" class="mr-3 text-red-500 text-lg"></ion-icon>
+          <span class="text-sm text-gray-700">Configuration système</span>
+        </div>
+        
+        <div class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+          <ion-icon name="analytics" class="mr-3 text-red-500 text-lg"></ion-icon>
+          <span class="text-sm text-gray-700">Statistiques globales</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Gestion (Admin et Moukhadam) -->
+    <div *appShowForRole="[UserRole.ADMIN, UserRole.MOUKHADAM]" class="px-6 py-4 bg-white rounded-xl shadow-sm mx-3 mb-3">
+      <h3 class="mb-3 text-sm font-bold text-gray-900">Gestion</h3>
+      
+      <div class="">
+        <div *appShowForPrimaryRole="UserRole.MOUKHADAM" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+          <ion-icon name="people-circle" class="mr-3 text-amber-500 text-lg"></ion-icon>
+          <span class="text-sm text-gray-700">Mes Disciples</span>
+        </div>
+        
+        <div *appShowForPrimaryRole="UserRole.MOUKHADAM" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+          <ion-icon name="home" class="mr-3 text-amber-500 text-lg"></ion-icon>
+          <span class="text-sm text-gray-700">Ma Dahira</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Apprentissage (Disciple uniquement) -->
+    <div *appShowForRole="UserRole.DISCIPLE" class="px-6 py-4 bg-white rounded-xl shadow-sm mx-3 mb-3">
+      <h3 class="mb-3 text-sm font-bold text-gray-900">Mon Apprentissage</h3>
+      
+      <div class="">
+        <div class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+          <ion-icon name="person-circle" class="mr-3 text-gray-500 text-lg"></ion-icon>
+          <span class="text-sm text-gray-700">Mon Moukhadam</span>
+        </div>
+      </div>
+    </div>
   
-    <!-- Demande Section -->
+    <!-- Demande Section - Visible selon le rôle -->
     <div class="px-6 py-4 bg-white rounded-xl shadow-sm mx-3 mb-3">
       <h3 class="mb-3 text-sm font-bold text-gray-900">Demandes</h3>
       
       <div class="">
-        <div class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+        <!-- Demandes pour les visiteurs et disciples -->
+        <div *appShowForPrimaryRole="UserRole.VISITEUR" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="person" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Devenir disciple d'un Moukhadam</span>
         </div>
         
-        <div class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+        <!-- Demande pour devenir Moukhadam (pas pour les admins) -->
+        <div *appShowForPrimaryRole="UserRole.DISCIPLE" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="person-circle" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Devenir Moukhadam</span>
         </div>
         
+        <!-- Mes demandes - visible pour tous les utilisateurs connectés -->
         <div (click)="navigateTo('demandes')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="receipt" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Mes demandes</span>
@@ -101,10 +170,15 @@
           <ion-icon name="map" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Kaolack - Sénégal</span>
         </div>
+        
+        <!-- Contenu avancé pour les membres connectés -->
+        <div *appHideForRole="UserRole.VISITEUR" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+          <ion-icon name="calendar" class="mr-3 text-gray-500 text-lg"></ion-icon>
+          <span class="text-sm text-gray-700">Événements à venir</span>
+        </div>
       </div>
     </div>
   
-    <!-- Password and Logout buttons -->
     <div class="px-6 py-4 mx-3 mb-3">
       <div class="mb-4">
         <app-button fontWeight="normal" text="Changer mon mot de passe" size="sm" radius="md" variant="transparent" color="light" width="full">

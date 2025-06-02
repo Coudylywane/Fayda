@@ -6,10 +6,10 @@
       <span class="text-xs">Accueil</span>
     </a>
     <a (click)="navigate('infos')" class="flex-1 flex flex-col items-center justify-center py-2"
-      *ngIf="hideVisisteurTab()" [class.opacity-100]="isActive('infos')" [class.opacity-60]="!isActive('infos')">
+      *appShowForRole="[UserRole.DISCIPLE, UserRole.MOUKHADAM]" [class.opacity-100]="isActive('infos')" [class.opacity-60]="!isActive('infos')">
       <ion-icon name="information-circle" class="text-2xl"></ion-icon>
       <span class="text-xs">Infos</span>
-    </a>
+    </a> 
     <a (click)="navigate('bibliotheque')" class="flex-1 flex flex-col items-center justify-center py-2"
       [class.opacity-100]="isActive('bibliotheque')" [class.opacity-60]="!isActive('bibliotheque')">
       <ion-icon name="book" class="text-2xl"></ion-icon>
@@ -20,7 +20,7 @@
         <ion-icon name="settings" class="text-2xl"></ion-icon>
         <span class="text-xs">Settings</span>
       </a> -->
-    <a (click)="navigate('finances')" *ngIf="hideVisisteurTab()"
+    <a (click)="navigate('finances')" *appShowForRole="[UserRole.DISCIPLE, UserRole.MOUKHADAM]"
       class="flex-1 flex flex-col items-center justify-center py-2" [class.opacity-100]="isActive('finances')"
       [class.opacity-60]="!isActive('finances')">
       <ion-icon name="stats-chart" class="text-2xl"></ion-icon>

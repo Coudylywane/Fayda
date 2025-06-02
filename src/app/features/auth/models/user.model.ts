@@ -22,9 +22,10 @@ export interface User {
 }
 
 export enum UserRole {
-    DISCIPLE = 'DISCIPLE',
-    MOUKHADAM = 'MOUKHADAM',
-    RESPONSIBLE = 'RESPONSIBLE'
+    DISCIPLE = 'FAYDA_ROLE_DISCIPLE',
+    MOUKHADAM = 'FAYDA_ROLE_MOUKHADAM',
+    ADMIN = 'FAYDA_ROLE_ADMIN',
+    VISITEUR = 'FAYDA_ROLE_USER'
 }
 
 export interface LocationInfo {

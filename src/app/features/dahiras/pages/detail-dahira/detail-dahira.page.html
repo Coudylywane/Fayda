@@ -22,9 +22,9 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="bg-gray-100">
+<ion-content class="bg-gray-100 pb-12">
   <!-- Contenu principal -->
-  <div class="max-w-4xl mx-auto px-4 py- overflow-scroll hide-scrollbar">
+  <div class=" mx-auto px-4 py-8  overflow-scroll hide-scrollbar">
     <!-- État de chargement -->
     <div *ngIf="loading" class="flex justify-center items-center py-20">
       <div class="text-center">
@@ -51,18 +51,18 @@
     </div>
 
     <!-- Contenu du dahira -->
-    <div *ngIf="dahira && !loading" class="space-y-8">
+    <div *ngIf="dahira && !loading" class="grid md:grid-cols-3 gap-4">
 
       <!-- En-tête principal -->
-      <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-        <div class="bg-gradient-to-r from-green-600 to-green-700 px-8 py-12 text-white">
+      <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 px-8 py-4 text-white">
           <div class="text-center">
-            <h1 class="text-3xl md:text-4xl font-bold mb-4">{{ dahira.dahiraName }}</h1>
+            <h1 class="text-xl md:text-2xl font-bold mb-4">{{ dahira.dahiraName }}</h1>
             <div class="flex justify-center items-center">
               <div class="bg-white/20 backdrop-blur-sm rounded-lg px-6 py-3">
                 <div class="flex items-center space-x-4">
                   <div class="text-center">
-                    <div class="text-3xl font-bold">{{ dahira.numberOfDisciples }}</div>
+                    <div class="text-2xl font-bold">{{ dahira.numberOfDisciples }}</div>
                     <div class="text-sm opacity-90">Disciples</div>
                   </div>
                 </div>
@@ -72,12 +72,12 @@
         </div>
 
         <!-- Informations de contact -->
-        <div class="p-8">
-          <h2 class="text-xl font-semibold text-gray-800 mb-6">Informations de contact</h2>
-          <div class="grid md:grid-cols-2 gap-6">
+        <div class="p-4">
+          <h2 class="text-lg font-semibold text-gray-800 mb-6">Informations de contact</h2>
+          <div class="grid md:grid-cols-1 gap-6">
 
             <!-- Email -->
-            <div class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div class="flex items-start space-x-2 p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
               <div class="flex-shrink-0">
                 <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                   <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,13 +88,13 @@
                 </div>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-600">Email</p>
-                <p class="text-lg text-gray-900 truncate">{{ dahira.email }}</p>
+                <p class="text-xs font-medium text-gray-600">Email</p>
+                <p class="text-md text-gray-900 truncate">{{ dahira.email }}</p>
               </div>
             </div>
 
             <!-- Téléphone -->
-            <div class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div class="flex items-start space-x-2 p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
               <div class="flex-shrink-0">
                 <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                   <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,51 +105,51 @@
                 </div>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-600">Téléphone</p>
-                <p class="text-lg text-gray-900">{{ dahira.phoneNumber }}</p>
+                <p class="text-xs font-medium text-gray-600">Téléphone</p>
+                <p class="text-md text-gray-900">{{ dahira.phoneNumber }}</p>
               </div>
+            </div>
+          </div>
+        </div>
+        <!-- Localisation -->
+        <div *ngIf="dahira.location" class=" p-4">
+          <h2 class="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+            <svg class="w-6 h-6 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z">
+              </path>
+            </svg>
+            Localisation
+          </h2>
+  
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div class="space-y-1">
+              <p class="text-sm font-medium text-gray-600">Pays</p>
+              <p class="text-lg text-gray-900">{{ dahira.location.country }}</p>
+            </div>
+  
+            <div class="space-y-1">
+              <p class="text-sm font-medium text-gray-600">Région</p>
+              <p class="text-lg text-gray-900">{{ dahira.location.region }}</p>
+            </div>
+  
+            <div class="space-y-1">
+              <p class="text-sm font-medium text-gray-600">Département</p>
+              <p class="text-lg text-gray-900">{{ dahira.location.country }}</p>
+            </div>
+  
+            <div class="md:col-span-2 lg:col-span-3 space-y-1" *ngIf="dahira.location.address">
+              <p class="text-sm font-medium text-gray-600">Adresse complète</p>
+              <p class="text-lg text-gray-900">{{ dahira.location.address }}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Localisation -->
-      <div *ngIf="dahira.location" class="bg-white rounded-2xl shadow-lg p-8">
-        <h2 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-          <svg class="w-6 h-6 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z">
-            </path>
-          </svg>
-          Localisation
-        </h2>
-
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div class="space-y-1">
-            <p class="text-sm font-medium text-gray-600">Pays</p>
-            <p class="text-lg text-gray-900">{{ dahira.location.country }}</p>
-          </div>
-
-          <div class="space-y-1">
-            <p class="text-sm font-medium text-gray-600">Région</p>
-            <p class="text-lg text-gray-900">{{ dahira.location.region }}</p>
-          </div>
-
-          <div class="space-y-1">
-            <p class="text-sm font-medium text-gray-600">Département</p>
-            <p class="text-lg text-gray-900">{{ dahira.location.country }}</p>
-          </div>
-
-          <div class="md:col-span-2 lg:col-span-3 space-y-1" *ngIf="dahira.location.address">
-            <p class="text-sm font-medium text-gray-600">Adresse complète</p>
-            <p class="text-lg text-gray-900">{{ dahira.location.address }}</p>
-          </div>
-        </div>
-      </div>
 
       <!-- Section d'action - Devenir membre -->
-      <div class="bg-white rounded-2xl shadow-lg p-8">
+      <div class="bg-white rounded-2xl shadow-md p-4">
         <div class="text-center">
           <div class="mb-6">
             <div
@@ -205,9 +205,9 @@
       </div>
 
       <!-- Informations supplémentaires -->
-      <div class="bg-white rounded-2xl shadow-lg p-8">
+      <div class="bg-white rounded-2xl shadow-md p-4">
         <h2 class="text-xl font-semibold text-gray-800 mb-6">À propos de ce Dahira</h2>
-        <div class="grid md:grid-cols-3 gap-6 text-center">
+        <div class="grid gap-6 text-center">
 
           <div class="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl">
             <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -230,20 +230,9 @@
               </svg>
             </div>
             <h3 class="font-semibold text-gray-800 mb-2">Activités régulières</h3>
-            <p class="text-sm text-gray-600">Participez aux séances de méditation et enseignements spirituels</p>
+            <p class="text-sm text-gray-600">Participez aux séances d'enseignements spirituels</p>
           </div>
 
-          <div class="p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
-            <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                </path>
-              </svg>
-            </div>
-            <h3 class="font-semibold text-gray-800 mb-2">Accompagnement</h3>
-            <p class="text-sm text-gray-600">Bénéficiez d'un accompagnement spirituel personnalisé</p>
-          </div>
         </div>
       </div>
     </div>

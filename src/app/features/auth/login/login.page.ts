@@ -25,8 +25,7 @@ import { ToastService } from 'src/app/shared/components/toast/toast.service';
     IonicModule,
     RouterModule,
     ReactiveFormsModule,
-    SelectorComponent,
-    PhoneInputComponent,
+   
   ],
 })
 export class LoginPage {

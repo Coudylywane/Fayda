@@ -1,58 +1,141 @@
-  <div class="px-6 py-4">
-    <!-- Titre de la page -->
-    <div class="flex items-center justify-between mb-4">
-      <h1 class="text-xl font-medium text-gray-700">Utilisateurs</h1>
-    </div>
+<div class="px-6 py-4">
+  <!-- Titre de la page -->
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-xl font-medium text-gray-700">Utilisateurs ({{ users.length }})</h1>
+    <button 
+      (click)="refreshUsers()" 
+      class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+      [disabled]="isLoading"
+    >
+      <ion-icon name="refresh-outline" class="text-xl" [class.animate-spin]="isLoading"></ion-icon>
+    </button>
+  </div>
 
-    <!-- Barre de recherche et boutons d'action -->
-    <div class="flex items-center justify-between mb-6">
-      <div class="relative w-full max-w-lg">
-        <input 
-          type="text" 
-          [(ngModel)]="searchTerm"
-          placeholder="Rechercher" 
-          class="w-full pl-4 pr-10 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-        />
-        <span class="absolute right-3 top-2.5 text-gray-400">
-          <ion-icon name="search-outline"></ion-icon>
-        </span>
-      </div>
-      <div class="flex space-x-3 ml-4">
-        <button (click)="openAddUserModal()" class="flex items-center justify-center w-10 h-10 rounded-full bg-green-600 text-white hover:bg-green-700 transition-colors">
-          <ion-icon name="add-outline" class="text-xl"></ion-icon>
-        </button>
-        <button (click)="openFilterModal()" class="flex items-center justify-center w-10 h-10 rounded-full bg-green-600 text-white hover:bg-green-700 transition-colors">
-          <ion-icon name="funnel-outline" class="text-xl"></ion-icon>
-        </button>
-      </div>
+  <!-- Barre de recherche et boutons d'action -->
+  <div class="flex items-center justify-between mb-6">
+    <div class="relative w-full max-w-lg">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm"
+        placeholder="Rechercher par nom, email..." 
+        class="w-full pl-4 pr-10 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+      />
+      <span class="absolute right-3 top-2.5 text-gray-400">
+        <ion-icon name="search-outline"></ion-icon>
+      </span>
     </div>
-
-    <!-- Filtres rapides -->
-    <div class="flex space-x-3 mb-6 overflow-x-auto pb-2">
-      <ng-container *ngFor="let filter of filters">
-        <button 
-          (click)="setFilter(filter)" 
-          [ngClass]="{'bg-gray-800 text-white': activeFilter === filter, 'bg-gray-100 text-gray-800': activeFilter !== filter}"
-          class="px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap"
-        >
-          {{ filter }}
-        </button>
-      </ng-container>
-    </div>
-
-    <!-- Liste des utilisateurs -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div *ngFor="let user of filteredUsers" class="relative bg-white rounded-lg p-4 border border-gray-200 flex items-center transition-shadow hover:shadow-md cursor-pointer">
-        <div class="relative overflow-hidden w-14 h-14 rounded-full mr-4">
-          <img [src]="user.image" alt="{{ user.name }}" class="w-full h-full object-cover" />
-        </div>
-        <div class="flex-grow">
-          <h3 class="text-lg font-medium text-gray-800">{{ user.name }}</h3>
-          <p class="text-sm text-gray-600">{{ user.category }}</p>
-        </div>
-        <button (click)="openUserOptions(user)" class="text-gray-500 hover:text-gray-700">
-          <ion-icon name="ellipsis-vertical-outline" class="text-xl"></ion-icon>
-        </button>
-      </div>
+    <div class="flex space-x-3 ml-4">
+      <button 
+        (click)="openAddUserModal()" 
+        class="flex items-center justify-center w-10 h-10 rounded-full bg-green-600 text-white hover:bg-green-700 transition-colors"
+        title="Ajouter un utilisateur"
+      >
+        <ion-icon name="add-outline" class="text-xl"></ion-icon>
+      </button>
+      <button 
+        (click)="openFilterModal()" 
+        class="flex items-center justify-center w-10 h-10 rounded-full bg-green-600 text-white hover:bg-green-700 transition-colors"
+        title="Filtrer les utilisateurs"
+      >
+        <ion-icon name="funnel-outline" class="text-xl"></ion-icon>
+      </button>
     </div>
   </div>
+
+  <!-- Filtres rapides -->
+  <div class="flex space-x-3 mb-6 overflow-x-auto pb-2">
+    <ng-container *ngFor="let filter of filters">
+      <button 
+        (click)="setFilter(filter)" 
+        [ngClass]="{'bg-gray-800 text-white': activeFilter === filter, 'bg-gray-100 text-gray-800': activeFilter !== filter}"
+        class="px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap"
+      >
+        {{ filter }}
+        <span *ngIf="filter === activeFilter && filteredUsers.length > 0" class="ml-2 bg-white text-gray-800 px-2 py-1 rounded-full text-xs">
+          {{ filteredUsers.length }}
+        </span>
+      </button>
+    </ng-container>
+  </div>
+
+  <!-- Indicateur de chargement -->
+  <div *ngIf="isLoading" class="flex justify-center items-center py-8">
+    <ion-spinner name="circular" color="primary"></ion-spinner>
+    <span class="ml-3 text-gray-600">Chargement des utilisateurs...</span>
+  </div>
+
+  <!-- Message si aucun utilisateur -->
+  <div *ngIf="!isLoading && users.length === 0" class="text-center py-8">
+    <ion-icon name="people-outline" class="text-6xl text-gray-300 mb-4"></ion-icon>
+    <h3 class="text-lg font-medium text-gray-600 mb-2">Aucun utilisateur trouvé</h3>
+    <p class="text-gray-500">Commencez par ajouter votre premier utilisateur</p>
+    <button 
+      (click)="openAddUserModal()" 
+      class="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+    >
+      Ajouter un utilisateur
+    </button>
+  </div>
+
+  <!-- Message si aucun résultat après filtrage -->
+  <div *ngIf="!isLoading && users.length > 0 && filteredUsers.length === 0" class="text-center py-8">
+    <ion-icon name="search-outline" class="text-6xl text-gray-300 mb-4"></ion-icon>
+    <h3 class="text-lg font-medium text-gray-600 mb-2">Aucun résultat trouvé</h3>
+    <p class="text-gray-500">Essayez de modifier vos critères de recherche ou de filtrage</p>
+    <button 
+      (click)="searchTerm = ''; setFilter('Tous')" 
+      class="mt-4 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+    >
+      Réinitialiser les filtres
+    </button>
+  </div>
+
+  <!-- Liste des utilisateurs -->
+  <div *ngIf="!isLoading && filteredUsers.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div 
+      *ngFor="let user of filteredUsers" 
+      class="relative bg-white rounded-lg p-4 border border-gray-200 flex items-center transition-shadow hover:shadow-md cursor-pointer"
+    >
+      <!-- Avatar -->
+      <div class="relative overflow-hidden w-14 h-14 rounded-full mr-4 bg-gray-200">
+        <img 
+          [src]="user.image || 'assets/images/default-avatar.png'" 
+          [alt]="user.name" 
+          class="w-full h-full object-cover"
+          (error)="onImageError($event)"
+        />
+        <!-- Indicateur de statut -->
+        <div 
+          class="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white"
+          [ngClass]="{'bg-green-500': user.active, 'bg-red-500': !user.active}"
+        ></div>
+      </div>
+      
+      <!-- Informations utilisateur -->
+      <div class="flex-grow">
+        <h3 class="text-lg font-medium text-gray-800">{{ user.name || (user.firstName + ' ' + user.lastName) }}</h3>
+        <p class="text-sm text-gray-600">{{ user.email }}</p>
+        <div class="flex items-center space-x-2 mt-1">
+          <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+            {{ user.category || 'Utilisateur' }}
+          </span>
+          <span class="text-xs text-gray-500">{{ user.gender }}</span>
+        </div>
+      </div>
+      
+      <!-- Menu d'options -->
+      <button 
+        (click)="openUserOptions(user)" 
+        class="text-gray-500 hover:text-gray-700 p-2"
+        title="Options"
+      >
+        <ion-icon name="ellipsis-vertical-outline" class="text-xl"></ion-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Résumé en bas de page -->
+  <div *ngIf="!isLoading && users.length > 0" class="mt-6 text-center text-sm text-gray-500">
+    Affichage de {{ filteredUsers.length }} sur {{ users.length }} utilisateur(s)
+  </div>
+</div>

@@ -2,7 +2,7 @@
   <ion-toolbar>
     <div class="flex justify-between items-center px-4">
       <ion-title class="text-lg font-semibold">Ajouter un utilisateur</ion-title>
-      <ion-button fill="clear" (click)="dismiss()">
+      <ion-button fill="clear" (click)="dismiss()" [disabled]="isSubmitting">
         <ion-icon name="close-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </div>
@@ -11,64 +11,209 @@
 
 <ion-content>
   <div class="px-6 py-4">
+    <!-- Photo de profil -->
     <div class="mb-6 flex justify-center">
       <div class="relative w-24 h-24 rounded-full overflow-hidden bg-gray-200 border-2 border-green-500">
-        <img [src]="newUser.image" alt="Avatar" class="w-full h-full object-cover">
-        <div class="absolute bottom-0 right-0 bg-green-600 rounded-full p-1.5 text-white">
+        <img [src]="newUser.image" alt="Avatar" class="w-full h-full object-cover" />
+        <div
+          class="absolute bottom-0 right-0 bg-green-600 rounded-full p-1.5 text-white cursor-pointer"
+          (click)="onImageChange($event)"
+        >
           <ion-icon name="camera-outline" class="text-sm"></ion-icon>
         </div>
       </div>
     </div>
 
     <div class="space-y-4">
+      <!-- Prénom -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Nom complet</label>
-        <input 
-          type="text" 
-          [(ngModel)]="newUser.name"
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Prénom <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="newUser.firstName"
+          (ngModelChange)="onFirstNameChange()"
           class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-          placeholder="Nom et prénom"
-        >
+          placeholder="Prénom"
+          [class.border-red-500]="!newUser.firstName.trim() && newUser.firstName.length > 0"
+        />
       </div>
 
+      <!-- Nom -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-        <input 
-          type="email" 
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Nom <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="newUser.lastName"
+          (ngModelChange)="onLastNameChange()"
+          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="Nom de famille"
+          [class.border-red-500]="!newUser.lastName.trim() && newUser.lastName.length > 0"
+        />
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Email <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="email"
           [(ngModel)]="newUser.email"
+          (ngModelChange)="onEmailChange()"
           class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
           placeholder="exemple@email.com"
-        >
+          [class.border-red-500]="!isValidEmail(newUser.email) && newUser.email.length > 0"
+        />
+        <small class="text-red-500" *ngIf="!isValidEmail(newUser.email) && newUser.email.length > 0">
+          Format d'email invalide
+        </small>
       </div>
 
+      <!-- Nom d'utilisateur -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
-        <input 
-          type="tel" 
-          [(ngModel)]="newUser.phone"
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Nom d'utilisateur <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="newUser.username"
           class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-          placeholder="+33 6 12 34 56 78"
-        >
+          placeholder="nom.utilisateur"
+          [class.border-red-500]="!newUser.username.trim() && newUser.username.length > 0"
+        />
+        <small class="text-gray-500">Généré automatiquement à partir de l'email</small>
       </div>
 
+      <!-- Téléphone -->
+     <!-- Téléphone -->
+<div>
+  <label class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+  <input
+    type="tel"
+    [(ngModel)]="newUser.phoneNumber"
+    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+    placeholder="+33 6 12 34 56 78"
+    [class.border-red-500]="!isValidPhone(newUser.phoneNumber) && newUser.phoneNumber.length > 0"
+  />
+  <small class="text-red-500" *ngIf="!isValidPhone(newUser.phoneNumber) && newUser.phoneNumber.length > 0">
+    Format invalide (ex: +33 6 12 34 56 78 ou 06 12 34 56 78)
+  </small>
+</div>
+
+
+      <!-- Genre -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
-        <select 
+        <label class="block text-sm font-medium text-gray-700 mb-1">Genre</label>
+        <select
+          [(ngModel)]="newUser.gender"
+          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+        >
+          <option *ngFor="let gender of genderOptions" [value]="gender.value">
+            {{ gender.label }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Date de naissance -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Date de naissance</label>
+        <input
+          type="date"
+          [(ngModel)]="newUser.dateOfBirth"
+          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+      </div>
+
+      <!-- Catégorie (REQUIS) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Catégorie <span class="text-red-500">*</span>
+        </label>
+        <select
           [(ngModel)]="newUser.category"
           class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
         >
-          <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+          <option *ngFor="let category of category" [value]="category">{{ category }}</option>
         </select>
+      </div>
+
+      <!-- Section Localisation -->
+      <div class="border-t pt-4 mt-6">
+        <h3 class="text-md font-medium text-gray-800 mb-4">Informations géographiques</h3>
+
+        <!-- Nationalité -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nationalité</label>
+          <input
+            type="text"
+            [(ngModel)]="newUser.nationality"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Sénégalaise"
+          />
+        </div>
+
+        <!-- Pays -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Pays</label>
+          <input
+            type="text"
+            [(ngModel)]="newUser.country"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Sénégal"
+          />
+        </div>
+
+        <!-- Région -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Région</label>
+          <input
+            type="text"
+            [(ngModel)]="newUser.region"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Dakar"
+          />
+        </div>
+
+        <!-- Département -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Département</label>
+          <input
+            type="text"
+            [(ngModel)]="newUser.department"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Dakar"
+          />
+        </div>
+
+        <!-- Adresse -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Adresse</label>
+          <textarea
+            [(ngModel)]="newUser.address"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Adresse complète"
+            rows="2"
+          ></textarea>
+        </div>
       </div>
     </div>
 
+    <!-- Bouton de validation -->
     <div class="mt-8">
-      <button 
-        (click)="saveUser()" 
-        class="w-full py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+      <button
+        (click)="saveUser()"
+        [disabled]="!isFormValid() || isSubmitting"
+        class="w-full py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
       >
-        Ajouter l'utilisateur
+        <ion-icon *ngIf="isSubmitting" name="refresh-outline" class="animate-spin mr-2"></ion-icon>
+        {{ isSubmitting ? 'Création en cours...' : 'Ajouter l\'utilisateur' }}
       </button>
+
+      <p class="text-xs text-gray-500 mt-2 text-center">* Champs obligatoires</p>
     </div>
   </div>
 </ion-content>

@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { LoginPage } from './features/auth/login/login.page';
-import { RegisterPage } from './features/auth/register/register.page';  // Importer le composant autonome RegisterPage
 import { AuthGuard } from './features/auth/guards/auth.guard';
 import { GuestGuard } from './features/auth/guards/guest.guard';
 
@@ -17,7 +15,7 @@ const routes: Routes = [
   },
   {
     path: 'register',
-    component: RegisterPage,
+    loadComponent: () => import('./features/auth/register/register.page').then(m => m.RegisterPage),
     canActivate: [GuestGuard]
   },
   {
@@ -31,40 +29,39 @@ const routes: Routes = [
   },
   {
     path: 'login',
-    component: LoginPage,
-    canActivate: [GuestGuard] // Utiliser le guard GuestGuard pour empêcher l'accès aux utilisateurs connectés
+    loadComponent: () => import('./features/auth/login/login.page').then(m => m.LoginPage),
+    canActivate: [GuestGuard]
   },
   {
     path: 'admin',
-    loadChildren: () => import('./Admin/base-layout-admin/base-layout-admin.module').then( m => m.BaseLayoutAdminPageModule)
+    loadChildren: () => import('./Admin/base-layout-admin/base-layout-admin.module').then(m => m.BaseLayoutAdminPageModule)
   },
   {
     path: 'bibliotheque/lire-ouvrage/:id',
-    loadChildren: () => import('./features/bibliotheque/pages/lire-ouvrage/lire-ouvrage.module').then( m => m.LireOuvragePageModule)
+    loadChildren: () => import('./features/bibliotheque/pages/lire-ouvrage/lire-ouvrage.module').then(m => m.LireOuvragePageModule)
   },
   {
     path: 'bibliotheque/detail-tafsir/:id',
-    loadChildren: () => import('./features/bibliotheque/pages/detail-tafsir/detail-tafsir.module').then( m => m.DetailTafsirPageModule)
+    loadChildren: () => import('./features/bibliotheque/pages/detail-tafsir/detail-tafsir.module').then(m => m.DetailTafsirPageModule)
   },
   {
     path: 'admin-login',
-    loadChildren: () => import('./Admin/pages/admin-login/admin-login.module').then( m => m.AdminLoginPageModule)
+    loadChildren: () => import('./Admin/pages/admin-login/admin-login.module').then(m => m.AdminLoginPageModule)
   },
   {
     path: 'demandes',
-    loadChildren: () => import('./features/demandes/demandes.module').then( m => m.DemandesPageModule)
+    loadChildren: () => import('./features/demandes/demandes.module').then(m => m.DemandesPageModule)
   },
-
-
-
-
- 
+  // Route fallback si aucune correspondance
+  {
+    path: '**',
+    redirectTo: 'login',
+    pathMatch: 'full'
+  }
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
-  ],
+  imports: [RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

@@ -4,8 +4,11 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://89.47.51.6:8787/api/v1/'
+  apiUrl: 'http://89.47.51.6:8787',
+  apiBaseUrl: 'http://89.47.51.6:8787/api/v1'
 };
+
+
 
 /*
  * For easier debugging in development mode, you can import the following file

@@ -35,6 +35,7 @@ export class UserRoleService {
     const roleHierarchy = [
       UserRole.ADMIN,
       UserRole.MOUKHADAM,
+      UserRole.G_DAHIRA,
       UserRole.DISCIPLE,
       UserRole.VISITEUR
     ];
@@ -88,6 +89,10 @@ export class UserRoleService {
 
   get isDisciple$(): Observable<boolean> {
     return this.hasRole(UserRole.DISCIPLE);
+  }
+
+  get isGestionnaire$(): Observable<boolean> {
+    return this.hasRole(UserRole.G_DAHIRA);
   }
 
   get isVisiteur$(): Observable<boolean> {

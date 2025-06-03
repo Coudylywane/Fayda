@@ -1,7 +1,7 @@
 <ion-header class="ion-no-border">
   <ion-toolbar class="bg-gray-100 shadow-sm">
     <ion-title class="text-xl font-bold text-gray-800">
-      Mes demandes
+      Ma Dahira
     </ion-title>
     <ion-buttons slot="start">
       <ion-button (click)="goHome()">
@@ -16,19 +16,19 @@
 
     <!-- Onglets de filtrage -->
     <div class="flex space-x-1 bg-white/80 rounded-lg p-1 shadow-sm">
-      <button (click)="setActiveTab('ALL')" [class]="'flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors duration-200 ' + 
+      <button (click)="setActiveTab('ALL')" [class]="'flex-1 py-2 px-2 text-sm font-medium rounded-md transition-colors duration-200 ' + 
                 (activeTab === 'ALL' ? 'bg-green-600 text-white' : 'text-gray-600 hover:text-gray-800')">
         Tous
       </button>
-      <button (click)="setActiveTab('APPROVED')" [class]="'flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors duration-200 ' + 
+      <button (click)="setActiveTab('APPROVED')" [class]="'flex-1 py-2 px-2 text-sm font-medium rounded-md transition-colors duration-200 ' + 
                 (activeTab === 'APPROVED' ? 'bg-green-600 text-white' : 'text-gray-600 hover:text-gray-800')">
         Approuvé
       </button>
-      <button (click)="setActiveTab('PENDING')" [class]="'flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors duration-200 ' + 
+      <button (click)="setActiveTab('PENDING')" [class]="'flex-1 py-2 px-2 text-sm font-medium rounded-md transition-colors duration-200 ' + 
                 (activeTab === 'PENDING' ? 'bg-green-600 text-white' : 'text-gray-600 hover:text-gray-800')">
         En attente
       </button>
-      <button (click)="setActiveTab('REJECTED')" [class]="'flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors duration-200 ' + 
+      <button (click)="setActiveTab('REJECTED')" [class]="'flex-1 py-2 px-2 text-sm font-medium rounded-md transition-colors duration-200 ' + 
                 (activeTab === 'REJECTED' ? 'bg-green-600 text-white' : 'text-gray-600 hover:text-gray-800')">
         Rejeté
       </button>

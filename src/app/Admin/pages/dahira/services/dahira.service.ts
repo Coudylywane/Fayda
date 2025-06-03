@@ -6,7 +6,7 @@ import { Dahira, DahiraMember, MemberRole } from '../models/dahira.model';
 @Injectable({
   providedIn: 'root'
 })
-export class DahiraService {
+export class DahiraServiceAdmin {
 //   private apiUrl = `${environment.apiUrl}/dahiras`;
   private dahirasSubject = new BehaviorSubject<Dahira[]>([]);
   public dahiras$ = this.dahirasSubject.asObservable();

@@ -4,7 +4,8 @@ export interface Request {
   requesterName: string;
   targetDahiraId: string;
   targetDahiraName: string;
-  requestType: string;
+  requestType: RequestType;
+  rejectionReason: string;
   approvalStatus: Status;
   createdAt: string;
   updatedAt: string;
@@ -22,4 +23,12 @@ export enum Status {
     PENDING = "PENDING",
     APPROVED = "APPROVED",
     REJECTED = "REJECTED",
+}
+
+export interface Approval {
+  targetId: string,
+  approvedByUserId: string,
+  approved: boolean,
+  rejectionReason?: string,
+  targetType: RequestType
 }

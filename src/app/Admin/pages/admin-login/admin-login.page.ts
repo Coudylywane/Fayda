@@ -35,8 +35,8 @@ export class AdminLoginPage implements OnInit, OnDestroy {
     private toast: ToastService
   ) {
     this.loginForm = this.fb.group({
-      username: ["dolnick", [Validators.required, Validators.minLength(3)]],
-      password: ["user123", [Validators.required, Validators.minLength(4)]],
+      username: ["admin", [Validators.required, Validators.minLength(3)]],
+      password: ["admin123", [Validators.required, Validators.minLength(4)]],
     })
 
     // Récupérer l'URL de retour des paramètres de requête ou définir la valeur par défaut

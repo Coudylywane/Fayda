@@ -4,7 +4,7 @@ import { initialState } from './request.states';
 
 export const requestReducer = createReducer(
   initialState,
-  on(RequestActions.loadRequests, state => ({
+  on(RequestActions.loadRequests, RequestActions.loadAdhesionRequests, state => ({
     ...state,
     loading: true,
     error: null
@@ -14,9 +14,14 @@ export const requestReducer = createReducer(
     loading: false,
     demandes: request
   })),
-  on(RequestActions.loadRequestsFailure, (state, { error }) => ({
+  on(RequestActions.loadRequestsFailure, RequestActions.loadAdhesionRequestsFailure, (state, { error }) => ({
     ...state,
     loading: false,
     error
+  })),
+  on(RequestActions.loadAdhesionRequestsSuccess, (state, { demandeAdhesion }) => ({
+    ...state,
+    loading: false,
+    demandeAdhesion
   }))
 );

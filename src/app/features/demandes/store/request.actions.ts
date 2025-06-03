@@ -15,3 +15,18 @@ export const loadRequestsFailure = createAction(
   '[Requests] Load Request Failure',
   props<{ error: string }>()
 );
+
+export const loadAdhesionRequests = createAction(
+  '[Requests] Load Request',
+  props<{ userId: string }>()
+);
+
+export const loadAdhesionRequestsSuccess = createAction(
+  '[Requests] Load Request Success',
+  props<{ demandeAdhesion: Request[] }>()
+);
+
+export const loadAdhesionRequestsFailure = createAction(
+  '[Requests] Load Request Failure',
+  props<{ error: string }>()
+);

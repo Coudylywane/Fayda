@@ -25,6 +25,7 @@ export enum UserRole {
     DISCIPLE = 'FAYDA_ROLE_DISCIPLE',
     MOUKHADAM = 'FAYDA_ROLE_MOUQADAM',
     ADMIN = 'FAYDA_ROLE_ADMIN',
+    G_DAHIRA = 'FAYDA_ROLE_DAHIRA',
     VISITEUR = 'FAYDA_ROLE_USER'
 }
 
@@ -38,3 +39,11 @@ export interface LocationInfo {
     latitude?: number;
     longitude?: number;
 }
+
+// {
+//     nationality: string,
+//     country: string,
+//     region: string,
+//     department: string,
+//     address: string
+//   }

@@ -1,0 +1,318 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-gray-100 shadow-sm">
+    <ion-title class="text-xl font-bold text-gray-800">
+      Mes demandes
+    </ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="goHome()">
+        <ion-icon name="arrow-back-outline" slot="icon-only" class="!text-green-600"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-gray-100">
+  <div class="p-4 space-y-4 max-w-screen-xl mx-auto">
+
+    <!-- Onglets de filtrage -->
+    <div class="flex space-x-1 bg-white/80 rounded-lg p-1 shadow-sm">
+      <button (click)="setActiveTab('ALL')" [class]="'flex-1 py-2 px-2 text-sm font-medium rounded-md transition-colors duration-200 ' + 
+                (activeTab === 'ALL' ? 'bg-green-600 text-white' : 'text-gray-600 hover:text-gray-800')">
+        Tous
+      </button>
+      <button (click)="setActiveTab('APPROVED')" [class]="'flex-1 py-2 px-2 text-sm font-medium rounded-md transition-colors duration-200 ' + 
+                (activeTab === 'APPROVED' ? 'bg-green-600 text-white' : 'text-gray-600 hover:text-gray-800')">
+        Approuvé
+      </button>
+      <button (click)="setActiveTab('PENDING')" [class]="'flex-1 py-2 px-2 text-sm font-medium rounded-md transition-colors duration-200 ' + 
+                (activeTab === 'PENDING' ? 'bg-green-600 text-white' : 'text-gray-600 hover:text-gray-800')">
+        En attente
+      </button>
+      <button (click)="setActiveTab('REJECTED')" [class]="'flex-1 py-2 px-2 text-sm font-medium rounded-md transition-colors duration-200 ' + 
+                (activeTab === 'REJECTED' ? 'bg-green-600 text-white' : 'text-gray-600 hover:text-gray-800')">
+        Rejeté
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+
+      <!-- Barre de recherche -->
+      <div class="bg-white rounded-lg shadow-sm">
+        <div class="relative">
+          <ion-icon name="search-outline"
+            class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg">
+          </ion-icon>
+          <input type="text" placeholder="Rechercher nom demandeur" [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+            class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none">
+        </div>
+      </div>
+    </div>
+
+    <!-- Nombre de résultats -->
+    <div class="text-sm text-gray-600">
+      {{ filteredRequests.length }} demande(s) trouvée(s)
+    </div>
+
+    <!-- Liste des demandes -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div *ngFor="let request of filteredRequests"
+        class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+
+        <!-- En-tête de la carte -->
+        <div class="p-4 border-b border-gray-100">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-900 text-lg">
+                {{ request.targetDahiraName }}
+              </h3>
+              <p class="text-gray-600 text-sm mt-1">
+                <ion-icon name="person-outline" class="text-green-600 mr-1"></ion-icon>
+                Demande {{ getRequestTypeLabel(request.requestType).toLowerCase() }}
+              </p>
+            </div>
+
+            <!-- Statut -->
+            <span
+              [class]="'px-3 py-1 rounded-full text-xs font-medium border ' + getStatusColor(request.approvalStatus)">
+              {{ request.approvalStatus }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Corps de la carte -->
+        <div class="p-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <!-- Type de demande -->
+            <div class="flex items-center">
+              <ion-icon name="document-text-outline" class="text-green-600 mr-2"></ion-icon>
+              <div>
+                <p class="text-xs text-gray-500 uppercase tracking-wide">Demandeur: </p>
+                <p class="font-medium text-gray-900">
+                  {{ request.requesterName }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Date de création -->
+            <div class="flex items-center">
+              <ion-icon name="calendar-outline" class="text-green-600 mr-2"></ion-icon>
+              <div>
+                <p class="text-xs text-gray-500 uppercase tracking-wide">Créée le</p>
+                <p class="font-medium text-gray-900">
+                  {{ formatDate(request.createdAt) }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Motif de rejet (si présent) -->
+          <div *ngIf="request.rejectionReason" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p class="text-xs text-red-600 uppercase tracking-wide font-medium mb-1">Motif du rejet</p>
+            <p class="text-sm text-red-800">{{ request.rejectionReason }}</p>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex justify-between mt-4 pt-4 border-t border-gray-100">
+            <!-- Actions pour les demandes en attente -->
+            <div *ngIf="request.approvalStatus === 'PENDING'" class="flex space-x-2 flex-1">
+              <button (click)="openApprovalModal(request)"
+                class="flex-1 flex items-center justify-center px-3 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors duration-200">
+                <ion-icon name="checkmark-outline" class="mr-2"></ion-icon>
+                Approuver
+              </button>
+              <button (click)="openRejectionModal(request)"
+                class="flex-1 flex items-center justify-center px-3 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors duration-200">
+                <ion-icon name="close-outline" class="mr-2"></ion-icon>
+                Rejeter
+              </button>
+            </div>
+
+            <!-- Action de suppression (pour toutes les demandes) -->
+            <div class="flex-shrink-0" *ngIf="request.approvalStatus !== 'PENDING'">
+              <button (click)="openDeleteModal(request)"
+                class="flex items-center px-4 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200">
+                <ion-icon name="trash-outline" class="mr-2"></ion-icon>
+                Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Message de rafraîchissement -->
+    <div *ngIf="loading && filteredRequests.length === 0" class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+      <div class="flex items-center">
+        <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-green-600 mr-3"></div>
+        <span class="text-green-600">Chargement des demandes...</span>
+      </div>
+    </div>
+
+    <!-- Message d'erreur -->
+    <div *ngIf="error && !loading" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span class="text-red-800">{{ error }}</span>
+        </div>
+        <button (click)="refresh()" class="px-3 py-1 text-sm bg-red-100 text-red-800 rounded hover:bg-red-200">
+          Réessayer
+        </button>
+      </div>
+    </div>
+    <div *ngIf="filteredRequests.length === 0" class="text-center py-12">
+      <ion-icon name="document-outline" class="text-6xl text-gray-300 mb-4"></ion-icon>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">
+        Aucune demande trouvée
+      </h3>
+      <p class="text-gray-500">
+        Vous n'avez pas encore reçu de demandes correspondant à ces critères.
+      </p>
+    </div>
+  </div>
+
+  <!-- Modale d'approbation -->
+  <div *ngIf="showApprovalModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+    (click)="closeApprovalModal()">
+
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 transform transition-all" (click)="$event.stopPropagation()">
+
+      <!-- En-tête de la modale -->
+      <div class="flex items-center mb-6">
+        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+          <ion-icon name="checkmark-outline" class="text-green-600 text-2xl"></ion-icon>
+        </div>
+      </div>
+
+      <!-- Contenu -->
+      <div class="text-center">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">
+          Approuver la demande
+        </h3>
+        <p class="text-sm text-gray-600 mb-6">
+          Êtes-vous sûr de vouloir approuver la demande de
+          <span class="font-medium text-gray-900">{{ requestToApprove?.requesterName }}</span>
+          pour rejoindre
+          <span class="font-medium text-gray-900">{{ requestToApprove?.targetDahiraName }}</span> ?
+        </p>
+      </div>
+
+      <!-- Actions de la modale -->
+      <div class="flex space-x-3">
+        <button (click)="closeApprovalModal()"
+          class="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200 font-medium">
+          Annuler
+        </button>
+        <button (click)="confirmApproval()"
+          class="flex-1 px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors duration-200 font-medium">
+          Approuver
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale de rejet -->
+  <div *ngIf="showRejectionModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+    (click)="closeRejectionModal()">
+
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 transform transition-all" (click)="$event.stopPropagation()">
+
+      <!-- En-tête de la modale -->
+      <div class="flex items-center mb-6">
+        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+          <ion-icon name="close-outline" class="text-red-600 text-2xl"></ion-icon>
+        </div>
+      </div>
+
+      <!-- Contenu -->
+      <div class="text-center">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">
+          Rejeter la demande
+        </h3>
+        <p class="text-sm text-gray-600 mb-6">
+          Vous allez rejeter la demande de
+          <span class="font-medium text-gray-900">{{ requestToReject?.requesterName }}</span>
+          pour rejoindre
+          <span class="font-medium text-gray-900">{{ requestToReject?.targetDahiraName }}</span>.
+        </p>
+      </div>
+
+      <!-- Champ motif -->
+      <div class="mb-6">
+        <label for="rejectionReason" class="block text-sm font-medium text-gray-700 mb-2">
+          Motif du rejet <span class="text-red-500">*</span>
+        </label>
+        <textarea
+          id="rejectionReason"
+          [(ngModel)]="rejectionReason"
+          placeholder="Veuillez expliquer pourquoi vous rejetez cette demande..."
+          rows="4"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none resize-none"
+          [class.border-red-300]="!isRejectionReasonValid && rejectionReason !== undefined"
+        ></textarea>
+        <div *ngIf="!isRejectionReasonValid && rejectionReason !== undefined" class="mt-1 text-sm text-red-600">
+          Le motif du rejet est obligatoire (minimum 10 caractères)
+        </div>
+      </div>
+
+      <!-- Actions de la modale -->
+      <div class="flex space-x-3">
+        <button (click)="closeRejectionModal()"
+          class="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200 font-medium">
+          Annuler
+        </button>
+        <button (click)="confirmRejection()"
+          [disabled]="!isRejectionReasonValid"
+          class="flex-1 px-4 py-2 text-white bg-red-600 hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed rounded-lg transition-colors duration-200 font-medium">
+          Rejeter
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale de confirmation de suppression -->
+  <div *ngIf="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+    (click)="closeDeleteModal()">
+
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 transform transition-all" (click)="$event.stopPropagation()">
+
+      <!-- En-tête de la modale -->
+      <div class="flex items-center mb-6">
+        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+          <ion-icon name="warning-outline" class="text-red-600 text-2xl"></ion-icon>
+        </div>
+      </div>
+
+      <!-- Contenu -->
+      <div class="text-center">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">
+          Confirmer la suppression
+        </h3>
+        <p class="text-sm text-gray-600 mb-6">
+          Êtes-vous sûr de vouloir supprimer votre demande pour
+          <span class="font-medium text-gray-900">{{ requestToDelete?.targetDahiraName }}</span> ?
+          Cette action est irréversible.
+        </p>
+      </div>
+
+      <!-- Actions de la modale -->
+      <div class="flex space-x-3">
+        <button (click)="closeDeleteModal()"
+          class="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200 font-medium">
+          Annuler
+        </button>
+        <button (click)="confirmDelete()"
+          class="flex-1 px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors duration-200 font-medium">
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+
+</ion-content>

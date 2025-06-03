@@ -7,3 +7,8 @@ export const selectRequests = createSelector(
   selectRequestState,
   (state) => state.demandes
 );
+
+export const selectAdhesionRequests = createSelector(
+  selectRequestState,
+  (state) => state.demandeAdhesion
+);

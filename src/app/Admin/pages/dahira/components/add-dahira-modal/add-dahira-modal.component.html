@@ -1,51 +1,273 @@
-<div class="bg-white rounded-lg shadow-lg overflow-hidden max-w-md w-full">
-  <div class="p-6">
-    <h3 class="text-lg font-semibold text-gray-900 mb-6">Ajouter un nouveau Dahira</h3>
+<!-- add-dahira-modal.component.html -->
+<div class="bg-white rounded-lg shadow-lg overflow-hidden max-w-2xl w-full">
+  <!-- Header avec stepper -->
+  <div class="p-6 border-b border-gray-200">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Ajouter un nouveau Dahira</h3>
     
+    <!-- Stepper Indicator -->
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center space-x-4">
+        <!-- Étape 1 -->
+        <div class="flex items-center">
+          <div class="flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium"
+               [class]="currentStep >= 1 ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-600'">
+            1
+          </div>
+          <span class="ml-2 text-sm font-medium text-gray-900">Informations</span>
+        </div>
+        
+        <!-- Ligne de connexion -->
+        <div class="h-px flex-1 mx-4"
+             [class]="currentStep > 1 ? 'bg-green-600' : 'bg-gray-200'"></div>
+        
+        <!-- Étape 2 -->
+        <div class="flex items-center">
+          <div class="flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium"
+               [class]="currentStep >= 2 ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-600'">
+            2
+          </div>
+          <span class="ml-2 text-sm font-medium text-gray-900">Contact</span>
+        </div>
+        
+        <!-- Ligne de connexion -->
+        <div class="h-px flex-1 mx-4"
+             [class]="currentStep > 2 ? 'bg-green-600' : 'bg-gray-200'"></div>
+        
+        <!-- Étape 3 -->
+        <div class="flex items-center">
+          <div class="flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium"
+               [class]="currentStep >= 3 ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-600'">
+            3
+          </div>
+          <span class="ml-2 text-sm font-medium text-gray-900">Localisation</span>
+        </div>
+      </div>
+    </div>
+    
+    <h4 class="text-md font-medium text-gray-700">{{ getStepTitle() }}</h4>
+  </div>
+
+  <!-- Contenu du formulaire -->
+  <div class="p-6">
     <form [formGroup]="dahiraForm" (ngSubmit)="onSubmit()">
-      <div class="mb-4">
-        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nom du Dahira*</label>
-        <input 
-          type="text" 
-          id="name" 
-          formControlName="name"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          placeholder="Entrez le nom du Dahira"
-        >
-        <div *ngIf="dahiraForm.get('name')?.invalid && (dahiraForm.get('name')?.dirty || dahiraForm.get('name')?.touched)" class="text-red-500 text-sm mt-1">
-          <div *ngIf="dahiraForm.get('name')?.errors?.['required']">Le nom du Dahira est requis.</div>
-          <div *ngIf="dahiraForm.get('name')?.errors?.['minlength']">Le nom doit contenir au moins 3 caractères.</div>
+      
+      <!-- Étape 1: Informations générales -->
+      <div *ngIf="currentStep === 1" class="space-y-4">
+        <div>
+          <label for="dahiraName" class="block text-sm font-medium text-gray-700 mb-1">
+            Nom du Dahira *
+          </label>
+          <input 
+            type="text" 
+            id="dahiraName" 
+            formControlName="dahiraName"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            placeholder="Entrez le nom du Dahira"
+          >
+          <div *ngIf="dahiraForm.get('dahiraName')?.invalid && (dahiraForm.get('dahiraName')?.dirty || dahiraForm.get('dahiraName')?.touched)" 
+               class="text-red-500 text-sm mt-1">
+            <div *ngIf="dahiraForm.get('dahiraName')?.errors?.['required']">
+              Le nom du Dahira est requis.
+            </div>
+            <div *ngIf="dahiraForm.get('dahiraName')?.errors?.['minlength']">
+              Le nom doit contenir au moins 3 caractères.
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <label for="numberOfDisciples" class="block text-sm font-medium text-gray-700 mb-1">
+            Nombre de disciples *
+          </label>
+          <input 
+            type="number" 
+            id="numberOfDisciples" 
+            formControlName="numberOfDisciples"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            placeholder="Entrez le nombre de disciples"
+            min="1"
+          >
+          <div *ngIf="dahiraForm.get('numberOfDisciples')?.invalid && (dahiraForm.get('numberOfDisciples')?.dirty || dahiraForm.get('numberOfDisciples')?.touched)" 
+               class="text-red-500 text-sm mt-1">
+            <div *ngIf="dahiraForm.get('numberOfDisciples')?.errors?.['required']">
+              Le nombre de disciples est requis.
+            </div>
+            <div *ngIf="dahiraForm.get('numberOfDisciples')?.errors?.['min']">
+              Le nombre de disciples doit être au moins 1.
+            </div>
+          </div>
         </div>
       </div>
       
-      <div class="mb-4">
-        <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Localisation</label>
-        <input 
-          type="text" 
-          id="location" 
-          formControlName="location"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          placeholder="Entrez la localisation du Dahira"
-        >
+      <!-- Étape 2: Contact -->
+      <div *ngIf="currentStep === 2" class="space-y-4">
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+            Email *
+          </label>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            placeholder="exemple@email.com"
+          >
+          <div *ngIf="dahiraForm.get('email')?.invalid && (dahiraForm.get('email')?.dirty || dahiraForm.get('email')?.touched)" 
+               class="text-red-500 text-sm mt-1">
+            <div *ngIf="dahiraForm.get('email')?.errors?.['required']">
+              L'email est requis.
+            </div>
+            <div *ngIf="dahiraForm.get('email')?.errors?.['email']">
+              L'email n'est pas valide.
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-1">
+            Numéro de téléphone *
+          </label>
+          <input 
+            type="tel" 
+            id="phoneNumber" 
+            formControlName="phoneNumber"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            placeholder="+221 77 123 45 67"
+          >
+          <div *ngIf="dahiraForm.get('phoneNumber')?.invalid && (dahiraForm.get('phoneNumber')?.dirty || dahiraForm.get('phoneNumber')?.touched)" 
+               class="text-red-500 text-sm mt-1">
+            <div *ngIf="dahiraForm.get('phoneNumber')?.errors?.['required']">
+              Le numéro de téléphone est requis.
+            </div>
+            <div *ngIf="dahiraForm.get('phoneNumber')?.errors?.['pattern']">
+              Le format du numéro n'est pas valide (ex: +221771234567).
+            </div>
+          </div>
+        </div>
       </div>
+      
+      <!-- Étape 3: Localisation -->
+      <div *ngIf="currentStep === 3" class="space-y-4">
+        <div>
+          <label for="country" class="block text-sm font-medium text-gray-700 mb-1">
+            Pays *
+          </label>
+          <input 
+            type="text" 
+            id="country" 
+            formControlName="country"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            placeholder="Sénégal"
+          >
+          <div *ngIf="dahiraForm.get('country')?.invalid && (dahiraForm.get('country')?.dirty || dahiraForm.get('country')?.touched)" 
+               class="text-red-500 text-sm mt-1">
+            <div *ngIf="dahiraForm.get('country')?.errors?.['required']">
+              Le pays est requis.
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <label for="region" class="block text-sm font-medium text-gray-700 mb-1">
+            Région *
+          </label>
+          <input 
+            type="text" 
+            id="region" 
+            formControlName="region"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            placeholder="Dakar, Thiès, Saint-Louis..."
+          >
+          <div *ngIf="dahiraForm.get('region')?.invalid && (dahiraForm.get('region')?.dirty || dahiraForm.get('region')?.touched)" 
+               class="text-red-500 text-sm mt-1">
+            <div *ngIf="dahiraForm.get('region')?.errors?.['required']">
+              La région est requise.
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <label for="department" class="block text-sm font-medium text-gray-700 mb-1">
+            Département *
+          </label>
+          <input 
+            type="text" 
+            id="department" 
+            formControlName="department"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            placeholder="Pikine, Guédiawaye, Rufisque..."
+          >
+          <div *ngIf="dahiraForm.get('department')?.invalid && (dahiraForm.get('department')?.dirty || dahiraForm.get('department')?.touched)" 
+               class="text-red-500 text-sm mt-1">
+            <div *ngIf="dahiraForm.get('department')?.errors?.['required']">
+              Le département est requis.
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <label for="address" class="block text-sm font-medium text-gray-700 mb-1">
+            Adresse complète *
+          </label>
+          <textarea 
+            id="address" 
+            formControlName="address"
+            rows="3"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+            placeholder="Adresse détaillée du Dahira"
+          ></textarea>
+          <div *ngIf="dahiraForm.get('address')?.invalid && (dahiraForm.get('address')?.dirty || dahiraForm.get('address')?.touched)" 
+               class="text-red-500 text-sm mt-1">
+            <div *ngIf="dahiraForm.get('address')?.errors?.['required']">
+              L'adresse est requise.
+            </div>
+          </div>
+        </div>
+      </div>
+      
     </form>
   </div>
   
-  <div class="flex justify-end gap-2 p-4 bg-gray-50">
-    <button 
-      type="button"
-      (click)="onCancel()"
-      class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
-    >
-      Annuler
-    </button>
-    <button 
-      type="button"
-      (click)="onSubmit()"
-      [disabled]="dahiraForm.invalid"
-      class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-      Enregistrer
-    </button>
+  <!-- Navigation buttons -->
+  <div class="flex justify-between items-center p-4 bg-gray-50 border-t border-gray-200">
+    <div class="flex space-x-2">
+      <button 
+        type="button"
+        (click)="onCancel()"
+        class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
+      >
+        Annuler
+      </button>
+    </div>
+    
+    <div class="flex space-x-2">
+      <button 
+        type="button"
+        (click)="previousStep()"
+        *ngIf="currentStep > 1"
+        class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
+      >
+        Précédent
+      </button>
+      
+      <button 
+        type="button"
+        (click)="nextStep()"
+        *ngIf="currentStep < totalSteps"
+        class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors"
+      >
+        Suivant
+      </button>
+      
+      <button 
+        type="button"
+        (click)="onSubmit()"
+        *ngIf="currentStep === totalSteps"
+        [disabled]="dahiraForm.invalid"
+        class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        Enregistrer
+      </button>
+    </div>
   </div>
 </div>

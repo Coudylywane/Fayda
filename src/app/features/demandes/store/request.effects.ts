@@ -30,4 +30,24 @@ export class RequestEffects {
             )
         )
     );
+
+    loadAdhesionRequests$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(RequestActions.loadAdhesionRequests),
+            mergeMap(action =>
+                from(RequestApiService.getRequestByTargetUser(action.userId)).pipe(
+                    mergeMap((response) => {
+                        console.log("resultat demandeAdhesion: ", response.data);
+
+                        return of(RequestActions.loadAdhesionRequestsSuccess({ demandeAdhesion: response.data.data  }));
+                    }),
+                    catchError((error) => {
+                        const errorMessage = error.response?.data?.message || error.message || 'Erreur de récupération';
+                        console.error('Login error:', error);
+                        return of(RequestActions.loadRequestsFailure({ error: errorMessage }));
+                    })
+                )
+            )
+        )
+    );
 }

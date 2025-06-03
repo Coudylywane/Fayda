@@ -54,7 +54,7 @@ export class DetailDahiraPage implements OnInit, OnDestroy {
       if (this.dahiraId) {
         this.loadDahiraDetails();
         this.DetailRequest();
-        this.checkMembershipStatus();
+        // this.checkMembershipStatus();
       }
     });
   }
@@ -113,7 +113,8 @@ export class DetailDahiraPage implements OnInit, OnDestroy {
    */
   private async checkMembershipStatus(): Promise<void> {
     const requestedDahiras = JSON.parse(localStorage.getItem('requestedMemberships') || '[]');
-    this.membershipRequested = requestedDahiras.includes(this.dahiraId);
+    // this.membershipRequested = requestedDahiras.includes(this.dahiraId);
+    this.membershipRequested = this.requestCheck(this.status.PENDING);
     console.log("checkMembershipStatus dahira detail", this.membershipRequested);
     // if (!this.membershipRequested) {
     //   try {

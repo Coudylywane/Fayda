@@ -16,14 +16,15 @@ import { ConfettiService } from 'src/app/Admin/services/confetti.service';
 import { PrimaryRoleVisibilityDirective } from '../auth/directives/primary-role-visibility.directive';
 import { RoleHideDirective } from '../auth/directives/role-hide.directive';
 import { RoleVisibilityDirective } from '../auth/directives/role-visibility.directive';
+import { ProfilModalService } from './services/profil-modal.service';
 
 @Component({
   selector: 'app-profil-modal',
   templateUrl: './profil-modal.component.html',
   styleUrls: ['./profil-modal.component.scss'],
-  imports: [IonicModule, 
-    CommonModule, 
-    IconButtonComponent, 
+  imports: [IonicModule,
+    CommonModule,
+    IconButtonComponent,
     ButtonComponent,
     RoleVisibilityDirective,
     RoleHideDirective,
@@ -37,6 +38,7 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
   logoutAttempted = false;
   logoutError: string = '';
   isLoading = false;
+  error: string = '';
 
 
   // Subject pour gérer la désinscription
@@ -49,7 +51,8 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
     private router: Router,
     private store: Store<AppState>,
     private confettiService: ConfettiService,
-    private toast: ToastService,
+    private toastService: ToastService,
+    private profilModalService: ProfilModalService
   ) {
   }
 
@@ -72,13 +75,13 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
       if (this.logoutAttempted && !authState.isAuthenticated) {
         this.modalCtrl.dismiss();
         // this.confettiService.triggerConfetti();
-        this.toast.showSuccess('Vous êtes déconnecté');
+        this.toastService.showSuccess('Vous êtes déconnecté');
         this.router.navigate(['/login']);
-      }else if (this.logoutAttempted && this.logoutError) {
+      } else if (this.logoutAttempted && this.logoutError) {
         console.log('Déconnexion echec');
-        this.toast.showError(this.logoutError);
+        this.toastService.showError(this.logoutError);
         this.logoutAttempted = false;
-      }else{
+      } else {
         console.log('rien');
         this.logoutAttempted = false;
       }
@@ -122,9 +125,28 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
     // this.dismiss();
   }
 
-  async navigateTo(url: string){
-    if(await this.router.navigate([url])){
+  async navigateTo(url: string) {
+    if (await this.router.navigate([url])) {
       this.modalCtrl.dismiss();
+    }
+  }
+
+  async becomeMoukhadam() {
+    this.isLoading = true;
+    this.error = '';
+
+    try {
+      const response = await this.profilModalService.becomeMoukhadam();
+      console.log("l", response);
+      this.isLoading = false;
+      this.dismiss();
+      this.toastService.showSuccess(response.data.message);
+    } catch (error: any) {
+      console.error('Erreur lors d envoie:', error);
+      this.error = error.response?.data?.message || 'Impossible d\'envoyer la demande';
+      this.isLoading = false;
+      this.dismiss();
+      this.toastService.showError(this.error!);
     }
   }
 

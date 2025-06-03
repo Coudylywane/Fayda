@@ -26,8 +26,8 @@ export class DahirasPage implements OnInit {
   filters: any = {};
   loading: boolean = false;
   selectedDahira: Dahira | null = null;
-  protected Math = Math;
   private destroy$ = new Subject<void>();
+  protected Math = Math;
 
   // Pour le menu contextuel
   activeContextMenu: string | null = null;

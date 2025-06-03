@@ -52,12 +52,17 @@ const routes: Routes = [
     path: 'demandes',
     loadChildren: () => import('./features/demandes/demandes.module').then(m => m.DemandesPageModule)
   },
-  // Route fallback si aucune correspondance
   {
-    path: '**',
-    redirectTo: 'login',
-    pathMatch: 'full'
-  }
+    path: 'demande-dahira',
+    loadChildren: () => import('./features/demande-dahira/demande-dahira.module').then( m => m.DemandeDahiraPageModule)
+  },
+  // Route fallback si aucune correspondance
+  // {
+  //   path: '**',
+  //   redirectTo: 'login',
+  //   pathMatch: 'full'
+  // },
+
 ];
 
 @NgModule({

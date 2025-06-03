@@ -25,7 +25,7 @@ export class RegisterPage {
   // private destroyRef = inject(DestroyRef);
   maxDate = new Date().toISOString();
   registerForm: FormGroup;
-  selectedGender: string = 'male';
+  selectedGender: string = 'homme';
   showPassword = false;
   registerError = "";
   isLoading = false;

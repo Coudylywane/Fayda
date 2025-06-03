@@ -1,6 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DahiraService } from '../../services/dahira.service';
+import { DahiraServiceAdmin } from '../../services/dahira.service';
 import { UserService } from '../../services/user.service';
 import { Dahira, DahiraMember, MemberRole } from '../../models/dahira.model';
 import { User } from '../../models/user.model';
@@ -38,7 +38,7 @@ export class DahiraDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private dahiraService: DahiraService,
+    private dahiraService: DahiraServiceAdmin,
     private userService: UserService
   ) {}
 
@@ -137,14 +137,14 @@ export class DahiraDetailsComponent implements OnInit {
   addMember(): void {
     if (this.selectedUser && this.selectedRole) {
       this.dahiraService.addMemberToDahira(this.dahiraId, this.selectedUser.id, this.selectedRole).subscribe({
-        next: (success) => {
+        next: (success: any) => {
           if (success) {
             this.showAddMemberModal = false;
             this.selectedUser = null;
             this.loadDahiraMembers();
           }
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Erreur lors de l\'ajout du membre', error);
         }
       });

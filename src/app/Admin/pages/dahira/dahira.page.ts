@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfettiService } from '../../services/confetti.service';
 import { Router } from '@angular/router';
-import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
-import { Dahira } from './models/dahira.model';
-import { DahiraService } from './services/dahira.service';
+import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { DahiraServiceAdmin } from './services/dahira.service';
+import { DahiraService } from 'src/app/features/dahiras/services/dahira.service';
+import { selectDahiraState } from 'src/app/features/dahiras/store/dahira.selector';
+import { Store } from '@ngrx/store';
+import { Dahira } from 'src/app/features/dahiras/models/dahira.model';
 
 @Component({
   selector: 'app-dahira',
@@ -12,7 +15,11 @@ import { DahiraService } from './services/dahira.service';
   standalone: false
 })
 export class DahiraPage implements OnInit {
+  // Données originales du serveur
+  allDahiras: Dahira[] = [];
+  // Données affichées (après filtrage)
   dahiras: Dahira[] = [];
+  error: string | null = null;
   totalItems: number = 0;
   currentPage: number = 1;
   itemsPerPage: number = 12;
@@ -24,82 +31,209 @@ export class DahiraPage implements OnInit {
   showConfirmDeleteModal: boolean = false;
   selectedDahira: Dahira | null = null;
   protected Math = Math;
-  
+  private destroy$ = new Subject<void>();
+
   // Pour le menu contextuel
   activeContextMenu: string | null = null;
   contextMenuPosition = { top: '0px', left: '0px' };
-  
+
   // Pour la recherche
   searchSubject = new Subject<string>();
-  
+
+  // Pagination côté client
+  filteredDahiras: Dahira[] = [];
+  totalFilteredItems: number = 0;
+
   constructor(
     private confettiService: ConfettiService,
+    private dahiraServiceAdmin: DahiraServiceAdmin,
     private dahiraService: DahiraService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private store: Store,
+  ) { }
 
   ngOnInit(): void {
-    this.loadDahiras();
-    
+    console.log("Initialisation DahirasPage");
+
+    // Charger toutes les données une seule fois
+    this.loadAllDahiras();
+
+    // S'abonner aux changements d'état du store
+    this.store.select(selectDahiraState).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(dahiraState => {
+      this.loading = dahiraState.loading;
+      this.error = dahiraState.error;
+
+      // Stocker toutes les données du serveur
+      if (dahiraState.dahiras && dahiraState.dahiras.length > 0) {
+        this.allDahiras = [...dahiraState.dahiras];
+        this.applyFiltersAndPagination();
+      }
+    });
+
     // Configuration de la recherche avec debounce
     this.searchSubject.pipe(
       debounceTime(300),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
     ).subscribe(term => {
       this.searchTerm = term;
-      this.currentPage = 1; // Réinitialiser à la première page lors d'une recherche
-      this.loadDahiras();
+      this.currentPage = 1; // Réinitialiser à la première page
+      this.applyFiltersAndPagination();
     });
   }
 
-  loadDahiras(): void {
-    this.loading = true;
-    this.dahiraService.getDahiras(this.currentPage, this.itemsPerPage, this.searchTerm, this.filters)
-      .subscribe({
-        next: (result) => {
-          this.dahiras = result.dahiras;
-          this.totalItems = result.total;
-          this.loading = false;
-        },
-        error: (error) => {
-          console.error('Erreur lors du chargement des dahiras', error);
-          this.loading = false;
-        }
-      });
+  /**
+ * Charge toutes les dahiras du serveur
+ */
+  private loadAllDahiras(): void {
+    this.dahiraService.getDahirasPagined(1, 12);
   }
 
+  /**
+   * Applique les filtres de recherche et la pagination côté client
+   */
+  private applyFiltersAndPagination(): void {
+    let filtered = [...this.allDahiras];
+
+    // Appliquer la recherche
+    if (this.searchTerm && this.searchTerm.length > 0) {
+      const searchLower = this.searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(dahira =>
+        dahira.dahiraName.toLowerCase().includes(searchLower) ||
+        dahira.email.toLowerCase().includes(searchLower) ||
+        dahira.phoneNumber.includes(searchLower) ||
+        dahira.location?.address?.toLowerCase().includes(searchLower) ||
+        dahira.location?.region?.toLowerCase().includes(searchLower) ||
+        dahira.location?.country?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Appliquer d'autres filtres si nécessaire
+    if (this.filters && Object.keys(this.filters).length > 0) {
+      filtered = this.applyCustomFilters(filtered, this.filters);
+    }
+
+    // Stocker les résultats filtrés
+    this.filteredDahiras = filtered;
+    this.totalFilteredItems = filtered.length;
+
+    // Appliquer la pagination
+    this.applyPagination();
+  }
+
+    /**
+   * Applique la pagination sur les données filtrées
+   */
+  private applyPagination(): void {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+
+    this.dahiras = this.filteredDahiras.slice(startIndex, endIndex);
+    this.totalItems = this.totalFilteredItems;
+  }
+
+  /**
+   * Applique des filtres personnalisés (à adapter selon vos besoins)
+   */
+  private applyCustomFilters(dahiras: Dahira[], filters: any): Dahira[] {
+    let filtered = dahiras;
+
+    // Exemple de filtres (adaptez selon vos besoins)
+    if (filters.region) {
+      filtered = filtered.filter(d =>
+        d.location?.region?.toLowerCase().includes(filters.region.toLowerCase())
+      );
+    }
+
+    if (filters.minDisciples) {
+      filtered = filtered.filter(d => d.numberOfDisciples >= filters.minDisciples);
+    }
+
+    if (filters.active !== undefined) {
+      filtered = filtered.filter(d => d.active === filters.active);
+    }
+
+    return filtered;
+  }
+
+  /**
+   * Gère la recherche avec debounce
+   */
   onSearch(term: string): void {
     this.searchSubject.next(term);
   }
 
-  onPageChange(page: number): void {
-    this.currentPage = page;
-    this.loadDahiras();
+  formatPhoneNumber(phoneNumber: string){
+    return phoneNumber;
   }
 
+    /**
+   * Calcule le nombre total de pages
+   */
+  getTotalPages(): number {
+    return Math.ceil(this.totalItems / this.itemsPerPage);
+  }
+
+  /**
+   * Gère le changement de page
+   */
+  onPageChange(page: number): void {
+    if (page !== this.currentPage && page > 0 && page <= this.getTotalPages()) {
+      this.currentPage = page;
+      this.applyPagination();
+    }
+  }
+
+    /**
+   * Vérifie s'il y a des résultats
+   */
+  hasResults(): boolean {
+    return this.dahiras.length > 0;
+  }
+
+  /**
+   * Vérifie si c'est une recherche vide
+   */
+  isEmptySearch(): boolean {
+    return this.searchTerm.length > 0 && this.totalFilteredItems === 0;
+  }
+
+  /**
+   * Gère le changement de filtres
+   */
   onFilterChange(filters: any): void {
     this.filters = filters;
-    this.currentPage = 1; // Réinitialiser à la première page lors d'un changement de filtre
-    this.loadDahiras();
+    this.currentPage = 1; // Réinitialiser à la première page
+    this.applyFiltersAndPagination();
+  }
+
+  /**
+   * Efface la recherche et recharge les données
+   */
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.searchSubject.next('');
   }
 
   showContextMenu(event: MouseEvent, dahira: Dahira): void {
     event.preventDefault();
     event.stopPropagation();
-    
+
     this.selectedDahira = dahira;
-    this.activeContextMenu = dahira.id;
-    
+    this.activeContextMenu = dahira.dahiraId;
+
     // Positionner le menu contextuel
     const menuWidth = 200; // Largeur estimée du menu
     const windowWidth = window.innerWidth;
     const clickX = event.clientX;
-    
+
     // Éviter que le menu ne sorte de l'écran par la droite
     const left = clickX + menuWidth > windowWidth
       ? windowWidth - menuWidth - 10
       : clickX;
-    
+
     this.contextMenuPosition = {
       top: `${event.clientY}px`,
       left: `${left}px`
@@ -111,11 +245,19 @@ export class DahiraPage implements OnInit {
   }
 
   viewDahiraDetails(dahira: Dahira): void {
-    this.router.navigate(['admin/dahira/detail', dahira.id]);
+    this.router.navigate(['admin/dahira/detail', dahira.dahiraId]);
   }
 
   openAddModal(): void {
     this.showAddModal = true;
+  }
+
+    /**
+   * Rafraîchit les données depuis le serveur
+   */
+  refresh(): void {
+    this.searchTerm = "";
+    this.loadAllDahiras();
   }
 
   openEditModal(dahira: Dahira): void {
@@ -131,21 +273,27 @@ export class DahiraPage implements OnInit {
   }
 
   onAddDahira(dahira: any): void {
-    this.dahiraService.createDahira(dahira).subscribe({
-      next: () => {
+    console.log('Tentative de création dahira:', dahira);
+
+    this.dahiraServiceAdmin.createDahira(dahira).subscribe({
+      next: (response) => {
+        console.log('Succès création dahira:', response);
         this.showAddModal = false;
-        this.loadDahiras();
+        this.loadAllDahiras();
       },
-      error: (error) => console.error('Erreur lors de la création du dahira', error)
+      error: (error) => {
+        console.error('Erreur création dahira:', error);
+        // La modal reste ouverte volontairement
+      }
     });
   }
 
   onEditDahira(changes: any): void {
     if (this.selectedDahira) {
-      this.dahiraService.updateDahira(this.selectedDahira.id, changes).subscribe({
+      this.dahiraServiceAdmin.updateDahira(this.selectedDahira.dahiraId, changes).subscribe({
         next: () => {
           this.showEditModal = false;
-          this.loadDahiras();
+          this.loadAllDahiras();
         },
         error: (error) => console.error('Erreur lors de la modification du dahira', error)
       });
@@ -154,11 +302,11 @@ export class DahiraPage implements OnInit {
 
   onDeleteDahira(): void {
     if (this.selectedDahira) {
-      this.dahiraService.deleteDahira(this.selectedDahira.id).subscribe({
+      this.dahiraServiceAdmin.deleteDahira(this.selectedDahira.dahiraId).subscribe({
         next: (success) => {
           if (success) {
             this.showConfirmDeleteModal = false;
-            this.loadDahiras();
+            this.loadAllDahiras();
           }
         },
         error: (error) => console.error('Erreur lors de la suppression du dahira', error)

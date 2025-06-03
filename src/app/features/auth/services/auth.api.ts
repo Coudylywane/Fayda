@@ -7,7 +7,11 @@ export class AuthApi {
     }
 
     static register(userData: Register) {
-        return axios.post('users', userData);
+        return axios.post('users', userData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
     }
 
     static logout() {

@@ -14,14 +14,14 @@
         <div class="bg-dark-green rounded-full p-1 flex">
           <button 
             type="button" 
-            (click)="selectGender('male')"
-            [class]="'px-6 py-2 rounded-full transition-all duration-200 text-white hover:bg-light-green ' + (selectedGender === 'male' ? 'bg-light-green' : '')">
+            (click)="selectGender('homme')"
+            [class]="'px-6 py-2 rounded-full transition-all duration-200 text-white hover:bg-light-green ' + (selectedGender === 'homme' ? 'bg-light-green' : '')">
             M.
           </button>
           <button 
             type="button" 
-            (click)="selectGender('female')"
-            [class]="'px-6 py-2 rounded-full transition-all duration-200 text-white hover:bg-light-green ' + (selectedGender === 'female' ? 'bg-light-green' : '')">
+            (click)="selectGender('femme')"
+            [class]="'px-6 py-2 rounded-full transition-all duration-200 text-white hover:bg-light-green ' + (selectedGender === 'femme' ? 'bg-light-green' : '')">
             Mme.
           </button>
         </div>

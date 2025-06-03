@@ -9,4 +9,8 @@ export interface Dahira {
     location?: LocationInfo;
     responsable?: User;
     readonly active: boolean;
+    approvedBy: User,
+    createdBy: User,
+    createdAt: Date;
+    updatedAt: Date;
 }

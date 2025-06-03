@@ -1,3 +1,4 @@
+import { LocationInfo } from "src/app/features/auth/models/user.model";
 import { User } from "./user.model";
 
 export interface Dahira {
@@ -23,3 +24,17 @@ export interface Dahira {
     role: MemberRole;
     joinedAt: Date;
   }
+
+export interface CreateDahira{
+  dahiraName: string,
+  email: string,
+  phoneNumber: string,
+  numberOfDisciples: number,
+  location: {
+    country: string,
+    region: string,
+    department: string,
+    address: string
+  },
+  createdByUserId: string
+}

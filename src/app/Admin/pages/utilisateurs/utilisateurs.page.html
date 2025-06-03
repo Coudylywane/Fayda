@@ -86,7 +86,7 @@
       class="relative bg-white rounded-lg p-4 border border-gray-200 flex items-center transition-shadow hover:shadow-md cursor-pointer">
       <!-- Avatar -->
       <div class="relative overflow-hidden w-14 h-14 rounded-full mr-4 bg-gray-200">
-        <img [src]="user.image || 'assets/images/default-avatar.png'" [alt]="user.name"
+        <img title="{{user.id}}" [src]="user.image || 'assets/images/1.png'" [alt]="user.name"
           class="w-full h-full object-cover" (error)="onImageError($event)" />
         <!-- Indicateur de statut -->
         <div class="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white"

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Approval } from '../models/request.model';
 
 export class RequestApiService {
 
@@ -7,6 +8,19 @@ export class RequestApiService {
         
         return axios.get(`user-requests/requester/${userId}`);
     }
+
+    static approval(data: Approval) {
+        return axios.post(`approval`, data);
+    }
+
+    static getRequestByTargetUser(userId: string) {
+        console.log("RequestApiService");
+        // user-requests/dahira/{dahiraId}
+
+        return axios.get(`user-requests/requester/${userId}`);
+    }
+
+
 
     /**
      * Récupère les détails d'un dahira par son ID

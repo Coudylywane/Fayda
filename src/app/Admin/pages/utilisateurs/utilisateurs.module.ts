@@ -10,6 +10,7 @@ import { FilterUsersModalComponent } from './modals/filter-users-modal/filter-us
 import { EditUserModalComponent } from './modals/edit-user-modal/edit-user-modal.component';  // <-- import ajouté
 import { LeftMenuComponent } from '../../components/left-menu/left-menu.component';
 import { UserAdminService } from './services/useradmin.service';
+import { IconButtonComponent } from "../../../shared/components/icon-button/icon-button.component";
 
 
 const routes: Routes = [
@@ -22,12 +23,12 @@ const routes: Routes = [
 @NgModule({
   imports: [
     CommonModule,
-    FormsModule,       
-    
+    FormsModule,
     IonicModule,
-     HttpClientModule,
-    RouterModule.forChild(routes)
-  ],
+    HttpClientModule,
+    RouterModule.forChild(routes),
+    IconButtonComponent
+],
   declarations: [
     UtilisateursPage,
     AddUserModalComponent,

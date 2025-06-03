@@ -18,7 +18,7 @@ export interface User {
     dahira?: Dahira;
     mouqadam?: User;
     disciples?: User[];
-    roles?: string[];
+    roles?: UserRole[];
 }
 
 export enum UserRole {

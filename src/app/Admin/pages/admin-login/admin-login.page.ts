@@ -70,7 +70,7 @@ export class AdminLoginPage implements OnInit, OnDestroy {
             this.confettiService.triggerConfetti();
             setTimeout(() => {
               this.router.navigate([this.returnUrl]);
-            }, 750); // Délai de 750 ms pour voir le toast et les confettis
+            }, 250); // Délai de 250 ms pour voir le toast et les confettis
             console.log("Redirection vers:", this.returnUrl);
           } else if (authState.isAuthenticated && !authState.isAdmin) {
             // Login réussi mais pas admin

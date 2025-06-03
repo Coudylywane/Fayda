@@ -5,7 +5,7 @@ import { catchError, map, mergeMap } from 'rxjs/operators';
 import * as AuthActions from './auth.actions';
 import { AuthApi } from '../services/auth.api';
 import { jwtDecode } from "jwt-decode";
-import { User } from '../models/user.model';
+import { User, UserRole } from '../models/user.model';
 import { Token } from '../models/auth.model';
 
 @Injectable()
@@ -36,8 +36,12 @@ export class AuthEffects {
                             return from(AuthApi.getUserInfo(userId!)).pipe(
                                 map((userDetailsResponse) => {
                                     const user: User = userDetailsResponse.data.data;
-                                    user.roles = roles; // Ajouter les rôles à l'utilisateur
-                                    const isAdmin: boolean = user.roles!.includes('FAYDA_ROLE_ADMIN');
+                                    user.roles = roles.filter(
+                                        (role: any): role is UserRole => Object.values(UserRole).includes(role as UserRole)
+                                    ); // Ajouter les rôles à l'utilisateur
+                                    const isAdmin: boolean = [UserRole.ADMIN, UserRole.MOUKHADAM].some(role => user.roles!.includes(role))
+                                    console.log(" is Admin?", user.roles);
+
                                     const messageLogin = isAdmin ? 'Connexion réussie en tant qu\'administrateur' : 'Connexion réussie en tant qu\'utilisateur';
                                     return AuthActions.loginSuccess({ token, user, isAdmin, message: messageLogin });
                                 }),

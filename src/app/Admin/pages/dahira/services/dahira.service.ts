@@ -26,33 +26,6 @@ export class DahiraServiceAdmin {
     this.dahirasSubject.next(this.mockDahiras);
   }
 
-  // Obtenir tous les Dahiras (paginés)
-  getDahiras(page: number = 1, limit: number = 10, search: string = '', filters: any = {}): Observable<{ dahiras: Dahira[], total: number }> {
-    // Pour la démo, nous filtrons les données mockées
-    let filteredDahiras = [...this.mockDahiras];
-    
-    // Appliquer la recherche
-    if (search) {
-      const searchLower = search.toLowerCase();
-      filteredDahiras = filteredDahiras.filter(
-        d => d.name.toLowerCase().includes(searchLower)
-      );
-    }
-    
-    // Appliquer les filtres (à implémenter selon les besoins)
-    
-    // Calculer la pagination
-    const total = filteredDahiras.length;
-    const startIndex = (page - 1) * limit;
-    const paginatedDahiras = filteredDahiras.slice(startIndex, startIndex + limit);
-    
-    return of({ dahiras: paginatedDahiras, total });
-    
-    // Dans une vraie implémentation, utilisez HTTP :
-    // return this.http.get<{ dahiras: Dahira[], total: number }>
-    //   (`${this.apiUrl}?page=${page}&limit=${limit}&search=${search}`);
-  }
-
   // Obtenir un Dahira par ID
   getDahiraById(id: string): Observable<Dahira> {
     // Pour la démo, nous utilisons les données mockées

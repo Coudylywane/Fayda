@@ -49,7 +49,7 @@ export function configureAxios(store: any) {
         isRedirecting = true;
         
         localStorage.removeItem('auth_token');
-        store.dispatch(AuthActions.logout());
+        // store.dispatch(AuthActions.logout());
         
         // Réinitialiser le flag après un délai
         setTimeout(() => {

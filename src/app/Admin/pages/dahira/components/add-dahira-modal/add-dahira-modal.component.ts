@@ -1,5 +1,5 @@
 // add-dahira-modal.component.ts
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -23,6 +23,7 @@ export interface CreateDahira {
   imports: [CommonModule, ReactiveFormsModule]
 })
 export class AddDahiraModalComponent implements OnInit {
+  @Input() isloading: boolean = false;
   @Output() save = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<void>();
   
@@ -33,18 +34,18 @@ export class AddDahiraModalComponent implements OnInit {
   constructor(private fb: FormBuilder) {
     this.dahiraForm = this.fb.group({
       // Étape 1: Informations générales
-      dahiraName: ['', [Validators.required, Validators.minLength(3)]],
+      dahiraName: ['Dahira Mbaye', [Validators.required, Validators.minLength(3)]],
       numberOfDisciples: [0, [Validators.required, Validators.min(1)]],
       
       // Étape 2: Contact
-      email: ['', [Validators.required, Validators.email]],
-      phoneNumber: ['', [Validators.required]],
+      email: ['d1@atcreative.sn', [Validators.required, Validators.email]],
+      phoneNumber: ['+24377882252', [Validators.required]],
       
       // Étape 3: Localisation
-      country: ['', [Validators.required]],
-      region: ['', [Validators.required]],
-      department: ['', [Validators.required]],
-      address: ['', [Validators.required]]
+      country: ['Senegal', [Validators.required]],
+      region: ['Dakar', [Validators.required]],
+      department: ['Dakar', [Validators.required]],
+      address: ['Grand Yoff', [Validators.required]]
     });
   }
   

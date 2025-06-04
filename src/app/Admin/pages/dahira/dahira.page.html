@@ -305,7 +305,7 @@
 
 <!-- Modal d'ajout de Dahira -->
 <div *ngIf="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <app-add-dahira-modal (cancel)="closeAddModal()" (save)="onAddDahira($event)"></app-add-dahira-modal>
+  <app-add-dahira-modal (cancel)="closeAddModal()" [isloading]="addLoading" (save)="onAddDahira($event)"></app-add-dahira-modal>
 </div>
 
 <!-- Modal de modification de Dahira -->

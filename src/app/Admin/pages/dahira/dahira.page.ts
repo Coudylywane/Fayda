@@ -7,6 +7,9 @@ import { DahiraService } from 'src/app/features/dahiras/services/dahira.service'
 import { selectDahiraState } from 'src/app/features/dahiras/store/dahira.selector';
 import { Store } from '@ngrx/store';
 import { Dahira } from 'src/app/features/dahiras/models/dahira.model';
+import { CreateDahira } from './models/dahira.model';
+import { ToastService } from 'src/app/shared/components/toast/toast.service';
+import { selectCurrentUser } from 'src/app/features/auth/store/auth.selectors';
 
 @Component({
   selector: 'app-dahira',
@@ -32,6 +35,7 @@ export class DahiraPage implements OnInit {
   selectedDahira: Dahira | null = null;
   protected Math = Math;
   private destroy$ = new Subject<void>();
+  addLoading: boolean = false;
 
   // Pour le menu contextuel
   activeContextMenu: string | null = null;
@@ -43,6 +47,7 @@ export class DahiraPage implements OnInit {
   // Pagination côté client
   filteredDahiras: Dahira[] = [];
   totalFilteredItems: number = 0;
+  userId: string = "";
 
   constructor(
     private confettiService: ConfettiService,
@@ -50,6 +55,7 @@ export class DahiraPage implements OnInit {
     private dahiraService: DahiraService,
     private router: Router,
     private store: Store,
+    private toastService: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -70,6 +76,14 @@ export class DahiraPage implements OnInit {
         this.allDahiras = [...dahiraState.dahiras];
         this.applyFiltersAndPagination();
       }
+    });
+
+        // S'abonner aux changements d'état du store
+    this.store.select(selectCurrentUser).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(currentUser => {
+      this.userId = currentUser?.userId!;
+
     });
 
     // Configuration de la recherche avec debounce
@@ -123,9 +137,9 @@ export class DahiraPage implements OnInit {
     this.applyPagination();
   }
 
-    /**
-   * Applique la pagination sur les données filtrées
-   */
+  /**
+ * Applique la pagination sur les données filtrées
+ */
   private applyPagination(): void {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
@@ -165,13 +179,13 @@ export class DahiraPage implements OnInit {
     this.searchSubject.next(term);
   }
 
-  formatPhoneNumber(phoneNumber: string){
+  formatPhoneNumber(phoneNumber: string) {
     return phoneNumber;
   }
 
-    /**
-   * Calcule le nombre total de pages
-   */
+  /**
+ * Calcule le nombre total de pages
+ */
   getTotalPages(): number {
     return Math.ceil(this.totalItems / this.itemsPerPage);
   }
@@ -186,9 +200,9 @@ export class DahiraPage implements OnInit {
     }
   }
 
-    /**
-   * Vérifie s'il y a des résultats
-   */
+  /**
+ * Vérifie s'il y a des résultats
+ */
   hasResults(): boolean {
     return this.dahiras.length > 0;
   }
@@ -252,9 +266,9 @@ export class DahiraPage implements OnInit {
     this.showAddModal = true;
   }
 
-    /**
-   * Rafraîchit les données depuis le serveur
-   */
+  /**
+ * Rafraîchit les données depuis le serveur
+ */
   refresh(): void {
     this.searchTerm = "";
     this.loadAllDahiras();
@@ -272,20 +286,26 @@ export class DahiraPage implements OnInit {
     this.closeContextMenu();
   }
 
-  onAddDahira(dahira: any): void {
+  onAddDahira(dahira: CreateDahira): void {
+    this.addLoading = true;
     console.log('Tentative de création dahira:', dahira);
-
-    this.dahiraServiceAdmin.createDahira(dahira).subscribe({
-      next: (response) => {
+    dahira.createdByUserId = this.userId;
+    dahira.location.nationality = dahira.location.country;
+    this.dahiraService.createDahira(dahira)
+      .then(response => {
+        this.addLoading = false;
         console.log('Succès création dahira:', response);
-        this.showAddModal = false;
-        this.loadAllDahiras();
-      },
-      error: (error) => {
+        if(response.success){
+          this.showAddModal = false;
+          this.toastService.showSuccess(response.data.message || "Votre demande a été envoyé");
+        }
+        // this.loadAllDahiras();
+      }).catch(error => {
+        this.addLoading = false;
         console.error('Erreur création dahira:', error);
-        // La modal reste ouverte volontairement
-      }
-    });
+        this.toastService.showError(error.message)
+      });
+
   }
 
   onEditDahira(changes: any): void {

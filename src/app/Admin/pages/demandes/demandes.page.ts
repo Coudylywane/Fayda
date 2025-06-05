@@ -7,7 +7,9 @@ import { Store } from '@ngrx/store';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { selectAdminRequestState } from './store/demande.selectors';
 import { RequestService } from 'src/app/features/demandes/services/request.service';
-import { RequestDto, RequestTypeEnum, StatusEnum } from 'src/app/features/demandes/models/request.model';
+import { ApprovalDto, RequestDto, RequestTypeEnum, StatusEnum } from 'src/app/features/demandes/models/request.model';
+import { selectCurrentUser } from 'src/app/features/auth/store/auth.selectors';
+import { ToastService } from 'src/app/shared/components/toast/toast.service';
 
 @Component({
   selector: 'app-demandes',
@@ -45,6 +47,7 @@ export class DemandesPage implements OnInit, OnDestroy {
   error: string | null = null;
   loading: boolean = false;
   totalFilteredItems: number = 0;
+  userId: string = '';
 
   // Search debounce
   private searchSubject = new Subject<string>();
@@ -54,7 +57,8 @@ export class DemandesPage implements OnInit, OnDestroy {
     private router: Router,
     private confettiService: ConfettiService,
     private store: Store,
-    private requestService: RequestService
+    private requestService: RequestService,
+    private toastService: ToastService
   ) {
     // Configuration du debounce pour la recherche
     this.searchSubject.pipe(
@@ -70,6 +74,11 @@ export class DemandesPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadAllRequests();
+
+    this.store.select(selectCurrentUser).subscribe(user => {
+
+      this.userId = user?.userId!;
+    });
 
     this.store.select(selectAdminRequestState).pipe(
       takeUntil(this.destroy$)
@@ -288,19 +297,72 @@ export class DemandesPage implements OnInit, OnDestroy {
   /**
    * Approuver une demande
    */
-  approveDemand(demand: RequestDto): void {
+  async approveDemand(demand: RequestDto) {
     if (demand.approvalStatus !== this.status.PENDING) {
       return;
     }
 
+    const data: ApprovalDto = { targetId: demand.requestId, approved: true, approvedByUserId: this.userId, targetType: demand.requestType }
+
+    try {
+      const response = await RequestApiService.approval(data);
+      console.log("request ", response);
+      this.toastService.showSuccess("Vous avez autorisé la demande");
+      this.loadAllRequests();
+      // Mise à jour locale en attendant la réponse du serveur
+      const requestIndex = this.allRequests.findIndex(
+        req => req.requestId === demand.requestId
+      );
+
+      if (requestIndex !== -1) {
+        this.allRequests[requestIndex] = {
+          ...this.allRequests[requestIndex],
+          approvalStatus: StatusEnum.APPROVED
+        };
+        this.filterDemands();
+      }
+      this.showActionsPopup = null;
+      this.updateCounts();
+    } catch (error: any) {
+      console.error('Erreur demande adhésion:', error);
+      const errorMessage = error.message || 'Erreur lors de l\'envoi de la demande';
+      this.toastService.showError(errorMessage);
+    }
     // Ici, vous devriez appeler votre service pour approuver la demande
     // this.requestService.approveRequest(demand.requestId).subscribe(...)
 
-    demand.approvalStatus = this.status.APPROVED;
-    this.updateCounts();
-    this.showActionsPopup = null;
-    this.confettiService.triggerConfetti();
+    // demand.approvalStatus = this.status.APPROVED;
+    // this.confettiService.triggerConfetti();
   }
+
+  // if (this.requestToApprove) {
+  //   const data: ApprovalDto = { targetId: this.requestToApprove.requestId, approved: true, approvedByUserId: this.userId, targetType: this.requestToApprove.requestType }
+
+  //   try {
+  //     const response = await RequestApiService.approval(data);
+  //     console.log("request ", response);
+  //     this.toastService.showSuccess("Vous avez autorisé la demande");
+  //     // Mise à jour locale en attendant la réponse du serveur
+  //     const requestIndex = this.allRequests.findIndex(
+  //       req => req.requestId === this.requestToApprove!.requestId
+  //     );
+
+  //     if (requestIndex !== -1) {
+  //       this.allRequests[requestIndex] = {
+  //         ...this.allRequests[requestIndex],
+  //         approvalStatus: StatusEnum.APPROVED
+  //       };
+  //       this.applyFilters();
+  //     }
+  //   } catch (error: any) {
+  //     console.error('Erreur demande adhésion:', error);
+  //     const errorMessage = error.message || 'Erreur lors de l\'envoi de la demande';
+  //     this.toastService.showError(errorMessage);
+  //   }
+
+
+  //   this.closeApprovalModal();
+  // }
 
   /**
    * Ouvrir le modal de rejet

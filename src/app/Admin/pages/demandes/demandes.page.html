@@ -1,4 +1,4 @@
-<div class="p-6 bg-gray-100 min-h-screen">
+<div class="p-6 bg-gray-100 min-h-screen" (click)="closePopupsOnOutsideClick($event)">
   <div class="max-w-7xl mx-auto">
     <!-- Header -->
     <div class="mb-8">
@@ -285,15 +285,20 @@
 
                     <!-- Menu dropdown -->
                     <div *ngIf="showActionsPopup === demand.requestId"
-                      class="fixed w-48 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-50 overflow-y-auto max-h-[calc(100vh-20px)]"
+                      class="fixed w-48 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-50 overflow-y-auto max-h-[calc(100vh-20px)] pointer-events-auto"
                       [ngStyle]="{top: contextMenuPosition.top, left: contextMenuPosition.left}">
                       <div class="py-1">
                         <button (click)="viewDetails(demand)"
                           class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
                           <div class="flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 mr-2 " fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+                              </path>
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                              </path>
                             </svg>
                             Voir les détails
                           </div>
@@ -462,5 +467,5 @@
   </div>
 
   <!-- Overlay pour fermer les popups -->
-  <div *ngIf="showActionsPopup" (click)="closePopupsOnOutsideClick($event)" class="fixed inset-0 z-10"></div>
+  <!-- <div *ngIf="showActionsPopup" (click)="closePopupsOnOutsideClick($event)" class="fixed inset-0 z-10"></div> -->
 </div>

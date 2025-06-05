@@ -9,7 +9,7 @@ import { DahiraApiService } from '../../services/dahira-api.service';
 import { selectCurrentUser } from 'src/app/features/auth/store/auth.selectors';
 import { Dahira } from '../../models/dahira.model';
 import { RequestApiService } from 'src/app/features/demandes/services/request.api';
-import { Request, RequestType, Status } from 'src/app/features/demandes/models/request.model';
+import { RequestDto, RequestTypeEnum, StatusEnum } from 'src/app/features/demandes/models/request.model';
 
 @Component({
   selector: 'app-detail-dahira',
@@ -19,15 +19,15 @@ import { Request, RequestType, Status } from 'src/app/features/demandes/models/r
 })
 export class DetailDahiraPage implements OnInit, OnDestroy {
   dahira: Dahira | null = null;
-  requests: Request[] | [] = [];
+  requests: RequestDto[] | [] = [];
   dahiraId: string = '';
   loading: boolean = false;
   error: string | null = null;
   membershipRequested: boolean = false;
   requestingMembership: boolean = false;
   userId!: string;
-  requestType = RequestType;
-  status = Status;
+  requestType = RequestTypeEnum;
+  status = StatusEnum;
 
   private destroy$ = new Subject<void>();
 
@@ -101,7 +101,7 @@ export class DetailDahiraPage implements OnInit, OnDestroy {
     }
   }
 
-  requestCheck(type: Status): boolean {
+  requestCheck(type: StatusEnum): boolean {
     return this.requests.some(request =>
       request.targetDahiraName === this.dahira?.dahiraName && request.approvalStatus === type
     );

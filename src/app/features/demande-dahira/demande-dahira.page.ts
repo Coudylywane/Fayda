@@ -5,7 +5,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { selectCurrentUser } from '../auth/store/auth.selectors';
 import { RequestService } from '../demandes/services/request.service';
 import { selectRequestState } from '../demandes/store/request.selectors';
-import { Approval, Request, RequestType, Status } from '../demandes/models/request.model';
+import { ApprovalDto, RequestDto, RequestTypeEnum, StatusEnum } from '../demandes/models/request.model';
 import { RequestApiService } from '../demandes/services/request.api';
 import { ToastService } from 'src/app/shared/components/toast/toast.service';
 
@@ -17,8 +17,8 @@ import { ToastService } from 'src/app/shared/components/toast/toast.service';
 })
 export class DemandeDahiraPage implements OnInit {
 
-  filteredRequests: Request[] = [];
-  allRequests: Request[] = [];
+  filteredRequests: RequestDto[] = [];
+  allRequests: RequestDto[] = [];
 
   // Filtres et recherche
   activeTab: string = 'ALL';
@@ -33,15 +33,15 @@ export class DemandeDahiraPage implements OnInit {
 
   // Modale de confirmation de suppression
   showDeleteModal: boolean = false;
-  requestToDelete: Request | null = null;
+  requestToDelete: RequestDto | null = null;
 
   // Modale d'approbation
   showApprovalModal: boolean = false;
-  requestToApprove: Request | null = null;
+  requestToApprove: RequestDto | null = null;
 
   // Modale de rejet
   showRejectionModal: boolean = false;
-  requestToReject: Request | null = null;
+  requestToReject: RequestDto | null = null;
   rejectionReason: string = '';
 
   constructor(
@@ -160,7 +160,7 @@ export class DemandeDahiraPage implements OnInit {
   }
 
   // === GESTION DE LA SUPPRESSION ===
-  openDeleteModal(request: Request) {
+  openDeleteModal(request: RequestDto) {
     this.requestToDelete = request;
     this.showDeleteModal = true;
   }
@@ -185,7 +185,7 @@ export class DemandeDahiraPage implements OnInit {
   }
 
   // === GESTION DE L'APPROBATION ===
-  openApprovalModal(request: Request) {
+  openApprovalModal(request: RequestDto) {
     this.requestToApprove = request;
     this.showApprovalModal = true;
   }
@@ -230,7 +230,7 @@ export class DemandeDahiraPage implements OnInit {
 
   async confirmApproval() {
     if (this.requestToApprove) {
-      const data: Approval = { targetId: this.requestToApprove.requestId, approved: true, approvedByUserId: this.userId, targetType: this.requestToApprove.requestType }
+      const data: ApprovalDto = { targetId: this.requestToApprove.requestId, approved: true, approvedByUserId: this.userId, targetType: this.requestToApprove.requestType }
 
       try {
         const response = await RequestApiService.approval(data);
@@ -244,7 +244,7 @@ export class DemandeDahiraPage implements OnInit {
         if (requestIndex !== -1) {
           this.allRequests[requestIndex] = {
             ...this.allRequests[requestIndex],
-            approvalStatus: Status.APPROVED
+            approvalStatus: StatusEnum.APPROVED
           };
           this.applyFilters();
         }
@@ -260,7 +260,7 @@ export class DemandeDahiraPage implements OnInit {
   }
 
   // === GESTION DU REJET ===
-  openRejectionModal(request: Request) {
+  openRejectionModal(request: RequestDto) {
     this.requestToReject = request;
     this.rejectionReason = '';
     this.showRejectionModal = true;
@@ -276,7 +276,7 @@ export class DemandeDahiraPage implements OnInit {
     if (this.requestToReject && this.isRejectionReasonValid) {
       // Appel à votre service pour rejeter la demande
       if (this.requestToApprove) {
-        const data: Approval = { targetId: this.requestToApprove.requestId,
+        const data: ApprovalDto = { targetId: this.requestToApprove.requestId,
           approved: true, 
           approvedByUserId: this.userId, 
           targetType: this.requestToApprove.requestType }
@@ -293,7 +293,7 @@ export class DemandeDahiraPage implements OnInit {
           if (requestIndex !== -1) {
             this.allRequests[requestIndex] = {
               ...this.allRequests[requestIndex],
-              approvalStatus: Status.REJECTED,
+              approvalStatus: StatusEnum.REJECTED,
               rejectionReason: this.rejectionReason
             };
             this.applyFilters();

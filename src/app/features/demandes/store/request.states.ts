@@ -1,8 +1,8 @@
-import { Request } from "../models/request.model";
+import { RequestDto } from "../models/request.model";
 
 export interface RequestState {
-    demandes: Request[];
-    demandeAdhesion: Request[];
+    demandes: RequestDto[];
+    demandeAdhesion: RequestDto[];
     loading: boolean;
     error: string | null;
 }

@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { Request } from '../models/request.model';
+import { RequestDto } from '../models/request.model';
 
 export const loadRequests = createAction(
   '[Requests] Load Request',
@@ -8,7 +8,7 @@ export const loadRequests = createAction(
 
 export const loadRequestsSuccess = createAction(
   '[Requests] Load Request Success',
-  props<{ request: Request[] }>()
+  props<{ request: RequestDto[] }>()
 );
 
 export const loadRequestsFailure = createAction(
@@ -23,7 +23,7 @@ export const loadAdhesionRequests = createAction(
 
 export const loadAdhesionRequestsSuccess = createAction(
   '[Requests] Load Request Success',
-  props<{ demandeAdhesion: Request[] }>()
+  props<{ demandeAdhesion: RequestDto[] }>()
 );
 
 export const loadAdhesionRequestsFailure = createAction(

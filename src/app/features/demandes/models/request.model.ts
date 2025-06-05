@@ -1,17 +1,18 @@
-export interface Request {
+export interface RequestDto {
   requestId: string;
   requesterId: string;
   requesterName: string;
   targetDahiraId: string;
   targetDahiraName: string;
-  requestType: RequestType;
-  rejectionReason: string;
-  approvalStatus: Status;
+  requestType: RequestTypeEnum;
+  rejectionReason?: string;
+  approvalStatus: StatusEnum;
   createdAt: string;
   updatedAt: string;
 }
 
-export enum RequestType {
+
+export enum RequestTypeEnum {
     BECOME_DISCIPLE = "BECOME_DISCIPLE",
     JOIN_DAHIRA = "JOIN_DAHIRA",
     BECOME_MOUQADAM = "BECOME_MOUQADAM",
@@ -19,16 +20,16 @@ export enum RequestType {
     CREATE_DAHIRA = "CREATE_DAHIRA",
 }
 
-export enum Status {
+export enum StatusEnum {
     PENDING = "PENDING",
     APPROVED = "APPROVED",
     REJECTED = "REJECTED",
 }
 
-export interface Approval {
+export interface ApprovalDto {
   targetId: string,
   approvedByUserId: string,
   approved: boolean,
   rejectionReason?: string,
-  targetType: RequestType
+  targetType: RequestTypeEnum
 }

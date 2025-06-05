@@ -24,6 +24,8 @@ import { DahiraEffects } from './features/dahiras/store/dahira.effects';
 import { dahiraReducer } from './features/dahiras/store/dahira.reducers';
 import { requestReducer } from './features/demandes/store/request.reducers';
 import { RequestEffects } from './features/demandes/store/request.effects';
+import { adminRequestReducer } from './Admin/pages/demandes/store/demande.reducers';
+import { AdminRequestEffects } from './Admin/pages/demandes/store/demande.effects';
 
 @NgModule({
   declarations: [AppComponent],
@@ -33,9 +35,9 @@ import { RequestEffects } from './features/demandes/store/request.effects';
     AppRoutingModule,
     SharedModule,
     FormsModule,
-    StoreModule.forRoot({ auth: authReducer, dahira: dahiraReducer, request: requestReducer }),
+    StoreModule.forRoot({ auth: authReducer, dahira: dahiraReducer, request: requestReducer, adminRequest: adminRequestReducer }),
     IonicStorageModule.forRoot(),
-    EffectsModule.forRoot([AuthEffects, DahiraEffects, RequestEffects]),
+    EffectsModule.forRoot([AuthEffects, DahiraEffects, RequestEffects, AdminRequestEffects]),
     ToastComponent
   ],
   providers: [

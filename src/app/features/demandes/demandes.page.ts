@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Request } from './models/request.model';
+import { RequestDto } from './models/request.model';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { selectRequestState } from './store/request.selectors';
@@ -15,8 +15,8 @@ import { selectCurrentUser } from '../auth/store/auth.selectors';
 })
 export class DemandesPage implements OnInit {
 
-  filteredRequests: Request[] = [];
-  allRequests: Request[] = [];
+  filteredRequests: RequestDto[] = [];
+  allRequests: RequestDto[] = [];
 
   // Filtres et recherche
   activeTab: string = 'ALL';
@@ -31,7 +31,7 @@ export class DemandesPage implements OnInit {
 
   // Modale de confirmation
   showDeleteModal: boolean = false;
-  requestToDelete: Request | null = null;
+  requestToDelete: RequestDto | null = null;
 
   // Types de demandes disponibles
   requestTypes: string[] = ['ALL', 'JOIN_DAHIRA', 'CREATE_DAHIRA', 'LEAVE_DAHIRA'];
@@ -179,7 +179,7 @@ export class DemandesPage implements OnInit {
 
 
   // Gestion de la suppression
-  openDeleteModal(request: Request) {
+  openDeleteModal(request: RequestDto) {
     this.requestToDelete = request;
     this.showDeleteModal = true;
   }

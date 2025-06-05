@@ -7,14 +7,16 @@ import { IonicModule } from '@ionic/angular';
 import { DemandesPageRoutingModule } from './demandes-routing.module';
 
 import { DemandesPage } from './demandes.page';
+import { IconButtonComponent } from "../../../shared/components/icon-button/icon-button.component";
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    DemandesPageRoutingModule
-  ],
+    DemandesPageRoutingModule,
+    IconButtonComponent
+],
   declarations: [DemandesPage]
 })
 export class DemandesPageModule {}

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Approval } from '../models/request.model';
+import { ApprovalDto } from '../models/request.model';
 
 export class RequestApiService {
 
@@ -9,8 +9,8 @@ export class RequestApiService {
         return axios.get(`user-requests/requester/${userId}`);
     }
 
-    static approval(data: Approval) {
-        return axios.post(`approval`, data);
+    static approval(data: ApprovalDto) {
+        return axios.post(`ApprovalDto`, data);
     }
 
     static getRequestByTargetUser(userId: string) {
@@ -20,7 +20,9 @@ export class RequestApiService {
         return axios.get(`user-requests/requester/${userId}`);
     }
 
-
+    static getAllRequest() {
+        return axios.get(`user-requests`);
+    }
 
     /**
      * Récupère les détails d'un dahira par son ID

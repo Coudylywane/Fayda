@@ -75,7 +75,9 @@ export class DemandesPage implements OnInit, OnDestroy {
   ngOnInit() {
     this.loadAllRequests();
 
-    this.store.select(selectCurrentUser).subscribe(user => {
+    this.store.select(selectCurrentUser).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(user => {
 
       this.userId = user?.userId!;
     });

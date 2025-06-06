@@ -61,32 +61,6 @@ export class DahiraServiceAdmin {
     // return this.http.get<DahiraMember[]>(`${this.apiUrl}/${dahiraId}/members`);
   }
 
-  // Créer un nouveau Dahira
-  createDahira(dahira: Partial<Dahira>): Observable<Dahira> {
-    // Pour la démo
-    const newDahira: Dahira = {
-      id: `dahira-${this.mockDahiras.length + 1}`,
-      name: dahira.name || '',
-      memberCount: 0,
-      location: dahira.location,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    this.mockDahiras.push(newDahira);
-    this.dahirasSubject.next([...this.mockDahiras]);
-    
-    return of(newDahira);
-    
-    // Dans une vraie implémentation :
-    // return this.http.post<Dahira>(this.apiUrl, dahira).pipe(
-    //   tap(newDahira => {
-    //     const currentDahiras = this.dahirasSubject.value;
-    //     this.dahirasSubject.next([...currentDahiras, newDahira]);
-    //   })
-    // );
-  }
-
   // Mettre à jour un Dahira
   updateDahira(id: string, changes: Partial<Dahira>): Observable<Dahira> {
     // Pour la démo

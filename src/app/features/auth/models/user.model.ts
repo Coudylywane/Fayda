@@ -7,6 +7,7 @@ export interface User {
     email: string,
     username: string,
     password: string,
+    img: string,
     phoneNumber: string,
     gender: string,
     userIdKeycloak?: string,

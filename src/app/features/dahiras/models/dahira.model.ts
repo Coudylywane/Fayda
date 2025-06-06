@@ -9,6 +9,7 @@ export interface Dahira {
     location?: LocationInfo;
     responsable?: User;
     readonly active: boolean;
+    members?: User[];
     approvedBy: User,
     createdBy: User,
     createdAt: Date;

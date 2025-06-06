@@ -22,9 +22,9 @@
             </svg>
           </span>
         </div>
-        <div class="flex items-center">
+        <div class="flex items-center gap-2">
           <button (click)="openAddModal()"
-            class="ml-auto mr-2 flex items-center justify-center rounded-full h-10 w-10 bg-green-600 text-white hover:bg-green-700 focus:outline-none">
+            class="ml-auto flex items-center justify-center rounded-full h-10 w-10 bg-green-600 text-white hover:bg-green-700 focus:outline-none">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -36,6 +36,13 @@
               fill="currentColor">
               <path
                 d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" />
+            </svg>
+          </button>
+          <button (click)="refresh()" [disabled]="loading"
+            class="bg-black/70 hover:opacity-90 disabled:opacity-50 text-white p-3 rounded-lg transition-colors duration-200 flex items-center justify-center">
+            <svg class="w-5 h-5" [class.animate-spin]="loading" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
           </button>
         </div>

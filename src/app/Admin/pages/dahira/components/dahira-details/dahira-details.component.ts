@@ -2,10 +2,12 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DahiraServiceAdmin } from '../../services/dahira.service';
 import { UserService } from '../../services/user.service';
-import { Dahira, DahiraMember, MemberRole } from '../../models/dahira.model';
-import { User } from '../../models/user.model';
+import { DahiraMember, MemberRole } from '../../models/dahira.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DahiraService } from 'src/app/features/dahiras/services/dahira.service';
+import { Dahira } from 'src/app/features/dahiras/models/dahira.model';
+import { User, UserRole } from 'src/app/features/auth/models/user.model';
 
 @Component({
   selector: 'app-dahira-details',
@@ -16,38 +18,40 @@ import { FormsModule } from '@angular/forms';
 export class DahiraDetailsComponent implements OnInit {
   dahiraId: string = '';
   dahira: Dahira | null = null;
-  members: DahiraMember[] = [];
-  filteredMembers: DahiraMember[] = [];
+  members: User[] = [];
+  filteredMembers: User[] = [];
   loading: boolean = false;
   searchTerm: string = '';
   selectedFilter: string = 'all';
-  
+  error: string | null = null;
+
   showAddMemberModal: boolean = false;
   showRemoveMemberModal: boolean = false;
   showMemberActions: boolean = false;
   usersWithoutDahira: User[] = [];
   selectedUser: User | null = null;
-  selectedMember: DahiraMember | null = null;
-  selectedRole: MemberRole = MemberRole.DISCIPLE;
-  
+  selectedMember: User | null = null;
+  selectedRole: UserRole = UserRole.DISCIPLE;
+
   roleOptions = [
-    { value: MemberRole.DISCIPLE, label: 'Disciple' },
-    { value: MemberRole.MOUKHADAM, label: 'Moukhadam' }
+    { value: UserRole.DISCIPLE, label: 'Disciple' },
+    { value: UserRole.MOUKHADAM, label: 'Moukhadam' },
+    { value: UserRole.VISITEUR, label: 'Visiteur' }
   ];
-  
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private dahiraService: DahiraServiceAdmin,
-    private userService: UserService
-  ) {}
+    // private dahiraService: DahiraServiceAdmin,
+    private userService: UserService,
+    private dahiraService: DahiraService,
+  ) { }
 
   ngOnInit(): void {
     this.dahiraId = this.route.snapshot.paramMap.get('id') || '';
-    
+
     if (this.dahiraId) {
       this.loadDahiraDetails();
-      this.loadDahiraMembers();
     } else {
       this.router.navigate(['admin/dahiras']);
     }
@@ -55,107 +59,99 @@ export class DahiraDetailsComponent implements OnInit {
 
   loadDahiraDetails(): void {
     this.loading = true;
-    this.dahiraService.getDahiraById(this.dahiraId).subscribe({
-      next: (dahira) => {
-        this.dahira = dahira;
+    this.dahiraService.getDahiraById(this.dahiraId).then((response) => {
+      if (response.success) {
+        this.dahira = response.data.data
+        this.members = this.dahira?.members!;
+        console.log("Dahira : ", this.dahira);
+        console.log("Dahira members: ", this.members);
+        this.applyFilters();
         this.loading = false;
-      },
-      error: (error) => {
-        console.error('Erreur lors du chargement des détails du dahira', error);
-        this.loading = false;
-        this.router.navigate(['admin/dahiras']);
       }
+    }).catch(error => {
+      this.loading = false;
+      this.error = error.message;
+      console.error('Erreur lors du chargement des détails du dahira', error);
     });
   }
 
-  loadDahiraMembers(): void {
-    this.loading = true;
-    this.dahiraService.getDahiraMembers(this.dahiraId).subscribe({
-      next: (members) => {
-        this.members = members;
-        this.applyFilters();
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Erreur lors du chargement des membres du dahira', error);
-        this.loading = false;
-      }
-    });
-  }
-  
   applyFilters(): void {
     // Appliquer la recherche
     let result = [...this.members];
-    
+
     if (this.searchTerm) {
       const searchLower = this.searchTerm.toLowerCase();
-      result = result.filter(member => 
-        member.user.firstName.toLowerCase().includes(searchLower) ||
-        member.user.lastName.toLowerCase().includes(searchLower) ||
-        member.user.email.toLowerCase().includes(searchLower)
+      result = result.filter(member =>
+        member.firstName.toLowerCase().includes(searchLower) ||
+        member.lastName.toLowerCase().includes(searchLower) ||
+        member.email.toLowerCase().includes(searchLower)
       );
     }
-    
+
     // Appliquer le filtre par rôle
-    if (this.selectedFilter !== 'all') {
-      result = result.filter(member => member.role === this.selectedFilter);
-    }
-    
+    // if (this.selectedFilter !== 'all') {
+    //   result = result.filter(member => member.roles === this.selectedFilter);
+    // }
+
     this.filteredMembers = result;
   }
-  
+
   onSearch(term: string): void {
     this.searchTerm = term;
     this.applyFilters();
   }
-  
+
   onFilterChange(filter: string): void {
     this.selectedFilter = filter;
     this.applyFilters();
   }
-  
+
   openAddMemberModal(): void {
-    this.loadUsersWithoutDahira();
+    // this.loadUsersWithoutDahira();
     this.showAddMemberModal = true;
   }
-  
-  loadUsersWithoutDahira(): void {
-    this.userService.getUsersWithoutDahira().subscribe({
-      next: (users) => {
-        this.usersWithoutDahira = users;
-      },
-      error: (error) => {
-        console.error('Erreur lors du chargement des utilisateurs sans dahira', error);
-      }
-    });
+
+  refresh(){
+    this.loadDahiraDetails();
   }
-  
+
+  // loadUsersWithoutDahira(): void {
+  //   this.userService.getUsersWithoutDahira().subscribe({
+  //     next: (users) => {
+  //       this.usersWithoutDahira = users;
+  //     },
+  //     error: (error) => {
+  //       console.error('Erreur lors du chargement des utilisateurs sans dahira', error);
+  //     }
+  //   });
+  // }
+
   selectUser(user: User): void {
     this.selectedUser = user;
   }
-  
+
   addMember(): void {
     if (this.selectedUser && this.selectedRole) {
-      this.dahiraService.addMemberToDahira(this.dahiraId, this.selectedUser.id, this.selectedRole).subscribe({
-        next: (success: any) => {
-          if (success) {
-            this.showAddMemberModal = false;
-            this.selectedUser = null;
-            this.loadDahiraMembers();
-          }
-        },
-        error: (error: any) => {
-          console.error('Erreur lors de l\'ajout du membre', error);
-        }
-      });
+      // this.dahiraService.addMemberToDahira(this.dahiraId, this.selectedUser.userId, this.selectedRole).subscribe({
+      //   next: (success: any) => {
+      //     if (success) {
+      //       this.showAddMemberModal = false;
+      //       this.selectedUser = null;
+      //       this.loadDahiraMembers();
+      //     }
+      //   },
+      //   error: (error: any) => {
+      //     console.error('Erreur lors de l\'ajout du membre', error);
+      //   }
+      // });
     }
   }
-  
+
   toggleMemberActions(member: any, event?: Event): void {
     if (event) {
       event.stopPropagation();
     }
-    
+
     if (this.selectedMember && this.selectedMember.userId === member.userId) {
       this.showMemberActions = !this.showMemberActions;
     } else {
@@ -163,12 +159,12 @@ export class DahiraDetailsComponent implements OnInit {
       this.showMemberActions = true;
     }
   }
-  
+
   closeMemberActions(): void {
     this.showMemberActions = false;
   }
-  
-  viewMemberDetails(member: DahiraMember, event?: Event): void {
+
+  viewMemberDetails(member: User, event?: Event): void {
     if (event) {
       event.stopPropagation();
     }
@@ -176,8 +172,8 @@ export class DahiraDetailsComponent implements OnInit {
     this.router.navigate(['/users', member.userId]);
     this.closeMemberActions();
   }
-  
-  openRemoveMemberModal(member: DahiraMember, event?: Event): void {
+
+  openRemoveMemberModal(member: User, event?: Event): void {
     if (event) {
       event.stopPropagation();
     }
@@ -185,21 +181,21 @@ export class DahiraDetailsComponent implements OnInit {
     this.showRemoveMemberModal = true;
     this.closeMemberActions();
   }
-  
+
   removeMember(): void {
     if (this.selectedMember) {
-      this.dahiraService.removeMemberFromDahira(this.dahiraId, this.selectedMember.userId).subscribe({
-        next: (success) => {
-          if (success) {
-            this.showRemoveMemberModal = false;
-            this.selectedMember = null;
-            this.loadDahiraMembers();
-          }
-        },
-        error: (error) => {
-          console.error('Erreur lors du retrait du membre', error);
-        }
-      });
+      // this.dahiraService.removeMemberFromDahira(this.dahiraId, this.selectedMember.userId).subscribe({
+      //   next: (success) => {
+      //     if (success) {
+      //       this.showRemoveMemberModal = false;
+      //       this.selectedMember = null;
+      //       this.loadDahiraMembers();
+      //     }
+      //   },
+      //   error: (error) => {
+      //     console.error('Erreur lors du retrait du membre', error);
+      //   }
+      // });
     }
   }
 
@@ -210,21 +206,21 @@ export class DahiraDetailsComponent implements OnInit {
       this.showMemberActions = false;
     }
   }
-  
+
   closeAddMemberModal(): void {
     this.showAddMemberModal = false;
     this.selectedUser = null;
   }
-  
+
   closeRemoveMemberModal(): void {
     this.showRemoveMemberModal = false;
     this.selectedMember = null;
   }
-  
+
   goBack(): void {
     this.router.navigate(['admin/dahira']);
   }
-  
+
   getRoleBadgeClass(role: MemberRole): string {
     switch (role) {
       case MemberRole.RESPONSIBLE:
@@ -236,7 +232,7 @@ export class DahiraDetailsComponent implements OnInit {
         return 'bg-green-100 text-green-800';
     }
   }
-  
+
   getRoleLabel(role: MemberRole): string {
     switch (role) {
       case MemberRole.RESPONSIBLE:
@@ -247,5 +243,26 @@ export class DahiraDetailsComponent implements OnInit {
       default:
         return 'Disciple';
     }
+  }
+
+  getResponsable(): string {
+    this.members.filter(e => {
+      
+    })
+    return ""
+  }
+
+    /**
+   * Vérifie si c'est une recherche vide
+   */
+  isEmptySearch(): boolean {
+    return this.searchTerm.length > 0 && !this.loading;
+  }
+
+    /**
+   * Vérifie s'il n'y a aucune donnée
+   */
+  hasNoData(): boolean {
+    return this.members.length === 0 && !this.loading;
   }
 }

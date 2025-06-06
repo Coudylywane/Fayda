@@ -156,7 +156,7 @@
     </div>
 
     <!-- Message aucun résultat -->
-    <div *ngIf="isEmptySearch() && !loading && !hasNoData()"
+    <div *ngIf="isEmptySearch() && !hasNoData()"
       class="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-200">
       <div class="max-w-md mx-auto">
         <div class="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
@@ -171,7 +171,7 @@
     </div>
 
     <!-- Message aucune donnée -->
-    <div *ngIf="hasNoData()" class="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-200">
+    <div *ngIf="hasNoData() && !error" class="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-200">
       <div class="max-w-md mx-auto">
         <div class="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
           <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

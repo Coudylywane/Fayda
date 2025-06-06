@@ -9,6 +9,7 @@ import { selectAuthState } from 'src/app/features/auth/store/auth.selectors';
 import { AppState } from 'src/app/store/app.state';
 import { ConfettiService } from '../../services/confetti.service';
 import { ToastService } from 'src/app/shared/components/toast/toast.service';
+import { RequestService } from 'src/app/features/demandes/services/request.service';
 
 @Component({
   selector: 'app-admin-login',
@@ -32,7 +33,8 @@ export class AdminLoginPage implements OnInit, OnDestroy {
     private authService: AuthService,
     private store: Store<AppState>,
     private confettiService: ConfettiService,
-    private toast: ToastService
+    private toast: ToastService,
+    private requestService: RequestService
   ) {
     this.loginForm = this.fb.group({
       username: ["admin", [Validators.required, Validators.minLength(3)]],
@@ -66,6 +68,7 @@ export class AdminLoginPage implements OnInit, OnDestroy {
         if (this.loginAttempted) {
           if (authState.isAuthenticated && authState.isAdmin) {
             // Login réussi et utilisateur admin
+            this.loadAllRequests()
             this.toast.showSuccess(authState.message!);
             this.confettiService.triggerConfetti();
             setTimeout(() => {
@@ -114,5 +117,12 @@ export class AdminLoginPage implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+    /**
+   * Charge toutes les demandes du serveur
+   */
+  private loadAllRequests(): void {
+    this.requestService.getAllRequest();
   }
 }

@@ -78,7 +78,7 @@
           <span class="mr-2">Demandes</span>
           <span
             [ngClass]="{'text-green-600 bg-white': isActive('demandes'), 'text-white bg-green-600': !isActive('demandes')}"
-            class="text-xs px-2.5 py-1 rounded-full">2</span>
+            class="text-xs px-2.5 py-1 rounded-full" *ngIf="requestCount">{{requestCount}}</span>
         </div>
       </a>
       <a (click)="navigate('maps')"
@@ -113,7 +113,7 @@
 
         <span class="">Discussions</span>
       </a>
-      <a (click)="navigate('statistiques')"
+      <!-- <a (click)="navigate('statistiques')"
         [ngClass]="{'hover:bg-gray-700 cursor-pointer opacity-80 transition-colors mb-1': !isActive('statistiques'), 'bg-green-600 text-white opacity-100': isActive('statistiques')}"
         class="flex items-center px-3 py-3 p-2 font-semibold rounded">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 " fill="none" viewBox="0 0 24 24"
@@ -123,7 +123,7 @@
         </svg>
 
         <span class="">Statistiques</span>
-      </a>
+      </a> -->
       <a (click)="navigate('logs')"
         [ngClass]="{'hover:bg-gray-700 cursor-pointer opacity-80 transition-colors mb-1': !isActive('logs'), 'bg-green-600 text-white opacity-100': isActive('logs')}"
         class="flex items-center px-3 py-3 p-2 font-semibold rounded">
@@ -132,8 +132,6 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M8.242 5.992h12m-12 6.003H20.24m-12 5.999h12M4.117 7.495v-3.75H2.99m1.125 3.75H2.99m1.125 0H5.24m-1.92 2.577a1.125 1.125 0 1 1 1.591 1.59l-1.83 1.83h2.16M2.99 15.745h1.125a1.125 1.125 0 0 1 0 2.25H3.74m0-.002h.375a1.125 1.125 0 0 1 0 2.25H2.99" />
         </svg>
-
-
         <span class="">Logs</span>
       </a>
     </nav>

@@ -43,11 +43,11 @@ export class ToastComponent implements OnInit, OnDestroy {
   getToastClasses(type: string): string {
     switch(type) {
       case 'success':
-        return 'bg-white border-l-4 border-green-500 text-green-500';
+        return 'bg-white border-l-4 border-l-green-500 text-green-500';
       case 'warning':
-        return 'bg-white border-l-4 border-amber-500 text-amber-500';
+        return 'bg-white border-l-4 border-l-amber-500 text-amber-500';
       case 'error':
-        return 'bg-white border-l-4 border-red-600 text-red-500';
+        return 'bg-white border-l-4 border-l-red-600 text-red-500';
       default:
         return '';
     }

@@ -1,4 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { ConfettiService } from '../../services/confetti.service';
+import { selectAdminRequestPending } from '../demandes/store/demande.selectors';
+import { Subject, takeUntil } from 'rxjs';
+import { RequestService } from 'src/app/features/demandes/services/request.service';
+import { BaseLayoutAdminService } from '../../base-layout-admin/base-layout-admin.service';
 // import { Chart, registerables } from 'chart.js';
 
 @Component({
@@ -10,13 +17,36 @@ import { Component, OnInit } from '@angular/core';
 export class AdminDashboardPage implements OnInit {
   chartOptions: any;
   isHovered = false;
+  requestPending: number = 0;
+  private destroy$ = new Subject<void>();
 
-  constructor() {
+  constructor(
+    private router: Router,
+    private confettiService: ConfettiService,
+    private store: Store,
+    private requestService: RequestService,
+    private navigationService: BaseLayoutAdminService,
+  ) {
     // Chart.register(...registerables);
   }
 
   ngOnInit() {
     this.initChart();
+    this.store.select(selectAdminRequestPending).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe(user => {
+
+      this.requestPending = user.length;
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  navigate(tab: string) {
+    this.navigationService.setActiveNav(tab);
   }
 
   initChart() {

@@ -46,7 +46,9 @@ export class DemandesPage implements OnInit {
   ngOnInit() {
     // Charger toutes les données une seule fois
     
-    this.store.select(selectCurrentUser).subscribe(user => {
+    this.store.select(selectCurrentUser).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe(user => {
       
       this.userId = user?.userId!;
       console.log("store: demande this.userId:", this.userId);

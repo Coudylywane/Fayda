@@ -8,6 +8,8 @@ import { takeUntil, filter, Subject } from 'rxjs';
 import { selectAuthState } from 'src/app/features/auth/store/auth.selectors';
 import { User, UserRole } from 'src/app/features/auth/models/user.model';
 import { Router } from '@angular/router';
+import { RequestService } from 'src/app/features/demandes/services/request.service';
+import { selectAdminRequestPending } from '../pages/demandes/store/demande.selectors';
 
 @Component({
   selector: 'app-base-layout-admin',
@@ -23,6 +25,7 @@ export class BaseLayoutAdminPage implements OnInit {
   activeTab: string = 'dashboard';
   isSidebarOpen = true;
   UserRole = UserRole;
+  requestCount: number = 0;
 
   // Observable pour les données utilisateur
   user: User | null = null;
@@ -56,6 +59,7 @@ export class BaseLayoutAdminPage implements OnInit {
     private router: Router,
     private store: Store<AppState>,
     private toast: ToastService,
+    private requestService: RequestService
   ) { }
 
   ngOnInit() {
@@ -69,7 +73,6 @@ export class BaseLayoutAdminPage implements OnInit {
     ).subscribe(authState => {
       this.isLoading = authState.loading;
     });
-
 
     // S'abonner aux données utilisateur
     this.store.select(selectAuthState).pipe(
@@ -92,7 +95,17 @@ export class BaseLayoutAdminPage implements OnInit {
         this.logoutAttempted = false;
       }
       console.log('Données utilisateur:', authState.user);
+      
+    });
+    
+    // this.loadAllRequests();
 
+    this.store.select(selectAdminRequestPending).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe(user => {
+      console.log("requestcount", user.length);
+      
+      this.requestCount = user.length;
     });
   }
 
@@ -133,5 +146,12 @@ export class BaseLayoutAdminPage implements OnInit {
 
   getUserEmail(): string {
     return this.user?.email || '';
+  }
+
+      /**
+   * Charge toutes les demandes du serveur
+   */
+  private loadAllRequests(): void {
+    this.requestService.getAllRequest();
   }
 }

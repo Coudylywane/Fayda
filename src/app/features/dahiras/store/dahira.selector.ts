@@ -7,3 +7,8 @@ export const selectDahiras = createSelector(
   selectDahiraState,
   (state) => state.dahiras
 );
+
+export const selectTotalDahiras = createSelector(
+  selectDahiraState,
+  (state) => state.totalElements
+);

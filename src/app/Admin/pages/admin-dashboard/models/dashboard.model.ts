@@ -1,6 +1,6 @@
 export interface StatCard {
     title: string;
-    value: string;
+    value: string | number;
     change: string;
     colorClass: string;
     iconColorClass: string;

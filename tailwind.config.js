@@ -17,12 +17,32 @@ module.exports = {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
       },
+      animation: {
+        'in': 'fadeIn 0.2s ease-out',
+        'slide-in-from-top-2': 'slideInFromTop 0.2s ease-out',
+      },
+      keyframes: {
+        fadeIn: {
+          'from': { opacity: '0' },
+          'to': { opacity: '1' },
+        },
+        slideInFromTop: {
+          'from': {
+            opacity: '0',
+            transform: 'translateY(-8px)'
+          },
+          'to': {
+            opacity: '1',
+            transform: 'translateY(0)'
+          },
+        }
+      }
     },
   },
   plugins: [require('@tailwindcss/aspect-ratio'),
-    require('@tailwindcss/forms'),
-    require('@tailwindcss/line-clamp'),
-    require('@tailwindcss/typography'),
-    require("tailwindcss-safe-area"),
+  require('@tailwindcss/forms'),
+  require('@tailwindcss/line-clamp'),
+  require('@tailwindcss/typography'),
+  require("tailwindcss-safe-area"),
   ]
 };

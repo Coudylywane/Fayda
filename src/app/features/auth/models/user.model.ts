@@ -31,7 +31,7 @@ export enum UserRole {
 }
 
 export interface LocationInfo {
-    locationInfoId: string;
+    locationInfoId?: string;
     address?: string;
     region?: string;
     country?: string;
@@ -39,6 +39,7 @@ export interface LocationInfo {
     postalCode?: string;
     latitude?: number;
     longitude?: number;
+    department?: string;
 }
 
 // {

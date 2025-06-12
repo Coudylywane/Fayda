@@ -50,41 +50,41 @@ export const authReducer = createReducer(
         loading: false,
         error: null
     })),
-    on(AuthActions.refreshToken, state => ({
-        ...state,
-        isRefreshing: true,
-        error: null
-    })),
+    // Set Token (utilisé par l'intercepteur)
+  on(AuthActions.setToken, (state, { token }) => ({
+    ...state,
+    token,
+    isAuthenticated: !!token?.access_token,
+    lastTokenRefresh: Date.now()
+  })),
 
-    on(AuthActions.refreshTokenSuccess, (state, { token }) => ({
-        ...state,
-        token,
-        isRefreshing: false,
-        isAuthenticated: true,
-        error: null
-    })),
+  // Refresh Token actions
+  on(AuthActions.refreshToken, (state) => ({
+    ...state,
+    refreshing: true,
+    error: null
+  })),
 
-    on(AuthActions.refreshTokenFailure, (state, { error }) => ({
-        ...state,
-        isRefreshing: false,
-        error,
-        isAuthenticated: false,
-        token: null,
-        user: null
-    })),
+  on(AuthActions.refreshTokenSuccess, (state, { token }) => ({
+    ...state,
+    token,
+    isAuthenticated: true,
+    refreshing: false,
+    error: null,
+    lastTokenRefresh: Date.now()
+  })),
 
-    // Set token action (utilisée par l'intercepteur)
-    on(AuthActions.setToken, (state, { token }) => ({
-        ...state,
-        token,
-        isAuthenticated: true
-    })),
+  on(AuthActions.refreshTokenFailure, (state, { error }) => ({
+    ...state,
+    refreshing: false,
+    error,
+    // Ne pas déconnecter automatiquement ici, laisser l'intercepteur gérer
+  })),
 
-    // Token expiration
-    on(AuthActions.tokenExpired, state => ({
-        ...state,
-        isAuthenticated: false,
-        token: null,
-        user: null
-    })),
+  // Token expiration
+  on(AuthActions.tokenExpired, (state) => ({
+    ...state,
+    isAuthenticated: false,
+    error: 'Token expiré'
+  }))
 );

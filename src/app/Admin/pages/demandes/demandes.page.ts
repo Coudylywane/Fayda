@@ -327,7 +327,7 @@ export class DemandesPage implements OnInit, OnDestroy {
       this.updateCounts();
     } catch (error: any) {
       console.error('Erreur demande adhésion:', error);
-      const errorMessage = error.message || 'Erreur lors de l\'envoi de la demande';
+      const errorMessage = error.response.data.developerMessage || error.message || 'Erreur lors de l\'envoi de la demande';
       this.toastService.showError(errorMessage);
     }
     // Ici, vous devriez appeler votre service pour approuver la demande

@@ -26,4 +26,6 @@ export interface Token {
     token_type: string;
     // not-before-policy': number;
     session_state: string;
+    iat: number;
+    exp: number;
 };

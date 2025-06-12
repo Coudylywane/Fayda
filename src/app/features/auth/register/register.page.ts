@@ -9,6 +9,13 @@ import { Store } from '@ngrx/store';
 import { ConfettiService } from 'src/app/Admin/services/confetti.service';
 import { selectAuthState } from '../store/auth.selectors';
 import { Register } from '../models/auth.model';
+import { ToastService } from 'src/app/shared/components/toast/toast.service';
+import { DateSelectorComponent } from "../../../shared/components/date-selector/date-selector.component";
+
+interface Step {
+  title: string;
+  fields: string[];
+}
 
 @Component({
   selector: 'app-register',
@@ -18,18 +25,41 @@ import { Register } from '../models/auth.model';
   imports: [
     CommonModule,
     IonicModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    DateSelectorComponent
   ],
 })
 export class RegisterPage {
-  // private destroyRef = inject(DestroyRef);
   maxDate = new Date().toISOString();
   registerForm: FormGroup;
   selectedGender: string = 'homme';
   showPassword = false;
   registerError = "";
   isLoading = false;
+  loginAttempted = false;
   returnUrl: string;
+  userBirthDate: Date | null = null;
+
+  // Propriétés pour la gestion des étapes
+  currentStep = 0;
+  steps: Step[] = [
+    {
+      title: 'Informations personnelles',
+      fields: ['firstName', 'lastName', 'dateOfBirth']
+    },
+    {
+      title: 'Contact',
+      fields: ['email', 'phoneNumber']
+    },
+    {
+      title: 'Compte',
+      fields: ['username', 'password']
+    },
+    {
+      title: 'Localisation',
+      fields: ['nationality', 'country', 'region']
+    }
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -38,6 +68,7 @@ export class RegisterPage {
     private authService: AuthService,
     private store: Store<AppState>,
     private confettiService: ConfettiService,
+    private toastService: ToastService
   ) {
     this.registerForm = this.createForm();
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || 'login';
@@ -45,23 +76,31 @@ export class RegisterPage {
     this.store.select(selectAuthState).subscribe(authState => {
       this.isLoading = authState.loading;
       this.registerError = authState.error ?? '';
-      console.log("Auth state:", authState);
-      
-      if (authState.user) {
-        this.startConfetti();
-        this.router.navigate(['/login']);
-      }
-    });
 
-    // this.store.select(selectAuthState)
-    //   .pipe(takeUntilDestroyed(this.destroyRef))
-    //   .subscribe(authState => {
-    //     this.isLoading = authState.loading;
-    //     this.registerError = authState.error ?? '';
-    //     if (authState.user) {
-    //       this.router.navigate(['/login']);
-    //     }
-    //   });
+      // Gérer la redirection
+      if (this.loginAttempted) {
+        if (authState.user) {
+          // Création réussi
+          this.toastService.showSuccess(authState.message!);
+          setTimeout(() => {
+            this.confettiService.triggerConfetti();
+            this.router.navigate([this.returnUrl]);
+          }, 750); // 750 ms Délai pour voir le toast et les confettis
+          console.log("Redirection vers:", this.returnUrl);
+        } else if (!authState.isAuthenticated && authState.error) {
+          // Échec
+          console.log("Échec de création:", authState.error);
+
+          this.toastService.showError(authState.error || "Erreur de création");
+          this.loginAttempted = false;
+        }
+      }
+
+      // if (authState.user) {
+      //   this.startConfetti();
+      //   this.router.navigate(['/login']);
+      // }
+    });
   }
 
   startConfetti() {
@@ -70,59 +109,109 @@ export class RegisterPage {
 
   private createForm(): FormGroup {
     return this.fb.group({
-      firstName: ['Epl', Validators.required],
-      lastName: ['EPL', Validators.required],
-      email: ['dr@epl', [Validators.required, Validators.email]],
-      username: ['Epl', [Validators.required, Validators.minLength(3)]],
-      password: ['password', [Validators.required, Validators.minLength(6)]],
-      phoneNumber: ['12345678', [Validators.required, Validators.pattern(/^[0-9+\-\s()]{8,20}$/)]],
-      gender: ['male', Validators.required],
-      dateOfBirth: ['1990-01-01', Validators.required],
-      nationality: ['American', Validators.required],
-      country: ['USA', Validators.required],
-      region: ['California', Validators.required],
-      department: ['Engineering'],
-      address: ['123 Main St']
+      // Étape 1: Informations personnelles
+      firstName: ['dahiraTest', Validators.required],
+      lastName: ['dahiraTest', Validators.required],
+      dateOfBirth: ['', Validators.required],
+      gender: ['homme', Validators.required],
+
+      // Étape 2: Contact
+      email: ['dahira@at.sn', [Validators.required, Validators.email]],
+      phoneNumber: ['', [Validators.required, Validators.pattern(/^[0-9+\-\s()]{8,20}$/)]],
+
+      // Étape 3: Compte
+      username: ['dahira', [Validators.required, Validators.minLength(3)]],
+      password: ['user123', [Validators.required, Validators.minLength(6)]],
+
+      // Étape 4: Localisation
+      nationality: ['Senegal', Validators.required],
+      country: ['Senegal', Validators.required],
+      region: ['Dakar', Validators.required],
+      department: ['Dakar'], // Optionnel
+      address: ['Grand Dakar'] // Optionnel
     });
   }
 
-  // register() {
-  //   if (this.registerForm.valid) {
-  //     this.isLoading = true;
-  //     this.registerError = "";
+  // Méthodes de navigation entre les étapes
+  nextStep(): void {
+    // Marquer les champs de l'étape actuelle comme touchés pour afficher les erreurs
+    this.markCurrentStepAsTouched();
 
-  //     const formData = this.prepareFormData();
-
-  //     this.authService.register(formData)
-  //       .pipe(finalize(() => this.isLoading = false))
-  //       .subscribe({
-  //         next: (result) => this.handleRegistrationResult(result),
-  //         error: (error) => this.handleRegistrationError(error)
-  //       });
-  //   } else {
-  //     this.markFormAsTouched();
-  //   }
-  // }
-
-
- register() {
-  if (this.registerForm.valid) {
-    const formData = this.prepareFormData();
-    console.log("Form data:", formData);
-    
-    // Dispatcher l'action sans subscription directe
-    this.authService.register(formData);
-    
-    // L'état sera mis à jour via le store et la subscription dans le constructor
-  } else {
-    this.markFormAsTouched();
+    if (this.canProceed()) {
+      if (this.currentStep < this.steps.length - 1) {
+        this.currentStep++;
+      } else {
+        // Dernière étape, procéder à l'inscription
+        this.register();
+      }
+    }
   }
-}
 
+  previousStep(): void {
+    if (this.currentStep > 0) {
+      this.currentStep--;
+    }
+  }
+
+  canProceed(): boolean {
+    const currentStepFields = this.steps[this.currentStep].fields;
+
+    // Vérifier si tous les champs requis de l'étape actuelle sont valides
+    return currentStepFields.every(fieldName => {
+      const field = this.registerForm.get(fieldName);
+      // Le champ doit être valide ET avoir une valeur si il est requis
+      if (field?.hasError('required')) {
+        return false;
+      }
+      return field?.valid ?? false;
+    });
+  }
+
+  // Méthodes pour les classes CSS des étapes
+  getStepClass(stepIndex: number): string {
+    if (stepIndex < this.currentStep) {
+      return 'bg-light-green text-dark-green'; // Étape complétée
+    } else if (stepIndex === this.currentStep) {
+      return 'bg-primary text-dark-green'; // Étape actuelle
+    } else {
+      return 'bg-white/40 text-white'; // Étape future
+    }
+  }
+
+  getConnectorClass(stepIndex: number): string {
+    if (stepIndex < this.currentStep) {
+      return 'bg-light-green'; // Connecteur complété
+    } else {
+      return 'bg-white/40'; // Connecteur non complété
+    }
+  }
+
+  register() {
+    if (this.registerForm.valid) {
+      this.loginAttempted = true;
+      const formData = this.prepareFormData();
+      console.log("Form data:", formData);
+
+      // Dispatcher l'action sans subscription directe
+      this.authService.register(formData);
+
+      // L'état sera mis à jour via le store et la subscription dans le constructor
+    } else {
+      this.markFormAsTouched();
+    }
+  }
 
   private prepareFormData(): Register {
+    const { dateOfBirth, email, firstName, gender, lastName, password, phoneNumber, username } = this.registerForm.value as Register;
     return {
-      ...this.registerForm.value,
+      dateOfBirth,
+      email,
+      firstName,
+      gender,
+      lastName,
+      password,
+      phoneNumber,
+      username,
       location: {
         nationality: this.registerForm.value.nationality,
         country: this.registerForm.value.country,
@@ -131,6 +220,13 @@ export class RegisterPage {
         address: this.registerForm.value.address
       }
     };
+  }
+
+  private markCurrentStepAsTouched(): void {
+    const currentStepFields = this.steps[this.currentStep].fields;
+    currentStepFields.forEach(fieldName => {
+      this.registerForm.get(fieldName)?.markAsTouched();
+    });
   }
 
   private markFormAsTouched(): void {
@@ -175,4 +271,10 @@ export class RegisterPage {
   goToLogin(): void {
     this.router.navigate(['/login']);
   }
+
+  onDateSelected(date: string | null): void {
+    this.registerForm.patchValue({ dateOfBirth: date });
+    console.log('Date sélectionnée:', date);
+  }
+
 }

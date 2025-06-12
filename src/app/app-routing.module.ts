@@ -10,7 +10,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'dahiras',
+    redirectTo: 'login',
     pathMatch: 'full'
   },
   {

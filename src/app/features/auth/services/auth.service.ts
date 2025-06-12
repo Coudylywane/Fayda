@@ -42,6 +42,8 @@ constructor(private store: Store, ) {
   }
 
   register(userData: Register) {
+    console.log('register: ', userData);
+    
     this.store.dispatch(AuthActions.register({ userData }));
   }
 

@@ -10,6 +10,7 @@ import { AppState } from 'src/app/store/app.state';
 import { ConfettiService } from '../../services/confetti.service';
 import { ToastService } from 'src/app/shared/components/toast/toast.service';
 import { RequestService } from 'src/app/features/demandes/services/request.service';
+import { DahiraService } from 'src/app/features/dahiras/services/dahira.service';
 
 @Component({
   selector: 'app-admin-login',
@@ -34,7 +35,8 @@ export class AdminLoginPage implements OnInit, OnDestroy {
     private store: Store<AppState>,
     private confettiService: ConfettiService,
     private toast: ToastService,
-    private requestService: RequestService
+    private requestService: RequestService,
+    private dahiraService: DahiraService,
   ) {
     this.loginForm = this.fb.group({
       username: ["admin", [Validators.required, Validators.minLength(3)]],
@@ -68,7 +70,8 @@ export class AdminLoginPage implements OnInit, OnDestroy {
         if (this.loginAttempted) {
           if (authState.isAuthenticated && authState.isAdmin) {
             // Login réussi et utilisateur admin
-            this.loadAllRequests()
+            this.loadAllRequests();
+            this.loadAllDahiras();
             this.toast.showSuccess(authState.message!);
             this.confettiService.triggerConfetti();
             setTimeout(() => {
@@ -124,5 +127,12 @@ export class AdminLoginPage implements OnInit, OnDestroy {
    */
   private loadAllRequests(): void {
     this.requestService.getAllRequest();
+  }
+
+    /**
+ * Charge toutes les dahiras du serveur
+ */
+  private loadAllDahiras(): void {
+    this.dahiraService.getDahirasPagined(1, 12);
   }
 }

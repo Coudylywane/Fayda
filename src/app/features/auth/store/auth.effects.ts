@@ -119,6 +119,7 @@ export class AuthEffects {
                     const decoded: any = jwtDecode(token.access_token);
                     const userId = decoded.sub;
                     const now = Date.now() / 1000;
+                    const roles = decoded?.realm_access.roles;
 
                     // Vérifier si le token n'est pas expiré
                     if (decoded.exp && decoded.exp < now) {
@@ -134,9 +135,15 @@ export class AuthEffects {
                         map((userDetailsResponse) => {
                             const user = userDetailsResponse.data.data;
                             // Stocker is_admin
-                            // localStorage.setItem('is_admin', user.is_admin ? 'true' : 'false');
+                            user.roles = roles.filter(
+                                        (role: any): role is UserRole => Object.values(UserRole).includes(role as UserRole)
+                                    ); // Ajouter les rôles à l'utilisateur
+                                    const isAdmin: boolean = [UserRole.ADMIN, UserRole.MOUKHADAM].some(role => user.roles!.includes(role))
+                                    console.log(" is Admin?", user.roles);
+
+                                    const message = isAdmin ? 'recupération de l\'administrateur' : 'Récupération de l\'utilisateur';
                             console.log('Informations utilisateur chargées avec succès:', user);
-                            return AuthActions.loadUserFromTokenSuccess({ token, user });
+                            return AuthActions.loadUserFromTokenSuccess({ token, isAdmin, user, message });
                         }),
                         catchError((error) => {
                             console.error('Erreur lors du chargement des informations utilisateur:', error);
@@ -148,6 +155,103 @@ export class AuthEffects {
                     console.error('Erreur lors du décodage du token:', error);
                     return of(AuthActions.loadUserFromTokenFailure({ error: 'Token invalide' }));
                 }
+            })
+        )
+    );
+
+
+    // Ajoutez cet effet dans votre classe AuthEffects
+
+    refreshToken$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(AuthActions.refreshToken),
+            mergeMap(() => {
+                // Récupérer le token actuel depuis localStorage
+                const currentToken: Token | null = (() => {
+                    try {
+                        const storedToken = localStorage.getItem('auth_token');
+                        return storedToken ? JSON.parse(storedToken) : null;
+                    } catch (error) {
+                        console.warn('Erreur lors de la lecture du token depuis localStorage:', error);
+                        return null;
+                    }
+                })();
+
+                if (!currentToken?.refresh_token) {
+                    console.error('❌ Pas de refresh token disponible');
+                    return of(AuthActions.refreshTokenFailure({
+                        error: 'Pas de refresh token disponible'
+                    }));
+                }
+
+                console.log('🔄 Démarrage du rafraîchissement du token...');
+
+                return from(AuthApi.refreshToken(currentToken.refresh_token)).pipe(
+                    mergeMap((response) => {
+                        const newToken: Token = response.data?.data || response.data;
+                        console.log("newToken: ", newToken);
+
+                        if (!newToken?.access_token || !newToken?.refresh_token) {
+                            console.error('❌ Token rafraîchi invalide - Champs manquants');
+                            return of(AuthActions.refreshTokenFailure({
+                                error: 'Token rafraîchi invalide'
+                            }));
+                        }
+
+                        // Sauvegarder le nouveau token dans localStorage
+                        try {
+                            localStorage.setItem('auth_token', JSON.stringify(newToken));
+                            console.log('✅ Token rafraîchi et sauvegardé avec succès');
+                        } catch (error) {
+                            console.error('❌ Erreur lors de la sauvegarde du token:', error);
+                        }
+
+                        // Optionnel : Mettre à jour les informations utilisateur si nécessaire
+                        try {
+                            const decoded: any = jwtDecode(newToken.access_token);
+                            const userId = decoded.sub;
+                            const roles = decoded?.realm_access?.roles;
+
+                            // Si vous voulez aussi rafraîchir les infos utilisateur
+                            return from(AuthApi.getUserInfo(userId)).pipe(
+                                map((userDetailsResponse) => {
+                                    const user: User = userDetailsResponse.data.data;
+                                    if (roles) {
+                                        user.roles = roles.filter(
+                                            (role: any): role is UserRole => Object.values(UserRole).includes(role as UserRole)
+                                        );
+                                    }
+
+                                    console.log('✅ Informations utilisateur mises à jour avec le nouveau token');
+
+                                    // Retourner le succès avec token et utilisateur mis à jour
+                                    return AuthActions.refreshTokenSuccess({ token: newToken });
+                                }),
+                                catchError((userError) => {
+                                    console.warn('⚠️ Token rafraîchi mais erreur lors de la récupération du profil utilisateur:', userError);
+                                    // Le token est valide, on peut continuer même si la récupération du profil échoue
+                                    return of(AuthActions.refreshTokenSuccess({ token: newToken }));
+                                })
+                            );
+                        } catch (decodeError) {
+                            console.warn('⚠️ Erreur lors du décodage du nouveau token:', decodeError);
+                            // Le token semble valide même si on ne peut pas le décoder
+                            return of(AuthActions.refreshTokenSuccess({ token: newToken }));
+                        }
+                    }),
+                    catchError((error) => {
+                        console.error('❌ Erreur lors du rafraîchissement du token:', error);
+
+                        // Nettoyer le localStorage en cas d'erreur
+                        localStorage.removeItem('auth_token');
+
+                        const errorMessage = error.response?.data?.message ||
+                            error.message ||
+                            'Erreur lors du rafraîchissement du token';
+
+                        return of(AuthActions.refreshTokenFailure({ error: errorMessage }));
+                    })
+                );
             })
         )
     );

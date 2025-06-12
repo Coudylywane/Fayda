@@ -6,6 +6,7 @@ import { selectAdminRequestPending } from '../demandes/store/demande.selectors';
 import { Subject, takeUntil } from 'rxjs';
 import { RequestService } from 'src/app/features/demandes/services/request.service';
 import { BaseLayoutAdminService } from '../../base-layout-admin/base-layout-admin.service';
+import { selectTotalDahiras } from 'src/app/features/dahiras/store/dahira.selector';
 // import { Chart, registerables } from 'chart.js';
 
 @Component({
@@ -37,7 +38,7 @@ export class AdminDashboardPage implements OnInit {
       ).subscribe(user => {
 
       this.requestPending = user.length;
-    });
+    });    
   }
 
   ngOnDestroy() {

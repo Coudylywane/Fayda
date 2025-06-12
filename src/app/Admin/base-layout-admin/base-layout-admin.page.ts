@@ -10,6 +10,9 @@ import { User, UserRole } from 'src/app/features/auth/models/user.model';
 import { Router } from '@angular/router';
 import { RequestService } from 'src/app/features/demandes/services/request.service';
 import { selectAdminRequestPending } from '../pages/demandes/store/demande.selectors';
+import { loadDahiras } from 'src/app/features/dahiras/store/dahira.actions';
+import { loadUserFromToken } from 'src/app/features/auth/store/auth.actions';
+import { Token } from 'src/app/features/auth/models/auth.model';
 
 @Component({
   selector: 'app-base-layout-admin',
@@ -26,6 +29,8 @@ export class BaseLayoutAdminPage implements OnInit {
   isSidebarOpen = true;
   UserRole = UserRole;
   requestCount: number = 0;
+
+  attempt: boolean = false;
 
   // Observable pour les données utilisateur
   user: User | null = null;
@@ -63,6 +68,7 @@ export class BaseLayoutAdminPage implements OnInit {
   ) { }
 
   ngOnInit() {
+
     this.navigationService.activeTab$.subscribe(tab => {
       this.activeTab = tab;
     });
@@ -72,7 +78,18 @@ export class BaseLayoutAdminPage implements OnInit {
       takeUntil(this.destroy$),
     ).subscribe(authState => {
       this.isLoading = authState.loading;
+      const token: Token = JSON.parse(localStorage.getItem('auth_token') || '{}');
+      if (!token && authState.user?.userId && authState.token?.access_token) {
+        console.log("Set item token");
+        localStorage.setItem('auth_token', JSON.stringify(token));
+      }
+      if (token && !authState.refreshing && authState.user === null && !this.attempt) {
+        this.attempt = true;
+        console.log("Chargement utilisateur depuis le token...");
+        this.store.dispatch(loadUserFromToken());
+      }
     });
+
 
     // S'abonner aux données utilisateur
     this.store.select(selectAuthState).pipe(
@@ -95,17 +112,17 @@ export class BaseLayoutAdminPage implements OnInit {
         this.logoutAttempted = false;
       }
       console.log('Données utilisateur:', authState.user);
-      
+
     });
-    
+
     // this.loadAllRequests();
 
     this.store.select(selectAdminRequestPending).pipe(
-        takeUntil(this.destroy$)
-      ).subscribe(user => {
-      console.log("requestcount", user.length);
-      
-      this.requestCount = user.length;
+      takeUntil(this.destroy$)
+    ).subscribe(demande => {
+      console.log("requestcount", demande.length);
+
+      this.requestCount = demande.length;
     });
   }
 
@@ -125,7 +142,7 @@ export class BaseLayoutAdminPage implements OnInit {
     // this.dismiss();
   }
 
-    // Méthodes utilitaires pour le template
+  // Méthodes utilitaires pour le template
   getUserInitials(): string {
     if (!this.user) return '';
 
@@ -148,9 +165,9 @@ export class BaseLayoutAdminPage implements OnInit {
     return this.user?.email || '';
   }
 
-      /**
-   * Charge toutes les demandes du serveur
-   */
+  /**
+* Charge toutes les demandes du serveur
+*/
   private loadAllRequests(): void {
     this.requestService.getAllRequest();
   }

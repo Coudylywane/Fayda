@@ -14,6 +14,7 @@ import { ConfettiService } from 'src/app/Admin/services/confetti.service';
 import { SelectorComponent } from "../../../shared/components/selector/selector.component";
 import { PhoneInputComponent } from 'src/app/shared/components/phone-input/phone-input.component';
 import { ToastService } from 'src/app/shared/components/toast/toast.service';
+import { DateSelectorComponent } from "../../../shared/components/date-selector/date-selector.component";
 
 @Component({
   selector: 'app-login',
@@ -24,9 +25,7 @@ import { ToastService } from 'src/app/shared/components/toast/toast.service';
     FormsModule,
     IonicModule,
     RouterModule,
-    ReactiveFormsModule,
-   
-  ],
+    ReactiveFormsModule, DateSelectorComponent],
 })
 export class LoginPage {
   loginForm: FormGroup

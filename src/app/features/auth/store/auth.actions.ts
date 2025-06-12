@@ -47,7 +47,7 @@ export const loadUserFromToken = createAction(
 
 export const loadUserFromTokenSuccess = createAction(
   '[Auth] Load User From Token Success',
-  props<{ token: Token, user: User }>()
+  props<{ token: Token, user: User, isAdmin: boolean, message: string }>()
 );
 
 export const loadUserFromTokenFailure = createAction(
@@ -57,8 +57,7 @@ export const loadUserFromTokenFailure = createAction(
 
 // actions pour le refresh token
 export const refreshToken = createAction(
-  '[Auth] Refresh Token',
-  props<{ refreshToken: string }>()
+  '[Auth] Refresh Token'
 );
 
 export const refreshTokenSuccess = createAction(

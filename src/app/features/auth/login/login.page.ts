@@ -11,10 +11,8 @@ import { AppState } from 'src/app/store/app.state';
 import { Login } from '../models/auth.model';
 import { selectAuthState } from '../store/auth.selectors';
 import { ConfettiService } from 'src/app/Admin/services/confetti.service';
-import { SelectorComponent } from "../../../shared/components/selector/selector.component";
-import { PhoneInputComponent } from 'src/app/shared/components/phone-input/phone-input.component';
 import { ToastService } from 'src/app/shared/components/toast/toast.service';
-import { DateSelectorComponent } from "../../../shared/components/date-selector/date-selector.component";
+import { PhonenumberInputComponent } from 'src/app/shared/components/phonenumber-input/phonenumber-input.component';
 
 @Component({
   selector: 'app-login',
@@ -25,7 +23,7 @@ import { DateSelectorComponent } from "../../../shared/components/date-selector/
     FormsModule,
     IonicModule,
     RouterModule,
-    ReactiveFormsModule, DateSelectorComponent],
+    ReactiveFormsModule, PhonenumberInputComponent],
 })
 export class LoginPage {
   loginForm: FormGroup
@@ -36,38 +34,7 @@ export class LoginPage {
   private destroy$ = new Subject<void>();
   private loginAttempted = false;
 
-  selectOptions = [
-    {
-      value: 'fr',
-      label: 'Français',
-      flag: 'https://flagcdn.com/w20/fr.png',
-      badge: 'Recommandé'
-    },
-    {
-      value: 'en',
-      label: 'Anglais',
-      icon: 'fas fa-language text-blue-500'
-    },
-    {
-      value: 'es',
-      label: 'Espagnol',
-      flag: 'https://flagcdn.com/w20/es.png'
-    },
-    {
-      value: 'de',
-      label: 'Allemand',
-      icon: 'fas fa-star text-yellow-500',
-      badge: 'Nouveau'
-    }
-  ];
-
-  selectedValue: any;
   selectedCountry: any;
-
-  onSelectChange(value: any) {
-    this.selectedValue = value;
-    console.log('Valeur sélectionnée :', value);
-  }
 
   constructor(
     private fb: FormBuilder,
@@ -121,7 +88,7 @@ export class LoginPage {
         } else if (!authState.isAuthenticated && authState.error) {
           // Échec de login
           console.log("Échec de connexion:", authState.error);
-          
+
           this.toast.showError(authState.error || "Erreur de connexion");
           this.loginAttempted = false;
         }
@@ -129,19 +96,12 @@ export class LoginPage {
     });
   }
 
-  // Gestionnaire d'événement pour le changement de pays
-  onCountryChange(country: any) {
-    this.selectedCountry = country;
-    console.log('Pays changé :', country);
-
-    // Vous pouvez aussi mettre à jour la logique de validation ici
-    // this.updatePhoneValidation();
-  }
-
 
   login() {
     if (this.loginForm.valid) {
       this.loginAttempted = true;
+      console.log(this.loginForm.value);
+
       this.authService.login(this.loginForm.value as Login);
     } else {
       // Marquer tous les champs comme touchés pour afficher les erreurs

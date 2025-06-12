@@ -11,6 +11,11 @@ import { selectAuthState } from '../store/auth.selectors';
 import { Register } from '../models/auth.model';
 import { ToastService } from 'src/app/shared/components/toast/toast.service';
 import { DateSelectorComponent } from "../../../shared/components/date-selector/date-selector.component";
+import { PhonenumberInputComponent } from 'src/app/shared/components/phonenumber-input/phonenumber-input.component';
+import { passwordMatchValidator } from 'src/app/shared/utils/custom-validators';
+import { CountrySelectorComponent } from "../../../shared/components/country-selector/country-selector.component";
+import { nationalities } from 'src/app/shared/utils/nationalities';
+import { nations } from 'src/app/shared/utils/nations';
 
 interface Step {
   title: string;
@@ -26,19 +31,25 @@ interface Step {
     CommonModule,
     IonicModule,
     ReactiveFormsModule,
-    DateSelectorComponent
-  ],
+    DateSelectorComponent,
+    PhonenumberInputComponent,
+    CountrySelectorComponent
+],
 })
 export class RegisterPage {
   maxDate = new Date().toISOString();
   registerForm: FormGroup;
   selectedGender: string = 'homme';
   showPassword = false;
+  showConfirmPassword = false;
   registerError = "";
   isLoading = false;
   loginAttempted = false;
   returnUrl: string;
   userBirthDate: Date | null = null;
+  selectedCountry: any;
+  nationationalities = nationalities;
+  nations = nations;
 
   // Propriétés pour la gestion des étapes
   currentStep = 0;
@@ -117,19 +128,20 @@ export class RegisterPage {
 
       // Étape 2: Contact
       email: ['dahira@at.sn', [Validators.required, Validators.email]],
-      phoneNumber: ['', [Validators.required, Validators.pattern(/^[0-9+\-\s()]{8,20}$/)]],
+      phoneNumber: ['', [Validators.required]],
 
       // Étape 3: Compte
       username: ['dahira', [Validators.required, Validators.minLength(3)]],
       password: ['user123', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['user1234', [Validators.required, Validators.minLength(6)]],
 
       // Étape 4: Localisation
-      nationality: ['Senegal', Validators.required],
+      nationality: ['', Validators.required],
       country: ['Senegal', Validators.required],
       region: ['Dakar', Validators.required],
       department: ['Dakar'], // Optionnel
       address: ['Grand Dakar'] // Optionnel
-    });
+    }, { validators: passwordMatchValidator() });
   }
 
   // Méthodes de navigation entre les étapes
@@ -156,15 +168,23 @@ export class RegisterPage {
   canProceed(): boolean {
     const currentStepFields = this.steps[this.currentStep].fields;
 
-    // Vérifier si tous les champs requis de l'étape actuelle sont valides
-    return currentStepFields.every(fieldName => {
-      const field = this.registerForm.get(fieldName);
-      // Le champ doit être valide ET avoir une valeur si il est requis
-      if (field?.hasError('required')) {
-        return false;
-      }
-      return field?.valid ?? false;
+    // Si l'étape contient des champs, tous doivent être valides
+    const allFieldsValid = currentStepFields.every(fieldName => {
+      const control = this.registerForm.get(fieldName);
+      return control?.valid ?? false;
     });
+
+    // Si cette étape contient le champ confirmPassword, on vérifie aussi les erreurs de groupe
+    const isGroupValid = this.currentStepIncludes(['password', 'confirmPassword'])
+      ? !this.registerForm.hasError('passwordMismatch')
+      : true;
+
+    return allFieldsValid && isGroupValid;
+  }
+
+  //pour savoir si un champ est présent dans l'étape
+  private currentStepIncludes(fields: string[]): boolean {
+    return fields.some(f => this.steps[this.currentStep].fields.includes(f));
   }
 
   // Méthodes pour les classes CSS des étapes
@@ -245,6 +265,10 @@ export class RegisterPage {
     this.showPassword = !this.showPassword;
   }
 
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
   isFieldInvalid(fieldName: string): boolean {
     const field = this.registerForm.get(fieldName);
     return !!(field?.invalid && (field.dirty || field.touched));
@@ -277,4 +301,28 @@ export class RegisterPage {
     console.log('Date sélectionnée:', date);
   }
 
+  // Gestionnaire d'événement pour le changement de pays
+  onCountryChange(country: any) {
+    this.selectedCountry = country;
+    console.log('Pays changé :', country);
+
+    // Vous pouvez aussi mettre à jour la logique de validation ici
+    // this.updatePhoneValidation();
+  }
+  
+  // Gestionnaire d'événement pour le changement de pays
+  onCountrySelected(country: any) {
+    this.registerForm.patchValue({ country });
+    console.log('Pays changé :', country);
+  }
+
+  // Gestionnaire d'événement pour le changement de pays
+  onNationalitySelected(nationality: any) {
+    this.registerForm.patchValue({ nationality });
+    console.log('Nationalité changé :', nationality);
+  }
+
+  onValidationChange(isValid: boolean) {
+    console.log('Numéro valide:', isValid);
+  }
 }

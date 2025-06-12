@@ -81,12 +81,15 @@ export class PhoneInputComponent implements ControlValueAccessor {
     this.isCountrySelectOpen = !this.isCountrySelectOpen;
   }
 
-  selectCountry(country: any) {
-    this.selectedCountry = country;
-    this.isCountrySelectOpen = false;
-    this.countryChange.emit(country);
-    this.onChange(this.fullPhoneNumber);
+selectCountry(country: any, event?: MouseEvent) {
+  if (event) {
+    event.stopPropagation();
   }
+  this.selectedCountry = country;
+  this.isCountrySelectOpen = false;
+  this.countryChange.emit(country);
+  this.onChange(this.fullPhoneNumber);
+}
 
   onPhoneNumberChange() {
     this.onChange(this.fullPhoneNumber);

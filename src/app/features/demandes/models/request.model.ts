@@ -28,7 +28,6 @@ export enum StatusEnum {
 
 export interface ApprovalDto {
   targetId: string,
-  approvedByUserId: string,
   approved: boolean,
   rejectionReason?: string,
   targetType: RequestTypeEnum

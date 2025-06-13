@@ -83,27 +83,6 @@
                 </div>
               </div>
             </div>
-
-            <div class="space-y-2">
-              <label for="numberOfDisciples" class="flex items-center text-sm font-semibold text-gray-700">
-                <ion-icon name="people-outline" class="text-gray-400 mr-2"></ion-icon>
-                Nombre de disciples *
-              </label>
-              <input type="number" id="numberOfDisciples" formControlName="numberOfDisciples"
-                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 bg-gray-50 focus:bg-white"
-                placeholder="Entrez le nombre de disciples" min="1">
-              <div
-                *ngIf="dahiraForm.get('numberOfDisciples')?.invalid && (dahiraForm.get('numberOfDisciples')?.dirty || dahiraForm.get('numberOfDisciples')?.touched)"
-                class="text-red-500 text-sm flex items-center mt-1">
-                <ion-icon name="alert-circle-outline" class="mr-1"></ion-icon>
-                <div *ngIf="dahiraForm.get('numberOfDisciples')?.errors?.['required']">
-                  Le nombre de disciples est requis.
-                </div>
-                <div *ngIf="dahiraForm.get('numberOfDisciples')?.errors?.['min']">
-                  Le nombre de disciples doit être au moins 1.
-                </div>
-              </div>
-            </div>
           </div>
 
           <!-- Étape 2: Contact -->

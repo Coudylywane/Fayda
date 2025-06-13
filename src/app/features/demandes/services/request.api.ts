@@ -10,7 +10,9 @@ export class RequestApiService {
     }
 
     static approval(data: ApprovalDto) {
-        return axios.post(`ApprovalDto`, data);
+        console.log("data: ",data);
+        
+        return axios.post(`approval`, data);
     }
 
     static getRequestByTargetUser(userId: string) {

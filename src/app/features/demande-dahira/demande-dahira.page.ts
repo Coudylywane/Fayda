@@ -230,7 +230,7 @@ export class DemandeDahiraPage implements OnInit {
 
   async confirmApproval() {
     if (this.requestToApprove) {
-      const data: ApprovalDto = { targetId: this.requestToApprove.requestId, approved: true, approvedByUserId: this.userId, targetType: this.requestToApprove.requestType }
+      const data: ApprovalDto = { targetId: this.requestToApprove.requestId, approved: true, targetType: this.requestToApprove.requestType }
 
       try {
         const response = await RequestApiService.approval(data);
@@ -277,8 +277,8 @@ export class DemandeDahiraPage implements OnInit {
       // Appel à votre service pour rejeter la demande
       if (this.requestToApprove) {
         const data: ApprovalDto = { targetId: this.requestToApprove.requestId,
-          approved: true, 
-          approvedByUserId: this.userId, 
+          approved: true,
+          rejectionReason: this.rejectionReason,
           targetType: this.requestToApprove.requestType }
 
         try {

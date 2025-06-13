@@ -304,7 +304,7 @@ export class DemandesPage implements OnInit, OnDestroy {
       return;
     }
 
-    const data: ApprovalDto = { targetId: demand.requestId, approved: true, approvedByUserId: this.userId, targetType: demand.requestType }
+    const data: ApprovalDto = { targetId: demand.requestId, approved: true, targetType: demand.requestType }
 
     try {
       const response = await RequestApiService.approval(data);
@@ -388,14 +388,44 @@ export class DemandesPage implements OnInit, OnDestroy {
   /**
    * Confirmer le rejet d'une demande
    */
-  confirmReject(): void {
-    if (this.selectedDemand && this.rejectReason.trim()) {
-      // Ici, vous devriez appeler votre service pour rejeter la demande
-      // this.requestService.rejectRequest(this.selectedDemand.requestId, this.rejectReason).subscribe(...)
+  async confirmReject() {
+    if (this.selectedDemand?.approvalStatus !== this.status.PENDING) {
+      return;
+    }
 
-      this.selectedDemand.approvalStatus = this.status.REJECTED;
-      this.selectedDemand.rejectionReason = this.rejectReason;
-      this.updateCounts();
+    if (this.selectedDemand && this.rejectReason.trim()) {
+      const data: ApprovalDto = {
+        targetId: this.selectedDemand.requestId,
+        approved: false,
+        targetType: this.selectedDemand.requestType,
+        rejectionReason: this.rejectReason};
+
+      try {
+        const response = await RequestApiService.approval(data);
+        console.log("request ", response);
+        this.toastService.showSuccess("Vous avez décliné la demande");
+        this.loadAllRequests();
+        // Mise à jour locale en attendant la réponse du serveur
+        const requestIndex = this.allRequests.findIndex(
+          req => req.requestId === this.selectedDemand?.requestId
+        );
+
+        if (requestIndex !== -1) {
+          this.allRequests[requestIndex] = {
+            ...this.allRequests[requestIndex],
+            approvalStatus: StatusEnum.REJECTED
+          };
+          this.filterDemands();
+        }
+        this.showActionsPopup = null;
+        this.updateCounts();
+      } catch (error: any) {
+        console.error('Erreur demande adhésion:', error);
+        const errorMessage = error.response.data.developerMessage || error.message || 'Erreur lors de l\'envoi de la demande';
+        this.toastService.showError(errorMessage);
+      }
+
+      // this.updateCounts();
       this.closeRejectModal();
     }
   }

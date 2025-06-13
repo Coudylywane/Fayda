@@ -47,7 +47,6 @@ export class RegisterPage {
   loginAttempted = false;
   returnUrl: string;
   userBirthDate: Date | null = null;
-  selectedCountry: any;
   nationationalities = nationalities;
   nations = nations;
 
@@ -137,7 +136,7 @@ export class RegisterPage {
 
       // Étape 4: Localisation
       nationality: ['', Validators.required],
-      country: ['Senegal', Validators.required],
+      country: ['', Validators.required],
       region: ['Dakar', Validators.required],
       department: ['Dakar'], // Optionnel
       address: ['Grand Dakar'] // Optionnel
@@ -303,7 +302,6 @@ export class RegisterPage {
 
   // Gestionnaire d'événement pour le changement de pays
   onCountryChange(country: any) {
-    this.selectedCountry = country;
     console.log('Pays changé :', country);
 
     // Vous pouvez aussi mettre à jour la logique de validation ici

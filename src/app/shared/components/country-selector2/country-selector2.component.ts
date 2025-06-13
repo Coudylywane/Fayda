@@ -1,21 +1,15 @@
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
-export interface OptionCountry {
-  country: string,
-  nationality: string,
-  icon?: string,    // Classes CSS pour l'icône (ex: "fas fa-flag")
-  flag?: string,    // URL vers une image de drapeau
-}
+import { OptionCountry } from '../country-selector/country-selector.component';
 
 @Component({
-  selector: 'app-country-selector',
-  templateUrl: './country-selector.component.html',
-  styleUrls: ['./country-selector.component.scss'],
+  selector: 'app-country-selector2',
+  templateUrl: './country-selector2.component.html',
+  styleUrls: ['./country-selector2.component.scss'],
   imports: [CommonModule, FormsModule]
 })
-export class CountrySelectorComponent implements OnInit {
+export class CountrySelector2Component  implements OnInit {
   @Input() options: OptionCountry[] = [];
   @Input() placeholder = 'Sélectionnez une option';
   // @Input() defaultOption: string | null = nationalities[0];

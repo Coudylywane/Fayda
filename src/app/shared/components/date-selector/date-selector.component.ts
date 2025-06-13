@@ -85,7 +85,7 @@ ngOnInit() {
       return this.placeholder;
     }
     
-    return this.selectedDate.toLocaleDateString('fr-FR', {
+    return this.selectedDate.toLocaleDateString('us-FR', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'

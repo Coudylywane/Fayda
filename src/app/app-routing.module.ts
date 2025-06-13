@@ -56,6 +56,10 @@ const routes: Routes = [
     path: 'demande-dahira',
     loadChildren: () => import('./features/demande-dahira/demande-dahira.module').then( m => m.DemandeDahiraPageModule)
   },
+  {
+    path: 'dahiras/create',
+    loadChildren: () => import('./features/dahiras/pages/create-dahira/create-dahira.module').then( m => m.CreateDahiraPageModule)
+  }
   // Route fallback si aucune correspondance
   // {
   //   path: '**',

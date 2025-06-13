@@ -11,7 +11,9 @@ const routes: Routes = [
   {
     path: 'detail/:id',
     loadChildren: () => import('./pages/detail-dahira/detail-dahira.module').then( m => m.DetailDahiraPageModule)
-  }
+  },
+  
+
 
 ];
 

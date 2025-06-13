@@ -4,7 +4,7 @@ export const nationalities: OptionCountry[] = [
   {
     country: "Afghanistan",
     nationality: "Afghane",
-    flag: "https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_the_Taliban.svg"
+    flag: "https://flagcdn.com/w20/af.png"
   },
   {
     country: "Afrique du Sud",
@@ -389,7 +389,7 @@ export const nationalities: OptionCountry[] = [
   {
     country: "Honduras",
     nationality: "Hondurienne",
-    flag: "https://upload.wikimedia.org/wikipedia/commons/8/82/Flag_of_Honduras.svg"
+    flag: "https://flagcdn.com/w20/hn.png"
   },
   {
     country: "Hongrie",
@@ -853,7 +853,7 @@ export const nationalities: OptionCountry[] = [
   {
     country: "Syrie",
     nationality: "Syrienne",
-    flag: "https://upload.wikimedia.org/wikipedia/commons/5/53/Flag_of_Syria.svg"
+    flag: "https://flagcdn.com/w20/sy.png"
   },
   {
     country: "Tadjikistan",
@@ -938,7 +938,7 @@ export const nationalities: OptionCountry[] = [
   {
     country: "Vatican",
     nationality: "Vaticane",
-    flag: "https://upload.wikimedia.org/wikipedia/commons/0/00/Flag_of_the_Vatican_City.svg"
+    flag: "https://flagcdn.com/w20/va.png"
   },
   {
     country: "Venezuela",

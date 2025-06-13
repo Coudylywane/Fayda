@@ -1,0 +1,281 @@
+<ion-content [fullscreen]="true" class="bg-gray-50">
+  <div class="min-h-full flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl overflow-hidden max-w-2xl w-full">
+
+      <!-- Header avec stepper -->
+      <div class="p-6 bg-white border-b border-gray-200 cursor-pointer">
+        <div (click)="goHome()">
+          <ion-icon name="arrow-back-outline" slot="icon-only" class="text-green-600 text-xl"></ion-icon>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-6 text-center">Demande création Dahira</h3>
+
+        <!-- Stepper Indicator -->
+        <div class="flex items-center justify-between">
+          <!-- Étape 1 -->
+          <div class="flex flex-col items-center">
+            <div
+              class="flex items-center justify-center w-10 h-10 rounded-full text-sm font-bold transition-all duration-300"
+              [ngClass]="currentStep >= 1 ? 'bg-green-600 text-white shadow-lg' : 'bg-gray-200 text-gray-600'">
+              1
+            </div>
+            <span class="mt-2 text-xs font-medium text-gray-700 text-center">Informations</span>
+          </div>
+
+          <!-- Ligne de connexion 1 -->
+          <div class="flex-1 h-1 mx-4 rounded-full transition-all duration-300"
+            [ngClass]="currentStep > 1 ? 'bg-green-600' : 'bg-gray-200'"></div>
+
+          <!-- Étape 2 -->
+          <div class="flex flex-col items-center">
+            <div
+              class="flex items-center justify-center w-10 h-10 rounded-full text-sm font-bold transition-all duration-300"
+              [ngClass]="currentStep >= 2 ? 'bg-green-600 text-white shadow-lg' : 'bg-gray-200 text-gray-600'">
+              2
+            </div>
+            <span class="mt-2 text-xs font-medium text-gray-700 text-center">Contact</span>
+          </div>
+
+          <!-- Ligne de connexion 2 -->
+          <div class="flex-1 h-1 mx-4 rounded-full transition-all duration-300"
+            [ngClass]="currentStep > 2 ? 'bg-green-600' : 'bg-gray-200'"></div>
+
+          <!-- Étape 3 -->
+          <div class="flex flex-col items-center">
+            <div
+              class="flex items-center justify-center w-10 h-10 rounded-full text-sm font-bold transition-all duration-300"
+              [ngClass]="currentStep >= 3 ? 'bg-green-600 text-white shadow-lg' : 'bg-gray-200 text-gray-600'">
+              3
+            </div>
+            <span class="mt-2 text-xs font-medium text-gray-700 text-center">Localisation</span>
+          </div>
+        </div>
+
+        <div class="mt-6 text-center">
+          <h4 class="text-lg font-semibold text-green-800 bg-white px-4 py-2 inline-block ">
+            {{ getStepTitle() }}
+          </h4>
+        </div>
+      </div>
+
+      <!-- Contenu du formulaire -->
+      <div class="p-6">
+        <form [formGroup]="dahiraForm" (ngSubmit)="onSubmit()">
+
+          <!-- Étape 1: Informations générales -->
+          <div *ngIf="currentStep === 1" class="space-y-6 animate-fade-in">
+            <div class="space-y-2">
+              <label for="dahiraName" class="flex items-center text-sm font-semibold text-gray-700">
+                <ion-icon name="home-outline" class="text-gray-400 mr-2"></ion-icon>
+                Nom du Dahira *
+              </label>
+              <input type="text" id="dahiraName" formControlName="dahiraName"
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                placeholder="Entrez le nom du Dahira">
+              <div
+                *ngIf="dahiraForm.get('dahiraName')?.invalid && (dahiraForm.get('dahiraName')?.dirty || dahiraForm.get('dahiraName')?.touched)"
+                class="text-red-500 text-sm flex items-center mt-1">
+                <ion-icon name="alert-circle-outline" class="mr-1"></ion-icon>
+                <div *ngIf="dahiraForm.get('dahiraName')?.errors?.['required']">
+                  Le nom du Dahira est requis.
+                </div>
+                <div *ngIf="dahiraForm.get('dahiraName')?.errors?.['minlength']">
+                  Le nom doit contenir au moins 3 caractères.
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label for="numberOfDisciples" class="flex items-center text-sm font-semibold text-gray-700">
+                <ion-icon name="people-outline" class="text-gray-400 mr-2"></ion-icon>
+                Nombre de disciples *
+              </label>
+              <input type="number" id="numberOfDisciples" formControlName="numberOfDisciples"
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                placeholder="Entrez le nombre de disciples" min="1">
+              <div
+                *ngIf="dahiraForm.get('numberOfDisciples')?.invalid && (dahiraForm.get('numberOfDisciples')?.dirty || dahiraForm.get('numberOfDisciples')?.touched)"
+                class="text-red-500 text-sm flex items-center mt-1">
+                <ion-icon name="alert-circle-outline" class="mr-1"></ion-icon>
+                <div *ngIf="dahiraForm.get('numberOfDisciples')?.errors?.['required']">
+                  Le nombre de disciples est requis.
+                </div>
+                <div *ngIf="dahiraForm.get('numberOfDisciples')?.errors?.['min']">
+                  Le nombre de disciples doit être au moins 1.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Étape 2: Contact -->
+          <div *ngIf="currentStep === 2" class="space-y-6 animate-fade-in">
+            <div class="space-y-2">
+              <label for="email" class="flex items-center text-sm font-semibold text-gray-700">
+                <ion-icon name="mail-outline" class="text-gray-400 mr-2"></ion-icon>
+                Email *
+              </label>
+              <input type="email" id="email" formControlName="email"
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                placeholder="exemple@email.com">
+              <div
+                *ngIf="dahiraForm.get('email')?.invalid && (dahiraForm.get('email')?.dirty || dahiraForm.get('email')?.touched)"
+                class="text-red-500 text-sm flex items-center mt-1">
+                <ion-icon name="alert-circle-outline" class="mr-1"></ion-icon>
+                <div *ngIf="dahiraForm.get('email')?.errors?.['required']">
+                  L'email est requis.
+                </div>
+                <div *ngIf="dahiraForm.get('email')?.errors?.['email']">
+                  L'email n'est pas valide.
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label for="phoneNumber" class="flex items-center text-sm font-semibold text-gray-700">
+                <ion-icon name="call-outline" class="text-gray-400 mr-2 mb-2"></ion-icon>
+                Numéro de téléphone *
+              </label>
+              <!-- <input type="tel" id="phoneNumber" formControlName="phoneNumber"
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                placeholder="+221 77 123 45 67"> -->
+              <div class="">
+                <app-phone-input formControlName="phoneNumber" placeholder="Votre numéro mobile">
+                </app-phone-input>
+              </div>
+              <div
+                *ngIf="dahiraForm.get('phoneNumber')?.invalid && (dahiraForm.get('phoneNumber')?.dirty || dahiraForm.get('phoneNumber')?.touched)"
+                class="text-red-500 text-sm flex items-center mt-1">
+                <ion-icon name="alert-circle-outline" class="mr-1"></ion-icon>
+                <div *ngIf="dahiraForm.get('phoneNumber')?.errors?.['required']">
+                  Le numéro de téléphone est requis.
+                </div>
+                <div *ngIf="dahiraForm.get('phoneNumber')?.errors?.['pattern']">
+                  Le format du numéro n'est pas valide (ex: +221771234567).
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Étape 3: Localisation -->
+          <div *ngIf="currentStep === 3" class="space-y-6 animate-fade-in">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <label for="country" class="flex items-center text-sm font-semibold text-gray-700">
+                  <ion-icon name="flag-outline" class="text-gray-400 mr-2"></ion-icon>
+                  Pays *
+                </label>
+                <div class="relative">
+                  <app-country-selector2 (selectedChange)="onCountrySelected($event)" [options]="nations">
+                  </app-country-selector2>
+                </div>
+                <div
+                  *ngIf="dahiraForm.get('country')?.invalid && (dahiraForm.get('country')?.dirty || dahiraForm.get('country')?.touched)"
+                  class="text-red-500 text-sm flex items-center mt-1">
+                  <ion-icon name="alert-circle-outline" class="mr-1"></ion-icon>
+                  <div *ngIf="dahiraForm.get('country')?.errors?.['required']">
+                    Le pays est requis.
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label for="region" class="flex items-center text-sm font-semibold text-gray-700">
+                  <ion-icon name="location-outline" class="text-gray-400 mr-2"></ion-icon>
+                  Région *
+                </label>
+                <input type="text" id="region" formControlName="region"
+                  class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                  placeholder="Dakar, Thiès, Saint-Louis...">
+                <div
+                  *ngIf="dahiraForm.get('region')?.invalid && (dahiraForm.get('region')?.dirty || dahiraForm.get('region')?.touched)"
+                  class="text-red-500 text-sm flex items-center mt-1">
+                  <ion-icon name="alert-circle-outline" class="mr-1"></ion-icon>
+                  <div *ngIf="dahiraForm.get('region')?.errors?.['required']">
+                    La région est requise.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label for="department" class="flex items-center text-sm font-semibold text-gray-700">
+                <ion-icon name="business-outline" class="text-gray-400 mr-2"></ion-icon>
+                Département *
+              </label>
+              <input type="text" id="department" formControlName="department"
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                placeholder="Pikine, Guédiawaye, Rufisque...">
+              <div
+                *ngIf="dahiraForm.get('department')?.invalid && (dahiraForm.get('department')?.dirty || dahiraForm.get('department')?.touched)"
+                class="text-red-500 text-sm flex items-center mt-1">
+                <ion-icon name="alert-circle-outline" class="mr-1"></ion-icon>
+                <div *ngIf="dahiraForm.get('department')?.errors?.['required']">
+                  Le département est requis.
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label for="address" class="flex items-center text-sm font-semibold text-gray-700">
+                <ion-icon name="map-outline" class="text-gray-400 mr-2"></ion-icon>
+                Adresse complète *
+              </label>
+              <textarea id="address" formControlName="address" rows="4"
+                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 bg-gray-50 focus:bg-white resize-none"
+                placeholder="Adresse détaillée du Dahira"></textarea>
+              <div
+                *ngIf="dahiraForm.get('address')?.invalid && (dahiraForm.get('address')?.dirty || dahiraForm.get('address')?.touched)"
+                class="text-red-500 text-sm flex items-center mt-1">
+                <ion-icon name="alert-circle-outline" class="mr-1"></ion-icon>
+                <div *ngIf="dahiraForm.get('address')?.errors?.['required']">
+                  L'adresse est requise.
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Navigation buttons -->
+      <div class="flex justify-between items-center p-2 bg-gray-50 border-t border-gray-200">
+        <button type="button" (click)="previousStep()" *ngIf="currentStep > 1"
+          class="flex items-center px-6 py-2 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 transition-all duration-200 font-medium">
+          <ion-icon name="chevron-back-outline" class="mr-2"></ion-icon>
+          Précédent
+        </button>
+
+        <button type="button" (click)="nextStep()" *ngIf="currentStep < totalSteps"
+          class="flex items-center px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 hover:shadow-lg transition-all duration-200 font-medium transform hover:scale-105">
+          Suivant
+          <ion-icon name="chevron-forward-outline" class="ml-2"></ion-icon>
+        </button>
+
+        <button type="button" (click)="onSubmit()" *ngIf="currentStep === totalSteps"
+          [disabled]="dahiraForm.invalid || isloading"
+          class="flex items-center px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium transform hover:scale-105 disabled:hover:scale-100">
+          <ion-icon *ngIf="isloading" name="sync-outline" class="mr-2 animate-spin"></ion-icon>
+          <ion-icon *ngIf="!isloading" name="checkmark-outline" class="mr-2"></ion-icon>
+          {{isloading ? "Envoie..." : "Enregistrer"}}
+        </button>
+      </div>
+    </div>
+  </div>
+</ion-content>
+
+<style>
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+</style>

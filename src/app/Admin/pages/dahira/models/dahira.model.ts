@@ -34,8 +34,8 @@ export interface CreateDahira{
     country: string,
     region: string,
     department: string,
-    nationality: string,
+    nationality?: string,
     address: string
   },
-  createdByUserId: string
+  createdByUserId?: string
 }

@@ -3,17 +3,18 @@
       <div 
         (click)="toggleOpen()"
         [class.border-green-500]="isOpen"
-        class="flex items-center justify-between p-1 px-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-gray-300 bg-white transition-all h-12"
+        class="flex items-center justify-between py-3 px-4 border-2 rounded-lg border-gray-200 cursor-pointer bg-gray-50 transition-all h-12"
       >
+      <!-- w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200  focus:bg-white -->
         <div class="flex items-center">
           <span *ngIf="selectedOption?.icon" class="mr-4">
             <i [class]="selectedOption?.icon"></i>
           </span>
           <span *ngIf="selectedOption?.flag" class="mr-4">
-            <img title="{{selectedOption?.value}}" [src]="selectedOption?.flag" class="w-5 h-5 object-contain">
+            <img title="{{selectedOption?.country}}" [src]="selectedOption?.flag" class="w-5 h-5 object-contain">
           </span>
-          <span class="text-gray-700 truncate">
-            {{ selectedOption?.label || placeholder }}
+          <span class="truncate">
+            {{ selectedOption?.nationality || placeholder }}
           </span>
         </div>
         <svg 
@@ -38,31 +39,21 @@
           *ngFor="let option of options; let last = last"
           (click)="selectOption(option)"
           class="p-3 hover:bg-green-100 cursor-pointer transition-colors flex items-center"
-          [class.text-green-700]="option.value === selectedOption?.value"
-          [class.font-medium]="option.value === selectedOption?.value"
+          [class.text-green-700]="option.country === selectedOption?.country"
+          [class.font-medium]="option.country === selectedOption?.country"
           [class.border-b]="!last"
-          [class.bg-green-50]="option.value === selectedOption?.value"
+          [class.bg-green-50]="option.country === selectedOption?.country"
         >
           <!-- Icône ou drapeau -->
           <span *ngIf="option.icon" class="mr-4">
             <i [class]="option.icon"></i>
           </span>
           <span *ngIf="option.flag" class="mr-4">
-            <img title="{{selectedOption?.value}}" [src]="option.flag" class="w-5 h-5 object-contain">
+            <img title="{{selectedOption?.country}}" [src]="option.flag" class="w-5 h-5 object-contain">
           </span>
           
           <!-- Texte -->
-          <span class="truncate">{{ option.label }}</span>
-          
-          <!-- Badge optionnel -->
-          <span *ngIf="option.badge" class="ml-auto px-2 py-1 text-xs rounded-full"
-            [class.bg-green-100]="option.value === selectedOption?.value"
-            [class.text-green-800]="option.value === selectedOption?.value"
-            [class.bg-gray-100]="option.value !== selectedOption?.value"
-            [class.text-gray-800]="option.value !== selectedOption?.value"
-          >
-            {{ option.badge }}
-          </span>
+          <span class="truncate">{{ option.nationality }}</span>
         </div>
       </div>
     </div>

@@ -89,6 +89,7 @@ export class UtilisateursPage implements OnInit, OnDestroy {
     this.store.dispatch(UsersActions.resetFilters());
   }
 
+  // ✅ CORRECTION MAJEURE: Supprimer le double dispatch
   async openAddUserModal() {
     const modal = await this.modalController.create({
       component: AddUserModalComponent,
@@ -98,9 +99,22 @@ export class UtilisateursPage implements OnInit, OnDestroy {
     await modal.present();
     const { data } = await modal.onWillDismiss();
     
-    if (data) {
-      this.store.dispatch(UsersActions.createUser({ userData: data }));
+    // ✅ SOLUTION: Ne plus dispatcher createUser ici
+    // Le modal fait déjà le dispatch dans sa méthode saveUser()
+    if (data && data.success) {
+      console.log('✅ Modal fermée avec succès - utilisateur créé');
+      // Optionnel: recharger la liste des utilisateurs
+      this.store.dispatch(UsersActions.loadUsers({}));
+      await this.presentSuccessToast('Utilisateur créé avec succès');
+    } else if (data && data.error) {
+      console.error('❌ Erreur lors de la création:', data.error);
+      await this.presentErrorToast(data.error);
     }
+    
+    // ❌ ANCIEN CODE PROBLÉMATIQUE (supprimé) :
+    // if (data) {
+    //   this.store.dispatch(UsersActions.createUser({ userData: data }));
+    // }
   }
 
   async openFilterModal() {

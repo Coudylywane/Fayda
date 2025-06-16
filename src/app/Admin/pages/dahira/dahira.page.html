@@ -317,8 +317,7 @@
 
 <!-- Modal de modification de Dahira -->
 <div *ngIf="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <!-- <app-edit-dahira-modal [dahira]="selectedDahira!" (cancel)="closeEditModal()"
-    (submit)="onEditDahira($event)"></app-edit-dahira-modal> -->
+  <app-edit-dahira-modal [dahira]="selectedDahira!" (cancel)="closeEditModal()" (save)="onEditDahira($event)"></app-edit-dahira-modal>
 </div>
 
 <!-- Modal de confirmation de suppression -->

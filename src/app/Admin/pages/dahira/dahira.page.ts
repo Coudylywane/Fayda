@@ -289,7 +289,6 @@ export class DahiraPage implements OnInit {
   onAddDahira(dahira: CreateDahira): void {
     this.addLoading = true;
     console.log('Tentative de création dahira:', dahira);
-    dahira.createdByUserId = this.userId;
     dahira.location.nationality = dahira.location.country;
     this.dahiraService.createDahira(dahira)
       .then(response => {
@@ -308,16 +307,25 @@ export class DahiraPage implements OnInit {
 
   }
 
-  onEditDahira(changes: any): void {
-    if (this.selectedDahira) {
-      this.dahiraServiceAdmin.updateDahira(this.selectedDahira.dahiraId, changes).subscribe({
-        next: () => {
-          this.showEditModal = false;
-          this.loadAllDahiras();
-        },
-        error: (error) => console.error('Erreur lors de la modification du dahira', error)
+  onEditDahira(dahira: any): void {
+    this.addLoading = true;
+    console.log('Tentative de modification dahira:', dahira);
+    dahira.location.nationality = dahira.location.country;
+    this.dahiraService.updateDahira(this.selectedDahira?.dahiraId!,dahira)
+      .then(response => {
+        this.addLoading = false;
+        console.log('Succès modification dahira:', response);
+        if(response.success){
+          this.showAddModal = false;
+          this.toastService.showSuccess(response.data.message || "La Dahira a été modifié");
+        }
+        // this.loadAllDahiras();
+      }).catch(error => {
+        this.addLoading = false;
+        console.error('Erreur modification dahira:', error);
+        this.toastService.showError(error.message)
       });
-    }
+
   }
 
   onDeleteDahira(): void {

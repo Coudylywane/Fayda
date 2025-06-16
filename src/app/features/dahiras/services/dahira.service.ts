@@ -49,8 +49,7 @@ export class DahiraService {
   */
   async createDahira(data: CreateDahira) {
     try {
-      const { address, country, department, region } = data.location
-      const { createdByUserId, email, dahiraName, numberOfDisciples, phoneNumber } = data
+      const { email, dahiraName, phoneNumber } = data
 
       const response = await axios.post(`dahiras`, {
         ...data
@@ -100,13 +99,11 @@ export class DahiraService {
   async updateDahira(dahiraId: string, data: CreateDahira) {
     try {
       const { address, country, department, region } = data.location
-      const { createdByUserId, email, dahiraName, numberOfDisciples, phoneNumber } = data
+      const { email, dahiraName, phoneNumber } = data
 
       const response = await axios.put(`dahiras/${dahiraId}`, {
-        createdByUserId,
         email,
         dahiraName,
-        numberOfDisciples,
         phoneNumber,
         location: {
           address,

@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+// Importez SEULEMENT les classes/interfaces
+
+
 import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
 import { filter, finalize, Subject, Subscription, takeUntil } from 'rxjs';

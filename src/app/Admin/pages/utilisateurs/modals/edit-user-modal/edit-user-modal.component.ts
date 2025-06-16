@@ -58,57 +58,88 @@ export class EditUserModalComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    console.log('🔍 USER DATA REÇU:', this.user);
     this.initializeUserData();
   }
 
   private initializeUserData() {
     if (this.user) {
-      // Mapper les données de l'utilisateur vers le formulaire d'édition
+      console.log('📋 INITIALISATION DES DONNÉES UTILISATEUR');
+      
+      // ✅ MAPPING ROBUSTE: Gérer toutes les variations possibles
       this.editedUser = {
-        firstName: this.user.firstName || '',
-        lastName: this.user.lastName || '',
+        // Informations de base avec fallbacks
+        firstName: this.user.firstName || (this.user.name ? this.user.name.split(' ')[0] : '') || '',
+        lastName: this.user.lastName || (this.user.name ? this.user.name.split(' ').slice(1).join(' ') : '') || '',
         email: this.user.email || '',
         username: this.user.username || '',
-        password: '', // Ne pas pré-remplir le mot de passe pour la sécurité
+        password: '', // Jamais pré-remplir pour la sécurité
         phoneNumber: this.user.phoneNumber || '',
         gender: this.user.gender || 'NON_SPECIFIED',
-        userIdKeycloak: this.user.userIdKeycloak || '',
-        dateOfBirth: this.user.dateOfBirth ? this.formatDate(this.user.dateOfBirth) : '',
+        userIdKeycloak: this.user.userIdKeycloak || this.user.id || this.generateUUID(),
+        
+        // Date de naissance avec gestion d'erreur
+        dateOfBirth: this.user.dateOfBirth ? this.formatDateSafe(this.user.dateOfBirth) : '',
+        
+        // Location avec mapping complet
         location: {
-          locationInfoId: this.user.location?.locationInfoId || '',
+          locationInfoId: this.user.location?.locationInfoId || this.generateUUID(),
           nationality: this.user.location?.nationality || 'Sénégalaise',
           country: this.user.location?.country || 'Sénégal',
           region: this.user.location?.region || 'Dakar',
-          department: this.user.location?.department || '',
+          department: this.user.location?.department || this.user.location?.region || 'Dakar',
           address: this.user.location?.address || ''
         },
-        role: this.user.role || 'DISCIPLE',
-        active: this.user.active !== false
+        
+        // Rôle et statut
+        role: this.user.role || this.user.category || 'DISCIPLE',
+        active: this.user.active !== false // true par défaut sauf si explicitement false
       };
 
-      // Définir l'image de prévisualisation
+      // Image avec source unique
       this.imagePreview = this.user.image || 'assets/images/default-avatar.png';
+      
+      console.log('✅ DONNÉES MAPPÉES:', this.editedUser);
+      console.log('🖼️ IMAGE PREVIEW:', this.imagePreview);
     }
   }
 
-  private formatDate(date: string | Date): string {
+  private formatDateSafe(date: string | Date): string {
     if (!date) return '';
-    const d = new Date(date);
-    return d.toISOString().split('T')[0];
+    try {
+      const d = new Date(date);
+      if (isNaN(d.getTime())) {
+        console.warn('⚠️ Date invalide:', date);
+        return '';
+      }
+      return d.toISOString().split('T')[0];
+    } catch (error) {
+      console.error('❌ Erreur format date:', error);
+      return '';
+    }
+  }
+
+  private generateUUID(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
   }
 
   updateLocation(field: string, value: string) {
     if (!this.editedUser.location) {
       this.editedUser.location = {
-        locationInfoId: '',
-        nationality: '',
-        country: '',
-        region: '',
+        locationInfoId: this.generateUUID(),
+        nationality: 'Sénégalaise',
+        country: 'Sénégal',
+        region: 'Dakar',
         department: '',
         address: ''
       };
     }
     this.editedUser.location[field as keyof typeof this.editedUser.location] = value;
+    console.log(`📍 Location ${field} mis à jour:`, value);
   }
 
   dismiss() {
@@ -132,32 +163,42 @@ export class EditUserModalComponent implements OnInit {
     
     // Vérifier les champs obligatoires
     if (!u.firstName?.trim() || !u.lastName?.trim()) {
+      console.log('❌ Validation: Nom/Prénom manquant');
       return false;
     }
     
     if (!u.email?.trim() || !this.isValidEmail(u.email)) {
+      console.log('❌ Validation: Email invalide');
       return false;
     }
     
     if (!u.gender || !u.dateOfBirth) {
+      console.log('❌ Validation: Genre/Date naissance manquant');
       return false;
     }
     
     if (!u.location?.country || !u.location?.region || !u.location?.address?.trim()) {
+      console.log('❌ Validation: Localisation incomplète');
       return false;
     }
     
     if (u.phoneNumber && !this.isValidPhone(u.phoneNumber)) {
+      console.log('❌ Validation: Téléphone invalide');
       return false;
     }
     
+    console.log('✅ Validation: Formulaire valide');
     return true;
   }
 
   async saveUser() {
     if (this.isSubmitting) {
+      console.warn('⚠️ Soumission déjà en cours');
       return;
     }
+
+    console.log('💾 DÉBUT SAUVEGARDE');
+    console.log('📝 Données avant validation:', this.editedUser);
 
     if (!this.isFormValid()) {
       await this.presentAlert('Validation', 'Veuillez remplir correctement tous les champs obligatoires.');
@@ -173,47 +214,68 @@ export class EditUserModalComponent implements OnInit {
     this.isSubmitting = true;
 
     try {
-      // Préparer les données pour la mise à jour
-      const updateData: Partial<UserFormData> = {
-        firstName: this.editedUser.firstName?.trim(),
-        lastName: this.editedUser.lastName?.trim(),
-        email: this.editedUser.email?.trim().toLowerCase(),
-        username: this.editedUser.username?.trim(),
-        phoneNumber: this.editedUser.phoneNumber?.trim(),
-        gender: this.editedUser.gender,
-        dateOfBirth: this.editedUser.dateOfBirth,
+      // ✅ PRÉPARATION DES DONNÉES COMPLÈTES
+      const updateData: any = {
+        // ID original (CRUCIAL pour l'update)
+        id: this.user.id,
+        
+        // Informations personnelles (fallback vers valeurs originales si vides)
+        firstName: this.editedUser.firstName?.trim() || this.user.firstName || '',
+        lastName: this.editedUser.lastName?.trim() || this.user.lastName || '',
+        email: this.editedUser.email?.trim().toLowerCase() || this.user.email || '',
+        username: this.editedUser.username?.trim() || this.user.username || this.editedUser.email?.split('@')[0] || '',
+        phoneNumber: this.editedUser.phoneNumber?.trim() || this.user.phoneNumber || '',
+        gender: this.editedUser.gender || this.user.gender || 'NON_SPECIFIED',
+        userIdKeycloak: this.editedUser.userIdKeycloak || this.user.userIdKeycloak || this.user.id,
+        
+        // Date de naissance
+        dateOfBirth: this.editedUser.dateOfBirth || this.user.dateOfBirth || '',
+        
+        // Location complète avec préservation des données existantes
         location: {
-          locationInfoId: this.editedUser.location?.locationInfoId || this.user.location?.locationInfoId || '',
-          nationality: this.editedUser.location?.nationality,
-          country: this.editedUser.location?.country,
-          region: this.editedUser.location?.region,
-          department: this.editedUser.location?.department,
-          address: this.editedUser.location?.address
+          locationInfoId: this.editedUser.location?.locationInfoId || this.user.location?.locationInfoId || this.generateUUID(),
+          nationality: this.editedUser.location?.nationality || this.user.location?.nationality || 'Sénégalaise',
+          country: this.editedUser.location?.country || this.user.location?.country || 'Sénégal',
+          region: this.editedUser.location?.region || this.user.location?.region || 'Dakar',
+          department: this.editedUser.location?.department || this.user.location?.department || '',
+          address: this.editedUser.location?.address || this.user.location?.address || ''
         },
-        role: this.editedUser.role,
-        active: this.editedUser.active
+        
+        // Rôle et statut
+        role: this.editedUser.role || this.user.role || 'DISCIPLE',
+        active: this.editedUser.active,
+        
+        // ✅ PRÉSERVATION DES MÉTADONNÉES
+        createdAt: this.user.createdAt,
+        updatedAt: new Date().toISOString(),
+        
+        // Préserver autres champs possibles
+        category: this.editedUser.role || this.user.category || this.user.role
       };
 
       // Inclure le mot de passe seulement s'il a été modifié
       if (this.editedUser.password && this.editedUser.password.trim()) {
         updateData.password = this.editedUser.password.trim();
+        console.log('🔑 Mot de passe inclus dans la mise à jour');
       }
 
-      console.log('Données de mise à jour:', updateData);
-      console.log('Fichier image sélectionné:', this.selectedFile);
+      console.log('📤 DONNÉES FINALES À ENVOYER:', updateData);
+      console.log('📎 FICHIER IMAGE:', this.selectedFile);
 
       await loading.dismiss();
 
-      // Retourner les données modifiées avec le fichier image si présent
+      // ✅ RETOUR ENRICHI avec toutes les informations nécessaires
       this.modalController.dismiss({
         userData: updateData,
         file: this.selectedFile || undefined,
-        hasImageChanged: !!this.selectedFile
+        hasImageChanged: !!this.selectedFile,
+        originalUser: this.user, // Pour comparaison côté parent
+        timestamp: new Date().toISOString()
       }, 'save');
 
     } catch (error) {
       await loading.dismiss();
-      console.error('Erreur lors de la modification:', error);
+      console.error('❌ Erreur lors de la modification:', error);
       await this.presentAlert('Erreur', 'Une erreur est survenue lors de la modification.');
     } finally {
       this.isSubmitting = false;
@@ -267,11 +329,10 @@ export class EditUserModalComponent implements OnInit {
   }
 
   private takePhoto() {
-    // Pour les navigateurs qui supportent l'API camera
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.capture = 'user'; // Utilise la caméra frontale
+    input.capture = 'user';
     input.onchange = (event: any) => {
       const file = event.target.files[0];
       if (file) {
@@ -284,10 +345,12 @@ export class EditUserModalComponent implements OnInit {
   private removeCurrentImage() {
     this.selectedFile = null;
     this.imagePreview = 'assets/images/default-avatar.png';
-    this.presentAlert('Information', 'Photo supprimée. L\'image par défaut sera utilisée.');
+    this.presentInfoMessage('Photo supprimée. L\'image par défaut sera utilisée.');
   }
 
   handleImageSelection(file: File) {
+    console.log('📷 Sélection d\'image:', file.name, file.size);
+    
     // Validation renforcée du fichier
     if (file.size > 5 * 1024 * 1024) {
       this.presentAlert('Erreur', 'L\'image ne doit pas dépasser 5MB');
@@ -310,6 +373,7 @@ export class EditUserModalComponent implements OnInit {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.imagePreview = e.target.result;
+        console.log('✅ Image prévisualisée');
       };
       reader.readAsDataURL(file);
 
@@ -323,9 +387,13 @@ export class EditUserModalComponent implements OnInit {
       const img = new Image();
       img.onload = () => {
         const isValid = img.width >= 100 && img.height >= 100;
+        console.log(`📐 Dimensions image: ${img.width}x${img.height} (valide: ${isValid})`);
         resolve(isValid);
       };
-      img.onerror = () => resolve(false);
+      img.onerror = () => {
+        console.error('❌ Erreur chargement image pour validation');
+        resolve(false);
+      };
       img.src = URL.createObjectURL(file);
     });
   }
@@ -357,6 +425,7 @@ export class EditUserModalComponent implements OnInit {
     // Mettre à jour automatiquement le nom d'utilisateur si vide
     if (!this.editedUser.username && this.editedUser.email?.includes('@')) {
       this.editedUser.username = this.editedUser.email.split('@')[0];
+      console.log('📧 Username auto-généré:', this.editedUser.username);
     }
   }
 
@@ -370,9 +439,20 @@ export class EditUserModalComponent implements OnInit {
   }
 
   async confirmDelete() {
+    const userName = this.user.firstName && this.user.lastName 
+      ? `${this.user.firstName} ${this.user.lastName}`
+      : this.user.name || 'cet utilisateur';
+      
     const alert = await this.alertController.create({
-      header: 'Confirmation',
-      message: `Êtes-vous sûr de vouloir supprimer ${this.user.firstName} ${this.user.lastName} ?`,
+      header: 'Confirmation de suppression',
+      message: `
+        <div style="text-align: center;">
+          <p>Êtes-vous sûr de vouloir supprimer <strong>${userName}</strong> ?</p>
+          <p style="color: #e74c3c; font-size: 0.9em; margin-top: 10px;">
+            ⚠️ Cette action est irréversible
+          </p>
+        </div>
+      `,
       buttons: [
         {
           text: 'Annuler',
@@ -382,7 +462,12 @@ export class EditUserModalComponent implements OnInit {
           text: 'Supprimer',
           role: 'destructive',
           handler: () => {
-            this.modalController.dismiss({ delete: true }, 'delete');
+            console.log('🗑️ Suppression confirmée pour:', userName);
+            this.modalController.dismiss({ 
+              delete: true, 
+              userId: this.user.id,
+              userName 
+            }, 'delete');
           }
         }
       ]
@@ -406,6 +491,7 @@ export class EditUserModalComponent implements OnInit {
           text: action.charAt(0).toUpperCase() + action.slice(1),
           handler: () => {
             this.editedUser.active = newStatus;
+            console.log(`🔄 Statut utilisateur changé: ${newStatus ? 'Actif' : 'Inactif'}`);
           }
         }
       ]

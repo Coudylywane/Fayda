@@ -12,7 +12,6 @@ import { UserFormData } from '../../modals/users.model';
   standalone: false,
 })
 export class AddUserModalComponent implements OnInit {
-  
   genderOptions = [
     { label: 'Homme', value: 'HOMME' },
     { label: 'Femme', value: 'FEMME' },
@@ -113,27 +112,21 @@ export class AddUserModalComponent implements OnInit {
 
   isFormValid(): boolean {
     const u = this.newUser;
-    
     if (!u.firstName?.trim() || !u.lastName?.trim()) {
       return false;
     }
-    
     if (!u.email?.trim() || !this.isValidEmail(u.email)) {
       return false;
     }
-    
     if (!u.gender || !u.dateOfBirth) {
       return false;
     }
-    
     if (!u.location?.country || !u.location?.region || !u.location?.address?.trim()) {
       return false;
     }
-    
     if (u.phoneNumber && !this.isValidPhone(u.phoneNumber)) {
       return false;
     }
-    
     return true;
   }
 
@@ -146,71 +139,7 @@ export class AddUserModalComponent implements OnInit {
     await alert.present();
   }
 
-  // ✅ MÉTHODE CORRIGÉE: Test direct de l'API 
-  async testDirectAPI() {
-    console.log('🔍 TEST DIRECT DE L\'API');
-    
-    let token = localStorage.getItem('access_token') || 
-                localStorage.getItem('token') || 
-                sessionStorage.getItem('access_token') ||
-                sessionStorage.getItem('token');
-    console.log('Token présent:', !!token);
-
-    // Test FormData CORRIGÉ selon l'API
-    const formData = new FormData();
-    formData.append('firstName', 'Test');
-    formData.append('lastName', 'User');
-    formData.append('email', 'mahamataba2@gmail.com');
-    formData.append('username', 'testuser');
-    formData.append('password', 'TestPass123!');
-    formData.append('phoneNumber', '+221701234567');
-    formData.append('gender', 'HOMME');
-    formData.append('userIdKeycloak', this.generateUUID());
-    formData.append('dateOfBirth', new Date('1990-01-01').toISOString());
-    
-    // ✅ Format de location simple et valide
-    formData.append('location', 'Test Address, Dakar, Dakar, Sénégal');
-    
-    formData.append('role', 'DISCIPLE');
-    formData.append('active', 'true');
-
-    // ✅ CORRECTION CRITIQUE: NE PAS ajouter 'img' si pas de fichier
-    if (this.selectedFile && this.selectedFile.size > 0) {
-      formData.append('img', this.selectedFile);
-      console.log('📎 Fichier ajouté:', this.selectedFile.name);
-    } else {
-      console.log('📎 Aucun fichier sélectionné, champ img COMPLÈTEMENT omis');
-    }
-
-    try {
-      const response = await fetch('http://89.47.51.6:8787/api/v1/users', {
-        method: 'POST',
-        headers: {
-          'Accept': '*/*',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        },
-        body: formData
-      });
-
-      console.log('📥 Statut:', response.status);
-      const responseText = await response.text();
-      console.log('📥 Réponse:', responseText);
-
-      if (response.ok) {
-        console.log('✅ SUCCÈS!', JSON.parse(responseText));
-        await this.presentAlert('Succès', 'Test API réussi!');
-      } else {
-        const errorData = JSON.parse(responseText);
-        console.error('❌ ERREUR:', errorData);
-        await this.presentAlert('Erreur API', `Erreur ${response.status}: ${errorData.message || 'Erreur inconnue'}`);
-      }
-    } catch (error) {
-      console.error('❌ Erreur réseau:', error);
-      await this.presentAlert('Erreur réseau', 'Impossible de joindre le serveur');
-    }
-  }
-
-  // ✅ MÉTHODE CORRIGÉE: Éviter le double dispatch
+  // ✅ MÉTHODE PRINCIPALE: Éviter le double dispatch
   async saveUser() {
     // ✅ Protection contre les doubles soumissions
     if (this.isSubmitting || this.hasSubmitted) {
@@ -227,8 +156,8 @@ export class AddUserModalComponent implements OnInit {
       message: 'Création de l\'utilisateur...',
       spinner: 'circular'
     });
-
     await loading.present();
+
     this.isSubmitting = true;
     this.hasSubmitted = true; // ✅ Marquer comme soumis
 
@@ -238,12 +167,12 @@ export class AddUserModalComponent implements OnInit {
 
       // ✅ Création d'un objet UserFormData propre
       const userData: UserFormData = {
-        firstName: this.newUser.firstName?.trim() || 'zara',
-        lastName: this.newUser.lastName?.trim() || 'ndiaye',
-        email: this.newUser.email?.trim().toLowerCase() || 'atcreatif@gmail.com',
+        firstName: this.newUser.firstName?.trim() || '',
+        lastName: this.newUser.lastName?.trim() || '',
+        email: this.newUser.email?.trim().toLowerCase() || '',
         username,
         password,
-        phoneNumber: this.newUser.phoneNumber?.trim() || '+221777665554',
+        phoneNumber: this.newUser.phoneNumber?.trim() || '',
         gender: this.newUser.gender || 'NON_SPECIFIED',
         userIdKeycloak: this.newUser.userIdKeycloak || this.generateUUID(),
         dateOfBirth: this.newUser.dateOfBirth || '',
@@ -253,7 +182,7 @@ export class AddUserModalComponent implements OnInit {
           country: this.newUser.location.country || 'Sénégal',
           region: this.newUser.location.region || 'Dakar',
           department: this.newUser.location.department || this.newUser.location.region || 'Dakar',
-          address: this.newUser.location.address?.trim() || 'Dakar, sn'
+          address: this.newUser.location.address?.trim() || 'Adresse non spécifiée'
         } : {
           locationInfoId: this.generateUUID(),
           nationality: 'Sénégalaise',
@@ -270,7 +199,7 @@ export class AddUserModalComponent implements OnInit {
       console.log('=== COMPONENT DEBUG ===');
       console.log('userData à envoyer:', userData);
       console.log('file à envoyer:', this.selectedFile);
-      
+
       // Vérifications avant envoi
       if (!userData.firstName || !userData.lastName || !userData.email) {
         await this.presentAlert('Erreur', 'Les champs Prénom, Nom et Email sont obligatoires.');
@@ -296,7 +225,7 @@ export class AddUserModalComponent implements OnInit {
         role: userData.role,
         active: userData.active
       };
-      
+
       console.log('🔍 COMPONENT - cleanUserData:', cleanUserData);
 
       // ✅ Validation finale
@@ -305,17 +234,17 @@ export class AddUserModalComponent implements OnInit {
       }
 
       // ✅ Dispatch unique de l'action
-      this.store.dispatch(UsersActions.createUser({ 
-        userData: cleanUserData, 
-        file: this.selectedFile || undefined 
+      this.store.dispatch(UsersActions.createUser({
+        userData: cleanUserData,
+        file: this.selectedFile || undefined
       }));
 
       await loading.dismiss();
-      
+
       // ✅ SOLUTION: Fermer le modal avec un flag de succès seulement
       // Ne pas passer les données utilisateur pour éviter le double dispatch
       this.modalController.dismiss({ success: true });
-      
+
     } catch (error) {
       await loading.dismiss();
       console.error('❌ Erreur création utilisateur:', error);
@@ -325,9 +254,9 @@ export class AddUserModalComponent implements OnInit {
       this.hasSubmitted = false;
       
       // ✅ Fermer le modal avec l'erreur
-      this.modalController.dismiss({ 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Erreur inconnue' 
+      this.modalController.dismiss({
+        success: false,
+        error: error instanceof Error ? error.message : 'Erreur inconnue'
       });
     } finally {
       this.isSubmitting = false;
@@ -353,14 +282,12 @@ export class AddUserModalComponent implements OnInit {
       this.presentAlert('Erreur', 'L\'image ne doit pas dépasser 5MB');
       return;
     }
-
     if (!file.type.startsWith('image/')) {
       this.presentAlert('Erreur', 'Veuillez sélectionner un fichier image valide');
       return;
     }
 
     this.selectedFile = file;
-    
     const reader = new FileReader();
     reader.onload = (e: any) => {
       this.imagePreview = e.target.result;

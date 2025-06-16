@@ -1,85 +1,289 @@
-<div class="bg-white shadow-md rounded-lg max-w-lg mx-auto my-8 max-h-[80vh] overflow-auto">
-  <div class="flex justify-between items-center px-4 py-3 border-b border-gray-200 sticky top-0 bg-white z-10">
-    <h1 class="text-lg font-semibold">Modifier l'utilisateur</h1>
-    <button (click)="dismiss()" class="text-gray-600 hover:text-gray-800 focus:outline-none">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-  </div>
+<!-- edit-user-modal.component.html -->
+<ion-header>
+  <ion-toolbar>
+    <div class="flex justify-between items-center px-4">
+      <ion-title class="text-lg font-semibold">Modifier l'utilisateur</ion-title>
+      <ion-button fill="clear" (click)="dismiss()" [disabled]="isSubmitting">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-header>
 
+<ion-content>
   <div class="px-6 py-4">
+    <!-- Photo de profil cliquable avec indicateurs visuels -->
     <div class="mb-6 flex justify-center">
-      <div class="relative w-24 h-24 rounded-full overflow-hidden bg-gray-200 border-2 border-green-500">
-        <img [src]="editedUser.image" alt="Avatar" class="w-full h-full object-cover" />
-        <div class="absolute bottom-0 right-0 bg-green-600 rounded-full p-1.5 text-white cursor-pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8h4l3-3 3 3h4v11H3V8z" />
-          </svg>
+      <div class="relative w-32 h-32 rounded-full overflow-hidden bg-gray-200 border-4 border-green-500 cursor-pointer group shadow-lg hover:shadow-xl transition-all duration-300"
+           (click)="onImageClick()">
+        <img [src]="imagePreview" alt="Avatar" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+        
+        <!-- Overlay d'interaction -->
+        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 flex items-center justify-center transition-all duration-300">
+          <div class="opacity-0 group-hover:opacity-100 text-center text-white transition-opacity duration-300">
+            <ion-icon name="camera-outline" class="text-3xl mb-1"></ion-icon>
+            <p class="text-xs font-medium">Changer</p>
+          </div>
+        </div>
+        
+        <!-- Badge d'édition -->
+        <div class="absolute bottom-1 right-1 bg-green-600 rounded-full p-2 text-white shadow-lg group-hover:bg-green-700 transition-colors">
+          <ion-icon name="pencil-outline" class="text-sm"></ion-icon>
+        </div>
+        
+        <!-- Indicateur de changement -->
+        <div *ngIf="selectedFile" class="absolute top-1 left-1 bg-blue-600 rounded-full p-1.5 text-white shadow-lg animate-pulse">
+          <ion-icon name="checkmark-outline" class="text-xs"></ion-icon>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Message d'aide et statut -->
+    <div class="text-center mb-4">
+      <p class="text-xs text-gray-500 mb-1">Cliquez sur la photo pour la modifier</p>
+      <p *ngIf="selectedFile" class="text-xs text-blue-600 font-medium bg-blue-50 px-3 py-1 rounded-full inline-block">
+        <ion-icon name="cloud-upload-outline" class="mr-1"></ion-icon>
+        Nouvelle image sélectionnée
+      </p>
+      <p *ngIf="!selectedFile && imagePreview !== 'assets/images/default-avatar.png'" class="text-xs text-gray-400">
+        Image actuelle conservée
+      </p>
+    </div>
+
+    <div class="space-y-4">
+      <!-- Prénom -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Prénom <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="editedUser.firstName"
+          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="Prénom"
+          [class.border-red-500]="editedUser.firstName && !editedUser.firstName.trim()"
+        />
+      </div>
+
+      <!-- Nom -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Nom <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="editedUser.lastName"
+          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="Nom de famille"
+          [class.border-red-500]="editedUser.lastName && !editedUser.lastName.trim()"
+        />
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Email <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="email"
+          [(ngModel)]="editedUser.email"
+          (ngModelChange)="onEmailChange()"
+          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="exemple@email.com"
+          [class.border-red-500]="editedUser.email && !isValidEmail(editedUser.email)"
+        />
+        <small class="text-red-500" *ngIf="editedUser.email && !isValidEmail(editedUser.email)">
+          Format d'email invalide
+        </small>
+      </div>
+
+      <!-- Nom d'utilisateur -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Nom d'utilisateur
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="editedUser.username"
+          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="Nom d'utilisateur"
+        />
+      </div>
+
+      <!-- Nouveau mot de passe -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Nouveau mot de passe
+        </label>
+        <input
+          type="password"
+          [(ngModel)]="editedUser.password"
+          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="Laissez vide pour conserver l'actuel"
+        />
+        <small class="text-gray-500">Laissez vide si vous ne souhaitez pas changer le mot de passe</small>
+      </div>
+
+      <!-- Téléphone -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+        <input
+          type="tel"
+          [(ngModel)]="editedUser.phoneNumber"
+          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="+221 77 123 45 67"
+          [class.border-red-500]="editedUser.phoneNumber && !isValidPhone(editedUser.phoneNumber)"
+        />
+        <small class="text-red-500" *ngIf="editedUser.phoneNumber && !isValidPhone(editedUser.phoneNumber)">
+          Format de téléphone invalide
+        </small>
+      </div>
+
+      <!-- Genre -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Genre <span class="text-red-500">*</span>
+        </label>
+        <select
+          [(ngModel)]="editedUser.gender"
+          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+        >
+          <option value="">Sélectionnez un genre</option>
+          <option *ngFor="let gender of genderOptions" [value]="gender.value">
+            {{ gender.label }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Date de naissance -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Date de naissance <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="date"
+          [(ngModel)]="editedUser.dateOfBirth"
+          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          [max]="today"
+        />
+      </div>
+
+      <!-- Rôle -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Rôle <span class="text-red-500">*</span>
+        </label>
+        <select
+          [(ngModel)]="editedUser.role"
+          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+        >
+          <option value="">Sélectionnez un rôle</option>
+          <option *ngFor="let role of roleOptions" [value]="role.value">
+            {{ role.label }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Statut actif -->
+      <div class="flex items-center justify-between">
+        <label class="text-sm font-medium text-gray-700">Compte actif</label>
+        <ion-toggle [(ngModel)]="editedUser.active" color="success" (ionChange)="toggleStatus()"></ion-toggle>
+      </div>
+
+      <!-- Section Localisation -->
+      <div class="border-t pt-4 mt-6">
+        <h3 class="text-md font-medium text-gray-800 mb-4">Informations géographiques</h3>
+
+        <!-- Nationalité -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nationalité</label>
+          <input
+            type="text"
+            [ngModel]="editedUser.location?.nationality"
+            (ngModelChange)="updateLocation('nationality', $event)"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Sénégalaise"
+          />
+        </div>
+
+        <!-- Pays -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Pays <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            [ngModel]="editedUser.location?.country"
+            (ngModelChange)="updateLocation('country', $event)"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Sénégal"
+          />
+        </div>
+
+        <!-- Région -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Région <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            [ngModel]="editedUser.location?.region"
+            (ngModelChange)="updateLocation('region', $event)"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Dakar"
+          />
+        </div>
+
+        <!-- Département -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Département</label>
+          <input
+            type="text"
+            [ngModel]="editedUser.location?.department"
+            (ngModelChange)="updateLocation('department', $event)"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Dakar"
+          />
+        </div>
+
+        <!-- Adresse -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Adresse <span class="text-red-500">*</span>
+          </label>
+          <textarea
+            [ngModel]="editedUser.location?.address"
+            (ngModelChange)="updateLocation('address', $event)"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Adresse complète"
+            rows="2"
+          ></textarea>
         </div>
       </div>
     </div>
 
-    <div class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1" for="name">Nom complet</label>
-        <input
-          id="name"
-          type="text"
-          [(ngModel)]="editedUser.name"
-          placeholder="Nom et prénom"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-        />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1" for="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          [(ngModel)]="editedUser.email"
-          placeholder="exemple@email.com"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-        />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1" for="phone">Téléphone</label>
-        <input
-          id="phone"
-          type="tel"
-          [(ngModel)]="editedUser.phone"
-          placeholder="+33 6 12 34 56 78"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-        />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1" for="address">Adresse</label>
-        <input
-          id="address"
-          type="text"
-          [(ngModel)]="editedUser.address"
-          placeholder="Votre adresse"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-        />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1" for="category">Catégorie</label>
-        <select
-          id="category"
-          [(ngModel)]="editedUser.category"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-        >
-          <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="mt-8">
+    <!-- Boutons d'action -->
+    <div class="mt-8 space-y-3">
+      <!-- Bouton principal: Enregistrer -->
       <button
         (click)="saveUser()"
-        class="w-full py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+        [disabled]="!isFormValid() || isSubmitting"
+        class="w-full py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
       >
-        Enregistrer les modifications
+        <ion-spinner name="circular" *ngIf="isSubmitting" class="mr-2"></ion-spinner>
+        {{ isSubmitting ? 'Modification en cours...' : 'Enregistrer les modifications' }}
       </button>
+
+      <!-- Bouton secondaire: Supprimer -->
+      <button
+        (click)="confirmDelete()"
+        [disabled]="isSubmitting"
+        class="w-full py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+      >
+        Supprimer l'utilisateur
+      </button>
+
+      <p class="text-xs text-gray-500 mt-2 text-center">* Champs obligatoires</p>
     </div>
   </div>
-</div>
+</ion-content>

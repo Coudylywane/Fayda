@@ -1,9 +1,8 @@
 <div class="px-6 py-4">
-  <!-- Titre de la page -->
-  <div class="flex items-center justify-between mb-4">
-    <h1 class="text-xl font-medium text-gray-700">
-      Utilisateurs ({{ (usersCount$ | async) || 0 }})
-    </h1>    
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">Gestion des utilisateurs</h1>
+    <p class="text-gray-600">Gérez et suivez tous les utilisateurs</p>
   </div>
 
   <!-- Barre de recherche et boutons d'action -->
@@ -11,11 +10,7 @@
     <!-- Search -->
     <div class="flex-grow max-w-md">
       <div class="relative">
-        <input 
-          type="text" 
-          [value]="(searchTerm$ | async) || ''"
-          (input)="onSearchTermChange($any($event.target).value)"
-          placeholder="Rechercher par nom, email..."
+        <input type="text" [(ngModel)]="searchTerm" placeholder="Rechercher par nom, email..."
           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
         <svg class="h-5 w-5 text-gray-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24"
           stroke="currentColor">
@@ -38,67 +33,62 @@
             d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" />
         </svg>
       </button>
-      <button (click)="refreshUsers()" [disabled]="(loading$ | async) || false"
-            class="bg-black/70 hover:opacity-90 disabled:opacity-50 text-white p-3 rounded-lg transition-colors duration-200 flex items-center justify-center">
-            <svg class="w-5 h-5" [class.animate-spin]="(loading$ | async) || false" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-          </button>
+      <button (click)="refreshUsers()" [disabled]="isLoading"
+        class="bg-black/70 hover:opacity-90 disabled:opacity-50 text-white p-3 rounded-lg transition-colors duration-200 flex items-center justify-center">
+        <svg class="w-5 h-5" [class.animate-spin]="isLoading" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+      </button>
     </div>
   </div>
 
   <!-- Filtres rapides -->
   <div class="flex space-x-3 mb-6 overflow-x-auto pb-2">
-    <button *ngFor="let filter of filters"
-        (click)="setFilter(filter)"
-        [ngClass]="{
-          'bg-gray-800 text-white': (category$ | async) === filter, 
-          'bg-gray-100 text-gray-800': (category$ | async) !== filter
-        }"
+    <ng-container *ngFor="let filter of filters">
+      <button (click)="setFilter(filter)"
+        [ngClass]="{'bg-gray-800 text-white': activeFilter === filter, 'bg-gray-100 text-gray-800': activeFilter !== filter}"
         class="px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap">
         {{ filter }}
-        <span *ngIf="filter === (category$ | async) && ((filteredUsersCount$ | async) || 0) > 0"
+        <span *ngIf="filter === activeFilter && filteredUsers.length > 0"
           class="ml-2 bg-white text-gray-800 px-2 py-1 rounded-full text-xs">
-          {{ filteredUsersCount$ | async }}
+          {{ filteredUsers.length }}
         </span>
       </button>
+    </ng-container>
   </div>
 
   <!-- Indicateur de chargement -->
-  <div *ngIf="(loading$ | async)" class="flex justify-center items-center py-8">
+  <div *ngIf="isLoading" class="flex justify-center items-center py-8">
     <ion-spinner name="circular" color="primary"></ion-spinner>
     <span class="ml-3 text-gray-600">Chargement des utilisateurs...</span>
   </div>
 
   <!-- Message si aucun utilisateur -->
-  <ng-container *ngIf="!(loading$ | async)">
-    <div *ngIf="((usersCount$ | async) || 0) === 0" class="text-center py-8">
-      <ion-icon name="people-outline" class="text-6xl text-gray-300 mb-4"></ion-icon>
-      <h3 class="text-lg font-medium text-gray-600 mb-2">Aucun utilisateur trouvé</h3>
-      <p class="text-gray-500">Commencez par ajouter votre premier utilisateur</p>
-      <button (click)="openAddUserModal()"
-        class="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-        Ajouter un utilisateur
-      </button>
-    </div>
+  <div *ngIf="!isLoading && users.length === 0" class="text-center py-8">
+    <ion-icon name="people-outline" class="text-6xl text-gray-300 mb-4"></ion-icon>
+    <h3 class="text-lg font-medium text-gray-600 mb-2">Aucun utilisateur trouvé</h3>
+    <p class="text-gray-500">Commencez par ajouter votre premier utilisateur</p>
+    <button (click)="openAddUserModal()"
+      class="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+      Ajouter un utilisateur
+    </button>
+  </div>
 
-    <!-- Message si aucun résultat après filtrage -->
-    <div *ngIf="((usersCount$ | async) || 0) > 0 && ((filteredUsersCount$ | async) || 0) === 0" class="text-center py-8">
-      <ion-icon name="search-outline" class="text-6xl text-gray-300 mb-4"></ion-icon>
-      <h3 class="text-lg font-medium text-gray-600 mb-2">Aucun résultat trouvé</h3>
-      <p class="text-gray-500">Essayez de modifier vos critères de recherche ou de filtrage</p>
-      <button (click)="resetFilters()"
-        class="mt-4 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
-        Réinitialiser les filtres
-      </button>
-    </div>
-  </ng-container>
+  <!-- Message si aucun résultat après filtrage -->
+  <div *ngIf="!isLoading && users.length > 0 && filteredUsers.length === 0" class="text-center py-8">
+    <ion-icon name="search-outline" class="text-6xl text-gray-300 mb-4"></ion-icon>
+    <h3 class="text-lg font-medium text-gray-600 mb-2">Aucun résultat trouvé</h3>
+    <p class="text-gray-500">Essayez de modifier vos critères de recherche ou de filtrage</p>
+    <button (click)="searchTerm = ''; setFilter('Tous')"
+      class="mt-4 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+      Réinitialiser les filtres
+    </button>
+  </div>
 
   <!-- Liste des utilisateurs -->
-  <div *ngIf="!(loading$ | async) && ((filteredUsersCount$ | async) || 0) > 0" 
-       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <div *ngFor="let user of (filteredUsers$ | async)"
+  <div *ngIf="!isLoading && filteredUsers.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div *ngFor="let user of filteredUsers"
       class="relative bg-white rounded-lg p-4 border border-gray-200 flex items-center transition-shadow hover:shadow-md cursor-pointer">
       <!-- Avatar -->
       <div class="relative overflow-hidden w-14 h-14 rounded-full mr-4 bg-gray-200">
@@ -129,7 +119,7 @@
   </div>
 
   <!-- Résumé en bas de page -->
-  <div *ngIf="!(loading$ | async) && ((usersCount$ | async) || 0) > 0" class="mt-6 text-center text-sm text-gray-500">
-    Affichage de {{ filteredUsersCount$ | async }} sur {{ usersCount$ | async }} utilisateur(s)
+  <div *ngIf="!isLoading && users.length > 0" class="mt-6 text-center text-sm text-gray-500">
+    Affichage de {{ filteredUsers.length }} sur {{ users.length }} utilisateur(s)
   </div>
 </div>

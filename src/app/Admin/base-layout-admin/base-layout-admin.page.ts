@@ -21,7 +21,7 @@ import { Token } from 'src/app/features/auth/models/auth.model';
   standalone: false
 })
 export class BaseLayoutAdminPage implements OnInit {
-  @Input() title: string = 'Dashboard';
+  @Input() title: string = 'Faydah';
   @Input() subtitle: string = 'Tableau de bord';
   showTooltip = false;
 

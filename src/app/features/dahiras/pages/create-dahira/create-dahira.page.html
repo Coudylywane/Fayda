@@ -113,9 +113,6 @@
                 <ion-icon name="call-outline" class="text-gray-400 mr-2 mb-2"></ion-icon>
                 Numéro de téléphone *
               </label>
-              <!-- <input type="tel" id="phoneNumber" formControlName="phoneNumber"
-                class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 bg-gray-50 focus:bg-white"
-                placeholder="+221 77 123 45 67"> -->
               <div class="">
                 <app-phone-input formControlName="phoneNumber" placeholder="Votre numéro mobile">
                 </app-phone-input>
@@ -217,25 +214,33 @@
 
       <!-- Navigation buttons -->
       <div class="flex justify-between items-center p-2 bg-gray-50 border-t border-gray-200">
-        <button type="button" (click)="previousStep()" *ngIf="currentStep > 1"
-          class="flex items-center px-6 py-2 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 transition-all duration-200 font-medium">
-          <ion-icon name="chevron-back-outline" class="mr-2"></ion-icon>
-          Précédent
-        </button>
+        <div class="flex space-x-2">
+          <button type="button" (click)="onCancel()"
+            class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors">
+            Annuler
+          </button>
+        </div>
+        <div class="flex space-x-2">
+          <button type="button" (click)="previousStep()" *ngIf="currentStep > 1"
+            class="flex items-center px-6 py-2 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 transition-all duration-200 font-medium">
+            <ion-icon name="chevron-back-outline" class="mr-2"></ion-icon>
+            Précédent
+          </button>
 
-        <button type="button" (click)="nextStep()" *ngIf="currentStep < totalSteps"
-          class="flex items-center px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 hover:shadow-lg transition-all duration-200 font-medium transform hover:scale-105">
-          Suivant
-          <ion-icon name="chevron-forward-outline" class="ml-2"></ion-icon>
-        </button>
+          <button type="button" (click)="nextStep()" *ngIf="currentStep < totalSteps"
+            class="flex items-center px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 hover:shadow-lg transition-all duration-200 font-medium transform hover:scale-105">
+            Suivant
+            <ion-icon name="chevron-forward-outline" class="ml-2"></ion-icon>
+          </button>
 
-        <button type="button" (click)="onSubmit()" *ngIf="currentStep === totalSteps"
-          [disabled]="dahiraForm.invalid || isloading"
-          class="flex items-center px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium transform hover:scale-105 disabled:hover:scale-100">
-          <ion-icon *ngIf="isloading" name="sync-outline" class="mr-2 animate-spin"></ion-icon>
-          <ion-icon *ngIf="!isloading" name="checkmark-outline" class="mr-2"></ion-icon>
-          {{isloading ? "Envoie..." : "Enregistrer"}}
-        </button>
+          <button type="button" (click)="onSubmit()" *ngIf="currentStep === totalSteps"
+            [disabled]="dahiraForm.invalid || isloading"
+            class="flex items-center px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium transform hover:scale-105 disabled:hover:scale-100">
+            <ion-icon *ngIf="isloading" name="sync-outline" class="mr-2 animate-spin"></ion-icon>
+            <ion-icon *ngIf="!isloading" name="checkmark-outline" class="mr-2"></ion-icon>
+            {{isloading ? "Envoie..." : "Enregistrer"}}
+          </button>
+        </div>
       </div>
     </div>
   </div>

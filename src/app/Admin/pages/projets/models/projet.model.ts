@@ -14,3 +14,9 @@ export interface Contributor {
     amount: number;
     date: Date;
 }
+
+export interface CreateProjectDTO {
+    title: string,
+    description: string,
+    targetAmount: number
+}

@@ -78,7 +78,7 @@ export class DahiraPage implements OnInit {
       }
     });
 
-        // S'abonner aux changements d'état du store
+    // S'abonner aux changements d'état du store
     this.store.select(selectCurrentUser).pipe(
       takeUntil(this.destroy$)
     ).subscribe(currentUser => {
@@ -289,17 +289,16 @@ export class DahiraPage implements OnInit {
   onAddDahira(dahira: CreateDahira): void {
     this.addLoading = true;
     console.log('Tentative de création dahira:', dahira);
-    dahira.createdByUserId = this.userId;
     dahira.location.nationality = dahira.location.country;
     this.dahiraService.createDahira(dahira)
       .then(response => {
         this.addLoading = false;
         console.log('Succès création dahira:', response);
-        if(response.success){
+        if (response.success) {
           this.showAddModal = false;
           this.toastService.showSuccess(response.data.message || "Votre demande a été envoyé");
         }
-        // this.loadAllDahiras();
+        this.loadAllDahiras();
       }).catch(error => {
         this.addLoading = false;
         console.error('Erreur création dahira:', error);
@@ -308,16 +307,24 @@ export class DahiraPage implements OnInit {
 
   }
 
-  onEditDahira(changes: any): void {
-    if (this.selectedDahira) {
-      this.dahiraServiceAdmin.updateDahira(this.selectedDahira.dahiraId, changes).subscribe({
-        next: () => {
+  onEditDahira(dahira: any): void {
+    this.addLoading = true;
+    console.log('Tentative de modification dahira:', dahira);
+    this.dahiraService.updateDahira(this.selectedDahira?.dahiraId!, dahira)
+      .then(response => {
+        this.addLoading = false;
+        console.log('Succès modification dahira:', response);
+        if (response.success) {
           this.showEditModal = false;
-          this.loadAllDahiras();
-        },
-        error: (error) => console.error('Erreur lors de la modification du dahira', error)
+          this.toastService.showSuccess(response.data.message || "La Dahira a été modifié");
+        }
+        this.loadAllDahiras();
+      }).catch(error => {
+        this.addLoading = false;
+        console.error('Erreur modification dahira:', error);
+        this.toastService.showError(error.message)
       });
-    }
+
   }
 
   onDeleteDahira(): void {

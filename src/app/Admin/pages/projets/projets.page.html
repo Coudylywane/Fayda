@@ -1,12 +1,14 @@
 <div class="w-full max-w-full p-4 bg-gray-100 min-h-screen" (click)="closeMenu()">
   <!-- En-tête -->
   <div class="flex flex-col space-y-4">
-    <div class="flex justify-between items-center">
-      <h1 class="text-2xl font-semibold text-gray-700">Levée de fonds</h1>
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Gestion de la levées des fonds</h1>
+      <p class="text-gray-600">Gérez et suivez toutes les levées de fonds</p>
     </div>
     <!-- Barre de recherche -->
     <div class="flex justify-between">
-      <div class="relative w-1/2">
+      <!-- <div class="relative w-1/2">
         <input type="text" (input)="search($event)" placeholder="Rechercher un projet"
           class="w-full p-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute right-3 top-3.5" fill="none"
@@ -14,6 +16,24 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
+      </div> -->
+      <div class="relative w-full max-w-md">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+          <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </span>
+        <input [(ngModel)]="searchTerm" (input)="onSearch($any($event.target).value)" type="text"
+          class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          placeholder="Rechercher par nom, description">
+        <span class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer hover:text-gray-600"
+          *ngIf="searchTerm" (click)="clearSearch()">
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </span>
       </div>
       <button (click)="openAddModal()"
         class="ml-auto mr-2 flex items-center justify-center rounded-full h-10 w-10 bg-green-600 text-white hover:bg-green-700 focus:outline-none">
@@ -144,20 +164,16 @@
 <!-- Modal d'ajout de projet -->
 <div *ngIf="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
   <div class="bg-white rounded-lg shadow-lg w-full max-w-xl p-6">
-    <app-add-projet-modal 
-      (cancel)="closeAddModal()" 
-      (submit)="onAddProject($event)">
+    <app-add-projet-modal (cancel)="closeAddModal()" (submit)="onAddProject($event)">
     </app-add-projet-modal>
   </div>
 </div>
 
 <!-- Modal de modification de projet -->
-<div *ngIf="showEditModal && selectedProject" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+<div *ngIf="showEditModal && selectedProject"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
   <div class="bg-white rounded-lg shadow-lg w-full max-w-xl ">
-    <app-edit-projet-modal
-      [project]="selectedProject"
-      (cancel)="closeEditModal()"
-      (submit)="onEditProject($event)">
+    <app-edit-projet-modal [project]="selectedProject" (cancel)="closeEditModal()" (submit)="onEditProject($event)">
     </app-edit-projet-modal>
   </div>
 </div>

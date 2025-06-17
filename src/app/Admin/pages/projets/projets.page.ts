@@ -5,6 +5,7 @@ import { Project } from './models/projet.model';
 import { ProjectService } from './services/project.service';
 import { EditProjetModalComponent } from './components/edit-projet-modal/edit-projet-modal.component';
 import { AddProjetModalComponent } from './components/add-projet-modal/add-projet-modal.component';
+import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-projets',
@@ -23,11 +24,15 @@ export class ProjetsPage implements OnInit {
   totalPages: number = 1;
   filters: string[] = ['Tous', 'En cours', 'En attente', 'Terminées'];
   activeFilter: string = 'Tous';
-  
+
   // Variables pour la modale d'ajout de projet
   showAddModal: boolean = false;
   showEditModal: boolean = false;
   selectedProject: Project | null = null;
+
+  // Pour la recherche
+  searchSubject = new Subject<string>();
+  private destroy$ = new Subject<void>();
 
   constructor(
     private projectService: ProjectService,
@@ -36,6 +41,17 @@ export class ProjetsPage implements OnInit {
 
   ngOnInit() {
     this.loadProjects();
+
+    // Configuration de la recherche avec debounce
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(term => {
+      this.searchTerm = term;
+      this.currentPage = 1; // Réinitialiser à la première page
+      this.applyFilters();
+    });
   }
 
   loadProjects() {
@@ -47,7 +63,7 @@ export class ProjetsPage implements OnInit {
 
   applyFilters() {
     let filtered = [...this.allProjects];
-    
+
     // Appliquer le filtre de statut
     if (this.activeFilter !== 'Tous') {
       const statusMap: { [key: string]: string } = {
@@ -57,16 +73,16 @@ export class ProjetsPage implements OnInit {
       };
       filtered = filtered.filter(project => project.status === statusMap[this.activeFilter]);
     }
-    
+
     // Appliquer la recherche
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(project => 
-        project.title.toLowerCase().includes(term) || 
+      filtered = filtered.filter(project =>
+        project.title.toLowerCase().includes(term) ||
         project.description.toLowerCase().includes(term)
       );
     }
-    
+
     this.filteredProjects = filtered;
     this.totalPages = Math.ceil(this.filteredProjects.length / this.itemsPerPage);
     this.currentPage = Math.min(this.currentPage, this.totalPages) || 1;
@@ -78,10 +94,19 @@ export class ProjetsPage implements OnInit {
     this.applyFilters();
   }
 
-  search(event: any) {
-    this.searchTerm = event.target.value;
-    this.currentPage = 1;
-    this.applyFilters();
+  /**
+ * Gère la recherche avec debounce
+ */
+  onSearch(term: string): void {
+    this.searchSubject.next(term);
+  }
+
+  /**
+ * Efface la recherche et recharge les données
+ */
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.searchSubject.next('');
   }
 
   getPaginatedProjects() {

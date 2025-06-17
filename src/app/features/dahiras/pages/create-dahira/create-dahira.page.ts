@@ -1,10 +1,8 @@
-import { CommonModule } from '@angular/common';
 import { Component, NgModule, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { CreateDahira } from 'src/app/Admin/pages/dahira/models/dahira.model';
-import { TabsLayoutService } from 'src/app/features/tabs-layout/tabs-layout.service';
 import { ToastService } from 'src/app/shared/components/toast/toast.service';
 import { DahiraService } from '../../services/dahira.service';
 import { selectCurrentUser } from 'src/app/features/auth/store/auth.selectors';
@@ -130,7 +128,6 @@ export class CreateDahiraPage implements OnInit {
         dahiraName: formValue.dahiraName,
         email: formValue.email,
         phoneNumber: formValue.phoneNumber,
-        numberOfDisciples: formValue.numberOfDisciples,
         location: {
           country: formValue.country,
           region: formValue.region,
@@ -140,7 +137,7 @@ export class CreateDahiraPage implements OnInit {
       };
 
       console.log('Tentative de création dahira:', dahiraData);
-      dahiraData.createdByUserId = this.userId;
+      // dahiraData.createdByUserId = this.userId;
       dahiraData.location.nationality = dahiraData.location.country;
       this.dahiraService.createDahira(dahiraData)
         .then(response => {
@@ -166,6 +163,7 @@ export class CreateDahiraPage implements OnInit {
   }
 
   onCancel(): void {
+    this.goHome();
   }
 
   getStepTitle(): string {
@@ -185,7 +183,7 @@ export class CreateDahiraPage implements OnInit {
     this.router.navigate(['tabs/home'])
   }
 
-    onCountrySelected(country: any) {
+  onCountrySelected(country: any) {
     this.dahiraForm.patchValue({ country });
     console.log('Pays changé :', country);
   }

@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
-import { ModalController, AlertController } from '@ionic/angular';
-import { UserAdminService } from '../../services/useradmin.service';
-import { CreateUserRequest } from '../../modals/users.model';
+import { Component, OnInit } from '@angular/core';
+import { ModalController, AlertController, LoadingController } from '@ionic/angular';
+import { Store } from '@ngrx/store';
+import { AppState } from '../../app.state';
+import * as UsersActions from '../../store/users.actions';
+import { UserFormData } from '../../modals/users.model';
 
 @Component({
   selector: 'app-add-user-modal',
@@ -9,41 +11,71 @@ import { CreateUserRequest } from '../../modals/users.model';
   styleUrls: ['./add-user-modal.component.scss'],
   standalone: false,
 })
-export class AddUserModalComponent {
-
+export class AddUserModalComponent implements OnInit {
   genderOptions = [
-    { label: 'Homme', value: 'M' },
-    { label: 'Femme', value: 'F' },
-    { label: 'Autre', value: 'O' }
+    { label: 'Homme', value: 'HOMME' },
+    { label: 'Femme', value: 'FEMME' },
+    { label: 'Non spécifié', value: 'NON_SPECIFIED' }
   ];
 
-  category = ['Disciple', 'Resp.dahira','Visteur','Mouqadam'];
+  categoryOptions = [
+    { label: 'Disciple', value: 'DISCIPLE' },
+    { label: 'Responsable Dahira', value: 'RESP_DAHIRA' },
+    { label: 'Visiteur', value: 'VISITEUR' },
+    { label: 'Mouqadam', value: 'MOUQADAM' }
+  ];
 
-  newUser = {
+  newUser: UserFormData = {
     firstName: '',
     lastName: '',
     email: '',
     username: '',
     password: '',
     phoneNumber: '',
-    gender: '',
+    gender: 'NON_SPECIFIED',
     dateOfBirth: '',
-    nationality: '',
-    country: '',
-    region: '',
-    department: '',
-    address: '',
-    image: '', // Base64 ou URL
-    category: '',
+    location: {
+      nationality: 'Sénégalaise',
+      country: 'Sénégal',
+      region: 'Dakar',
+      department: '',
+      address: ''
+    },
+    category: 'DISCIPLE',
+    role: 'DISCIPLE',
+    active: true,
+    userIdKeycloak: ''
   };
 
+  selectedFile: File | null = null;
+  imagePreview: string = 'assets/images/default-avatar.png';
   isSubmitting = false;
+  hasSubmitted = false; // ✅ Flag pour éviter les doubles soumissions
+  today: string = new Date().toISOString().split('T')[0];
 
   constructor(
     private modalController: ModalController,
     private alertController: AlertController,
-    private userAdminService: UserAdminService
+    private loadingController: LoadingController,
+    private store: Store<AppState>
   ) {}
+
+  ngOnInit() {
+    this.newUser.userIdKeycloak = this.generateUUID();
+  }
+
+  updateLocation(field: string, value: string) {
+    if (!this.newUser.location) {
+      this.newUser.location = {
+        nationality: '',
+        country: '',
+        region: '',
+        department: '',
+        address: ''
+      };
+    }
+    this.newUser.location[field as keyof typeof this.newUser.location] = value;
+  }
 
   dismiss() {
     this.modalController.dismiss();
@@ -57,46 +89,39 @@ export class AddUserModalComponent {
     });
   }
 
-  private formatDateForAPI(dateStr: string): string {
-    const date = new Date(dateStr);
-    return date.toISOString().split('T')[0];
-  }
-
   private generateTempPassword(): string {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%';
     let pass = '';
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 12; i++) {
       pass += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    return pass;
+    return pass + '1A!';
   }
 
-  isValidEmail(email: string): boolean {
+  isValidEmail(email: string | undefined): boolean {
+    if (!email) return false;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
 
-  isValidPhone(phone: string): boolean {
-    const phoneRegex = /^(\+33|0)[1-9](\d{2}){4}$/;
+  isValidPhone(phone: string | undefined): boolean {
+    if (!phone) return false;
+    const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/;
     return phoneRegex.test(phone);
   }
 
   isFormValid(): boolean {
     const u = this.newUser;
-    if (
-      !u.firstName.trim() ||
-      !u.lastName.trim() ||
-      !u.email.trim() ||
-      !this.isValidEmail(u.email) ||
-      !u.gender ||
-      !u.dateOfBirth ||
-      !u.nationality ||
-      !u.country ||
-      !u.region ||
-      !u.department ||
-      !u.address.trim() ||
-      !u.category
-    ) {
+    if (!u.firstName?.trim() || !u.lastName?.trim()) {
+      return false;
+    }
+    if (!u.email?.trim() || !this.isValidEmail(u.email)) {
+      return false;
+    }
+    if (!u.gender || !u.dateOfBirth) {
+      return false;
+    }
+    if (!u.location?.country || !u.location?.region || !u.location?.address?.trim()) {
       return false;
     }
     if (u.phoneNumber && !this.isValidPhone(u.phoneNumber)) {
@@ -114,67 +139,169 @@ export class AddUserModalComponent {
     await alert.present();
   }
 
+  // ✅ MÉTHODE PRINCIPALE: Éviter le double dispatch
   async saveUser() {
-    if (this.isSubmitting) return;
+    // ✅ Protection contre les doubles soumissions
+    if (this.isSubmitting || this.hasSubmitted) {
+      console.warn('⚠️ Soumission déjà en cours ou déjà effectuée');
+      return;
+    }
 
     if (!this.isFormValid()) {
       await this.presentAlert('Validation', 'Veuillez remplir correctement tous les champs obligatoires.');
       return;
     }
 
+    const loading = await this.loadingController.create({
+      message: 'Création de l\'utilisateur...',
+      spinner: 'circular'
+    });
+    await loading.present();
+
     this.isSubmitting = true;
+    this.hasSubmitted = true; // ✅ Marquer comme soumis
 
     try {
-      const username = this.newUser.username.trim() || this.newUser.email.split('@')[0];
+      const username = this.newUser.username?.trim() || (this.newUser.email ? this.newUser.email.split('@')[0] : '');
       const password = this.newUser.password || this.generateTempPassword();
 
-      const userData: CreateUserRequest = {
-        firstName: this.newUser.firstName.trim(),
-        lastName: this.newUser.lastName.trim(),
-        email: this.newUser.email.trim().toLowerCase(),
+      // ✅ Création d'un objet UserFormData propre
+      const userData: UserFormData = {
+        firstName: this.newUser.firstName?.trim() || '',
+        lastName: this.newUser.lastName?.trim() || '',
+        email: this.newUser.email?.trim().toLowerCase() || '',
         username,
         password,
-        phoneNumber: this.newUser.phoneNumber.trim(),
-        gender: this.newUser.gender,
-        userIdKeycloak: this.generateUUID(),
-        dateOfBirth: this.formatDateForAPI(this.newUser.dateOfBirth),
-        location: {
+        phoneNumber: this.newUser.phoneNumber?.trim() || '',
+        gender: this.newUser.gender || 'NON_SPECIFIED',
+        userIdKeycloak: this.newUser.userIdKeycloak || this.generateUUID(),
+        dateOfBirth: this.newUser.dateOfBirth || '',
+        location: this.newUser.location ? {
+          locationInfoId: this.newUser.location.locationInfoId || this.generateUUID(),
+          nationality: this.newUser.location.nationality || 'Sénégalaise',
+          country: this.newUser.location.country || 'Sénégal',
+          region: this.newUser.location.region || 'Dakar',
+          department: this.newUser.location.department || this.newUser.location.region || 'Dakar',
+          address: this.newUser.location.address?.trim() || 'Adresse non spécifiée'
+        } : {
           locationInfoId: this.generateUUID(),
-          nationality: this.newUser.nationality,
-          country: this.newUser.country,
-          region: this.newUser.region,
-          department: this.newUser.department,
-          address: this.newUser.address.trim(),
+          nationality: 'Sénégalaise',
+          country: 'Sénégal',
+          region: 'Dakar',
+          department: 'Dakar',
+          address: 'Adresse non spécifiée'
         },
-        role: this.newUser.category.toUpperCase(),
-        active: true,
+        category: this.newUser.category || 'DISCIPLE',
+        role: this.newUser.category || 'DISCIPLE',
+        active: this.newUser.active !== false
       };
 
-      await this.userAdminService.createUser(userData).toPromise();
-      await this.presentAlert('Succès', 'Utilisateur créé avec succès.');
-      this.modalController.dismiss(true);
+      console.log('=== COMPONENT DEBUG ===');
+      console.log('userData à envoyer:', userData);
+      console.log('file à envoyer:', this.selectedFile);
+
+      // Vérifications avant envoi
+      if (!userData.firstName || !userData.lastName || !userData.email) {
+        await this.presentAlert('Erreur', 'Les champs Prénom, Nom et Email sont obligatoires.');
+        await loading.dismiss();
+        this.isSubmitting = false;
+        this.hasSubmitted = false; // ✅ Reset en cas d'erreur
+        return;
+      }
+
+      // ✅ Objet sérialisable pour NgRx (sans références circulaires)
+      const cleanUserData = {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        username: userData.username,
+        password: userData.password,
+        phoneNumber: userData.phoneNumber,
+        gender: userData.gender,
+        userIdKeycloak: userData.userIdKeycloak,
+        dateOfBirth: userData.dateOfBirth,
+        location: userData.location,
+        category: userData.category,
+        role: userData.role,
+        active: userData.active
+      };
+
+      console.log('🔍 COMPONENT - cleanUserData:', cleanUserData);
+
+      // ✅ Validation finale
+      if (typeof cleanUserData !== 'object' || !cleanUserData.firstName) {
+        throw new Error('Données utilisateur invalides');
+      }
+
+      // ✅ Dispatch unique de l'action
+      this.store.dispatch(UsersActions.createUser({
+        userData: cleanUserData,
+        file: this.selectedFile || undefined
+      }));
+
+      await loading.dismiss();
+
+      // ✅ SOLUTION: Fermer le modal avec un flag de succès seulement
+      // Ne pas passer les données utilisateur pour éviter le double dispatch
+      this.modalController.dismiss({ success: true });
+
     } catch (error) {
-      console.error('Erreur création utilisateur:', error);
+      await loading.dismiss();
+      console.error('❌ Erreur création utilisateur:', error);
       await this.presentAlert('Erreur', 'Une erreur est survenue lors de la création de l\'utilisateur.');
+      
+      // ✅ Reset les flags en cas d'erreur
+      this.hasSubmitted = false;
+      
+      // ✅ Fermer le modal avec l'erreur
+      this.modalController.dismiss({
+        success: false,
+        error: error instanceof Error ? error.message : 'Erreur inconnue'
+      });
     } finally {
       this.isSubmitting = false;
     }
   }
 
-  // Gérer les changements d'image
-  onImageChange(event: any): void {
-    const file = event.target.files && event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.newUser.image = reader.result as string;
-      };
-      reader.readAsDataURL(file);
-    }
+  async onImageClick() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (event: any) => {
+      const file = event.target.files[0];
+      if (file) {
+        this.handleImageSelection(file);
+      }
+    };
+    input.click();
   }
 
-  // Méthodes déclenchées par les inputs
-  onFirstNameChange(): void {}
-  onLastNameChange(): void {}
-  onEmailChange(): void {}
+  handleImageSelection(file: File) {
+    // ✅ Validation renforcée du fichier
+    if (file.size > 5 * 1024 * 1024) {
+      this.presentAlert('Erreur', 'L\'image ne doit pas dépasser 5MB');
+      return;
+    }
+    if (!file.type.startsWith('image/')) {
+      this.presentAlert('Erreur', 'Veuillez sélectionner un fichier image valide');
+      return;
+    }
+
+    this.selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.imagePreview = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  onCategoryChange() {
+    this.newUser.role = this.newUser.category;
+  }
+
+  onEmailChange() {
+    if (!this.newUser.username && this.newUser.email?.includes('@')) {
+      this.newUser.username = this.newUser.email.split('@')[0];
+    }
+  }
 }

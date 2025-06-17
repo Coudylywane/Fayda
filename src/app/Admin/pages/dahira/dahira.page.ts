@@ -78,7 +78,7 @@ export class DahiraPage implements OnInit {
       }
     });
 
-        // S'abonner aux changements d'état du store
+    // S'abonner aux changements d'état du store
     this.store.select(selectCurrentUser).pipe(
       takeUntil(this.destroy$)
     ).subscribe(currentUser => {
@@ -294,11 +294,11 @@ export class DahiraPage implements OnInit {
       .then(response => {
         this.addLoading = false;
         console.log('Succès création dahira:', response);
-        if(response.success){
+        if (response.success) {
           this.showAddModal = false;
           this.toastService.showSuccess(response.data.message || "Votre demande a été envoyé");
         }
-        // this.loadAllDahiras();
+        this.loadAllDahiras();
       }).catch(error => {
         this.addLoading = false;
         console.error('Erreur création dahira:', error);
@@ -310,16 +310,15 @@ export class DahiraPage implements OnInit {
   onEditDahira(dahira: any): void {
     this.addLoading = true;
     console.log('Tentative de modification dahira:', dahira);
-    dahira.location.nationality = dahira.location.country;
-    this.dahiraService.updateDahira(this.selectedDahira?.dahiraId!,dahira)
+    this.dahiraService.updateDahira(this.selectedDahira?.dahiraId!, dahira)
       .then(response => {
         this.addLoading = false;
         console.log('Succès modification dahira:', response);
-        if(response.success){
-          this.showAddModal = false;
+        if (response.success) {
+          this.showEditModal = false;
           this.toastService.showSuccess(response.data.message || "La Dahira a été modifié");
         }
-        // this.loadAllDahiras();
+        this.loadAllDahiras();
       }).catch(error => {
         this.addLoading = false;
         console.error('Erreur modification dahira:', error);

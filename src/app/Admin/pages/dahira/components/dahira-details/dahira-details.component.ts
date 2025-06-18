@@ -1,7 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DahiraServiceAdmin } from '../../services/dahira.service';
-import { UserService } from '../../services/user.service';
 import { DahiraMember, MemberRole } from '../../models/dahira.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -43,7 +41,7 @@ export class DahiraDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     // private dahiraService: DahiraServiceAdmin,
-    private userService: UserService,
+    // private userService: UserService,
     private dahiraService: DahiraService,
   ) { }
 

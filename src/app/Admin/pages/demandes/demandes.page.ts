@@ -437,7 +437,8 @@ export class DemandesPage implements OnInit, OnDestroy {
     JOIN_DAHIRA: 'Rejoindre Dahira',
     CREATE_DAHIRA: 'Créer Dahira',
     BECOME_MOUQADAM: 'Devenir Moukhadam',
-    BECOME_FONDS_CREATOR: 'Devenir Gestionnaire'
+    BECOME_FONDS_CREATOR: 'Devenir Gestionnaire',
+    CREATE_FUND_COLLECTION: 'Devenir collecteur de fonds',
   };
 
   statusLabels: { [key: string]: string } = {

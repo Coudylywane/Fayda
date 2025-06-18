@@ -8,6 +8,27 @@ export interface Project {
     contributors?: Contributor[];
 }
 
+export interface ProjectDTO {
+    collectionId: string,
+    creatorName:string,
+    title: string,
+    description: string,
+    targetAmount: number,
+    currentAmount: number,
+    status: "APPROVED" | "",
+    progressPercentage: number,
+    isActive: boolean,
+    isTargetAchieved: boolean,
+    isClosed: boolean,
+    startDate: string,
+    endDate: string,
+    remainingDays: number,
+    totalDurationInDays: number
+    progress: number,
+    createdAt: string,
+    updatedAt: string,
+}
+
 export interface Contributor {
     id: string;
     name: string;
@@ -18,5 +39,7 @@ export interface Contributor {
 export interface CreateProjectDTO {
     title: string,
     description: string,
-    targetAmount: number
+    targetAmount: number,
+    startDate: string,
+    endDate: string,
 }

@@ -4,11 +4,17 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Project } from '../models/projet.model';
+import { Store } from '@ngrx/store';
+import * as ProjectActions from '../store/project.actions';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ProjectService {
+    constructor(private store: Store,) {
+    
+        }
+
     private projects: Project[] = [
         {
             id: '1',
@@ -74,8 +80,13 @@ export class ProjectService {
 
     private projectsSubject = new BehaviorSubject<Project[]>(this.projects);
 
-    getProjects(): Observable<Project[]> {
-        return this.projectsSubject.asObservable();
+    /**
+     * Dispatcher l'action de getAllProject
+     *
+     * @memberof ProjectService
+     */
+    getProjects() {
+        this.store.dispatch(ProjectActions.loadProjects());
     }
 
     getProjectById(id: string): Project | undefined {

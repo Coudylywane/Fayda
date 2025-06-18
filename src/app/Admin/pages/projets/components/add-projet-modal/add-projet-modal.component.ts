@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule, ModalController } from '@ionic/angular';
-import { Project } from '../../models/projet.model';
+import { CreateProjectDTO, ProjectDTO } from '../../models/projet.model';
 
 @Component({
   selector: 'app-add-projet-modal',
@@ -14,7 +14,7 @@ export class AddProjetModalComponent  implements OnInit {
   projectForm!: FormGroup;
   
   @Output() cancel = new EventEmitter<void>();
-  @Output() submit = new EventEmitter<Project>();
+  @Output() submit = new EventEmitter<CreateProjectDTO>();
 
   constructor(
     private fb: FormBuilder
@@ -32,19 +32,19 @@ export class AddProjetModalComponent  implements OnInit {
     this.projectForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
-      status: ['en_cours', [Validators.required]],
-      progress: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
-      dueDate: [this.formatDateForInput(defaultDueDate), [Validators.required]]
+      targetAmount: [0, [Validators.required, Validators.min(1000)]],
+      endDate: [this.formatDateForInput(defaultDueDate), [Validators.required]],
+      startDate: [this.formatDateForInput(today), [Validators.required]]
     });
     
     // Mise à jour automatique de la progression en fonction du statut
-    this.projectForm.get('status')?.valueChanges.subscribe(status => {
-      if (status === 'termine') {
-        this.projectForm.get('progress')?.setValue(100);
-      } else if (status === 'en_attente' && this.projectForm.get('progress')?.value === 0) {
-        this.projectForm.get('progress')?.setValue(25);
-      }
-    });
+    // this.projectForm.get('status')?.valueChanges.subscribe(status => {
+    //   if (status === 'termine') {
+    //     this.projectForm.get('progress')?.setValue(100);
+    //   } else if (status === 'en_attente' && this.projectForm.get('progress')?.value === 0) {
+    //     this.projectForm.get('progress')?.setValue(25);
+    //   }
+    // });
   }
 
   formatDateForInput(date: Date): string {
@@ -58,14 +58,12 @@ export class AddProjetModalComponent  implements OnInit {
     if (this.projectForm.valid) {
       const formValue = this.projectForm.value;
       
-      const project: Project = {
-        id: Date.now().toString(), // ID temporaire qui sera remplacé par le service
+      const project: CreateProjectDTO = {
         title: formValue.title,
         description: formValue.description,
-        status: formValue.status,
-        progress: parseInt(formValue.progress),
-        dueDate: new Date(formValue.dueDate),
-        contributors: []
+        endDate: formValue.endDate,
+        targetAmount: formValue.targetAmount,
+        startDate: formValue.startDate
       };
       
       this.submit.emit(project);

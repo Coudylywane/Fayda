@@ -100,8 +100,8 @@
   </div>
 
   <!-- Grille de projets -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-    <div *ngIf="!loading && getPaginatedProjects()">
+  <div>
+    <div *ngIf="!loading && getPaginatedProjects()" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <div *ngFor="let project of getPaginatedProjects()" class="bg-white rounded-lg shadow-md overflow-hidden">
         <div class="p-5">
           <div class="flex justify-between items-start">
@@ -171,12 +171,12 @@
               <div class="space-x-4">
                 <span class="text-xs font-medium text-gray-600">{{ project.currentAmount +"/" +
                   project.targetAmount}}</span>
-                <span class="text-xs font-medium text-gray-600">{{ project.progress }}%</span>
+                <span class="text-xs font-medium text-gray-600">{{ project.progressPercentage }}%</span>
               </div>
             </div>
             <div class="mt-1 relative">
               <div class="h-2 bg-gray-200 rounded-full">
-                <div class="h-full bg-green-600 rounded-full" [style.width]="project.progress + '%'"></div>
+                <div class="h-full bg-green-600 rounded-full" [style.width]="project.progressPercentage + '%'"></div>
               </div>
             </div>
           </div>
@@ -235,7 +235,7 @@
 <!-- Modal d'ajout de projet -->
 <div *ngIf="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
   <div class="bg-white rounded-lg shadow-lg w-full max-w-xl p-6">
-    <app-add-projet-modal (cancel)="closeAddModal()" (submit)="onAddProject($event)">
+    <app-add-projet-modal (cancel)="closeAddModal()" (submit)="onAddProject($event)" [isloading]="addLoading">
     </app-add-projet-modal>
   </div>
 </div>

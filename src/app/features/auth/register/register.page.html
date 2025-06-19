@@ -97,7 +97,8 @@
                 class="bg-transparent w-full text-white placeholder-gray-400 border-0 border-b-2 border-white pb-2 focus:outline-none focus:ring-0 focus:border-white transition-colors"
                 [ngClass]="{'!border-red-500': registerForm.get('dateOfBirth')?.invalid && registerForm.get('dateOfBirth')?.touched}" /> -->
               <app-date-selector placeholder="Sélectionnez votre date de naissance"
-                (dateChange)="onDateSelected($event)" class="mb-4"></app-date-selector>
+                (dateChange)="onDateSelected($event)" class="mb-4">
+              </app-date-selector>
             </div>
             <div *ngIf="registerForm.get('dateOfBirth')?.invalid && registerForm.get('dateOfBirth')?.touched"
               class="text-red-500 text-sm mt-1">

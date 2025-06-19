@@ -13,7 +13,7 @@ import { ButtonComponent } from "../../../../shared/components/button/button.com
 })
 export class DetailFondsComponent  implements OnInit {
 
-  @Input() campaign!: CampaignData;
+  @Input() project!: CampaignData;
   @Input() balance: number = 0;
   
   activeTab: string = 'Résumé';

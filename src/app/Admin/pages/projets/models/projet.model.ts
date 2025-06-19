@@ -39,7 +39,7 @@ export interface Contributor {
 export interface CreateProjectDTO {
     title: string,
     description: string,
-    targetAmount: number,
+    targetAmount: number | string,
     startDate: string,
     endDate: string,
 }

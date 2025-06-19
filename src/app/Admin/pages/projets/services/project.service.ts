@@ -3,17 +3,18 @@
 // src/app/services/project.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Project } from '../models/projet.model';
+import { CreateProjectDTO, Project } from '../models/projet.model';
 import { Store } from '@ngrx/store';
 import * as ProjectActions from '../store/project.actions';
+import { ProjectApiService } from './project.api';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ProjectService {
     constructor(private store: Store,) {
-    
-        }
+
+    }
 
     private projects: Project[] = [
         {
@@ -93,25 +94,24 @@ export class ProjectService {
         return this.projects.find(p => p.id === id);
     }
 
-    addProject(project: Project): void {
-        project.id = Date.now().toString();
-        this.projects.push(project);
-        this.projectsSubject.next([...this.projects]);
+    async addProject(project: CreateProjectDTO) {
+        return ProjectApiService.createProject(project)
     }
+
 
     updateProject(project: Project): void {
         const index = this.projects.findIndex(p => p.id === project.id);
         if (index !== -1) {
             this.projects[index] = { ...project };
             this.projectsSubject.next([...this.projects]);
-        } 
+        }
     }
 
     changeStatus(id: string, status: 'en_cours' | 'en_attente' | 'termine'): void {
         const index = this.projects.findIndex(p => p.id === id);
         if (index !== -1) {
             this.projects[index].status = status;
-            this.projectsSubject.next([...this.projects]);  
+            this.projectsSubject.next([...this.projects]);
         }
     }
 

@@ -24,7 +24,7 @@ export class ProjectEffects {
                     catchError((error) => {
                         const errorMessage = error.response?.data?.message || error.message || 'Erreur de récupération';
                         console.error('Projects error:', error);
-                        return of(ProjectActions.loadProjectsFailure({ error: errorMessage }));
+                        return of(ProjectActions.loadActiveProjectsFailure({ error: errorMessage }));
                     })
                 )
             )
@@ -33,7 +33,7 @@ export class ProjectEffects {
 
     loadActiveProjects$ = createEffect(() =>
         this.actions$.pipe(
-            ofType(ProjectActions.loadProjects),
+            ofType(ProjectActions.loadActiveProjects),
             mergeMap(_ =>
                 from(ProjectApiService.getAllActiveProject()).pipe(
                     mergeMap((response) => {
@@ -44,7 +44,7 @@ export class ProjectEffects {
                     catchError((error) => {
                         const errorMessage = error.response?.data?.message || error.message || 'Erreur de récupération';
                         console.error('Projects actifs error:', error);
-                        return of(ProjectActions.loadProjectsFailure({ error: errorMessage }));
+                        return of(ProjectActions.loadActiveProjectsFailure({ error: errorMessage }));
                     })
                 )
             )

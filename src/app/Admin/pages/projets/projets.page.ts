@@ -8,6 +8,7 @@ import { AddProjetModalComponent } from './components/add-projet-modal/add-proje
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectProjectState } from './store/project.selectors';
+import { ToastService } from 'src/app/shared/components/toast/toast.service';
 
 @Component({
   selector: 'app-projets',
@@ -29,6 +30,7 @@ export class ProjetsPage implements OnInit {
   loading: boolean = false;
   filters: string[] = ['Tous', 'En cours', 'En attente', 'Terminées'];
   activeFilter: string = 'Tous';
+  addLoading: boolean = false;
 
   // Variables pour la modale d'ajout de projet
   showAddModal: boolean = false;
@@ -43,6 +45,7 @@ export class ProjetsPage implements OnInit {
     private projectService: ProjectService,
     private router: Router,
     private store: Store,
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
@@ -177,9 +180,23 @@ export class ProjetsPage implements OnInit {
   }
 
   onAddProject(project: CreateProjectDTO) {
-    // this.projectService.addProject(project);
-    this.closeAddModal();
-    this.loadProjects();
+    this.addLoading = true;
+    console.log('Tentative de création collecte de fonds:', project);
+    this.projectService.addProject(project)
+      .then(response => {
+        this.addLoading = false;
+        console.log('Succès création collecte de fonds:', response);
+        if (response.success) {
+          this.showAddModal = false;
+          this.toastService.showSuccess(response.data.message || "Votre demande a été envoyé");
+        }
+        this.closeAddModal();
+        this.loadProjects();
+      }).catch(error => {
+        this.addLoading = false;
+        console.error('Erreur création collecte de fonds:', error);
+        this.toastService.showError(error.message)
+      });
   }
 
   openEditModal(project: ProjectDTO, event: Event) {
@@ -251,5 +268,5 @@ export class ProjetsPage implements OnInit {
    */
   isEmptySearch(): boolean {
     return this.searchTerm.length > 0 && this.totalFilteredItems === 0;
-}
+  }
 }

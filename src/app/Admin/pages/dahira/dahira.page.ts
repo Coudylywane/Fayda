@@ -304,7 +304,6 @@ export class DahiraPage implements OnInit {
         console.error('Erreur création dahira:', error);
         this.toastService.showError(error.message)
       });
-
   }
 
   onEditDahira(dahira: any): void {

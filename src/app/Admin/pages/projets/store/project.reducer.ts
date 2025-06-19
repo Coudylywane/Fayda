@@ -9,12 +9,12 @@ export const projectReducer = createReducer(
     loading: true,
     error: null
     })),
-  on(ProjectActions.loadProjectsSuccess, (state, { projects }) => ({
+  on(ProjectActions.loadProjectsSuccess, ProjectActions.loadActiveProjectsSuccess, (state, { projects }) => ({
     ...state,
     loading: false,
     projects
   })),
-  on(ProjectActions.loadProjectsFailure, (state, { error }) => ({
+  on(ProjectActions.loadProjectsFailure, ProjectActions.loadActiveProjectsFailure,(state, { error }) => ({
     ...state,
     loading: false,
     error

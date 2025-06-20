@@ -22,6 +22,8 @@ export class FinancesPage implements OnInit {
   zakatProgress = 75; // Pourcentage pour le cercle de progression
   error: string | null = null;
   loading: boolean = false;
+  showAddModal: boolean = false;
+  addLoading: boolean = false;
 
   private destroy$ = new Subject<void>();
 

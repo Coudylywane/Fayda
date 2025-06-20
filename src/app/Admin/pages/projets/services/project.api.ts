@@ -57,7 +57,15 @@ export class ProjectApiService {
      */
     static async donate(collectId: string, amount: number) {
         try {
-            const response = await axios.post(`fund-collections/${collectId}/donate`, {collectId, amount});
+            const formData = new FormData();
+            formData.append('amount', amount.toString());
+            formData.append('collectId', collectId);
+
+            const response = await axios.post(`fund-collections/${collectId}/donate`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
             console.log("donate: ", response);
 
             return {
@@ -79,7 +87,7 @@ export class ProjectApiService {
     */
     static async createProject(data: CreateProjectDTO) {
         console.log("data:", data);
-        
+
         try {
             const response = await axios.post(`fund-collections`, {
                 ...data

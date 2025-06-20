@@ -8,6 +8,7 @@ import { CreateCollectPageRoutingModule } from './create-collect-routing.module'
 
 import { CreateCollectPage } from './create-collect.page';
 import { DateSelector2Component } from 'src/app/shared/components/date-selector2/date-selector2.component';
+import { FormatNumberDirective } from 'src/app/directives/format-number.directive';
 
 @NgModule({
   imports: [
@@ -15,7 +16,9 @@ import { DateSelector2Component } from 'src/app/shared/components/date-selector2
     FormsModule,
     IonicModule,
     CreateCollectPageRoutingModule,
-    ReactiveFormsModule, DateSelector2Component
+    ReactiveFormsModule,
+    DateSelector2Component,
+    FormatNumberDirective
   ],
   declarations: [CreateCollectPage]
 })

@@ -23,18 +23,21 @@
       <p class="text-center text-sm text-gray-600">Rôle principal: {{ primaryRole$ | async }}</p> -->
       
       <!-- Badge de rôle principal -->
-      <div class="mt-2">
-        <div *appShowForPrimaryRole="UserRole.MOUKHADAM" class="px-3 py-1 bg-amber-200 text-amber-600 text-xs font-medium rounded-full">
+      <div class="mt-2 flex flex-row gap-2">
+        <div *appShowForRole="UserRole.MOUKHADAM" class="px-3 py-1 bg-amber-200 text-amber-600 text-xs font-medium rounded-full">
           Moukhadam
         </div>
-        <div *appShowForPrimaryRole="UserRole.DISCIPLE" class="px-3 py-1 bg-green-200 text-green-600 text-xs font-medium rounded-full">
+        <div *appShowForRole="UserRole.DISCIPLE" class="px-3 py-1 bg-green-100 text-green-600 text-xs font-medium rounded-full">
           Disciple
         </div>
         <div *appShowForPrimaryRole="UserRole.VISITEUR" class="px-3 py-1 bg-gray-200 text-gray-600 text-xs font-medium rounded-full">
           Visiteur
         </div>
-        <div *appShowForPrimaryRole="UserRole.G_DAHIRA" class="px-3 py-1 bg-gray-200 text-gray-900 text-xs font-medium rounded-full">
+        <div *appShowForRole="UserRole.G_DAHIRA" class="px-3 py-1 bg-blue-200 text-blue-900 text-xs font-medium rounded-full">
           Gestionnaire Dahira
+        </div>
+        <div *appShowForRole="UserRole.COLLECTE_FONDS" class="px-3 py-1 bg-violet-200 text-violet-900 text-xs font-medium rounded-full">
+          Collecteur de fonds
         </div>
       </div>
     </div>

@@ -3,6 +3,10 @@ import { CampaignData } from './model/finances.type';
 import { DetailFondsService } from './services/detail-fonds.service';
 import { ModalController } from '@ionic/angular';
 import { ContributionStoryComponent } from './components/contribution-story/contribution-story.component';
+import { Store } from '@ngrx/store';
+import { Subject, takeUntil } from 'rxjs';
+import { selectProjectState } from 'src/app/Admin/pages/projets/store/project.selectors';
+import { ProjectDTO } from 'src/app/Admin/pages/projets/models/projet.model';
 
 @Component({
   selector: 'app-finances',
@@ -12,11 +16,22 @@ import { ContributionStoryComponent } from './components/contribution-story/cont
 })
 export class FinancesPage implements OnInit {
 
+  allProjects: ProjectDTO[] = [];
   showContributionAmount = false;
   showBalanceAmount = false;
   zakatProgress = 75; // Pourcentage pour le cercle de progression
+  error: string | null = null;
+  loading: boolean = false;
+  showAddModal: boolean = false;
+  addLoading: boolean = false;
 
-  constructor(private detailFondsService: DetailFondsService, private modalController: ModalController) { }
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private detailFondsService: DetailFondsService,
+    private modalController: ModalController,
+    private store: Store,
+  ) { }
 
   toggleContributionVisibility() {
     this.showContributionAmount = !this.showContributionAmount;
@@ -37,47 +52,27 @@ export class FinancesPage implements OnInit {
   zakatTarget: number = 350000;
   zakatPercentage: number = Math.round((this.zakatAmount / this.zakatTarget) * 100);
 
-  // Données pour les levées de fonds
-  fundraisings = [
-    {
-      title: 'Mosquée Medina Baye',
-      amount: 123000000,
-      target: 300000000,
-      contributions: 1240,
-      percentage: 35
-    },
-    {
-      title: 'Musée Cheikh Al Islami',
-      amount: 45000000,
-      target: 70000000,
-      contributions: 340,
-      percentage: 65
-    },
-    {
-      title: 'Daara Serigne Touba',
-      amount: 45000000,
-      target: 65000000,
-      contributions: 340,
-      percentage: 70
-    }
-  ];
+    ngOnInit() {
+      this.loadProjects();
 
-  // Données pour l'historique des contributions
-  contributionHistory = [
-    {
-      amount: 50000,
-      description: 'Rénovation Mosquée Medina Baye',
-      method: 'Orange Money',
-      date: '20 Octobre 2024 à 20:31',
-      type: 'outgoing'
-    }
-    // Vous pouvez ajouter d'autres entrées historiques ici
-  ];
-
-
-  ngOnInit() {
     // Initialisation ou récupération des données depuis un service
     this.openContributionStory();
+
+    this.store.select(selectProjectState).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(projectState => {
+      this.error = projectState.error;
+      this.loading = projectState.loading;
+
+      if (projectState.projects && Array.isArray(projectState.projects)) {
+        this.allProjects = [...projectState.projects];
+        console.log('fonds loaded:', this.allProjects.length);
+      }
+    });
+  }
+
+  loadProjects() {
+    this.detailFondsService.getFonds();
   }
 
   // Méthode pour formater les nombres avec espacement des milliers
@@ -101,7 +96,7 @@ export class FinancesPage implements OnInit {
     // Logique pour rafraîchir les contributions
   }
 
-  openCampaignModal() {
+  openCampaignModal(data: ProjectDTO) {
     const campaignData: CampaignData = {
       id: '1',
       title: 'Rénovation Mosquée Medina Baye',
@@ -119,17 +114,17 @@ export class FinancesPage implements OnInit {
       imageUrl: 'assets/images/1.png'
     };
 
-    this.detailFondsService.openCampaignModal(campaignData);
+    this.detailFondsService.openCampaignModal(data);
   }
 
   async openContributionStory() {
-      const modal = await this.modalController.create({
-        component: ContributionStoryComponent,
-        initialBreakpoint: 0.2,
-        breakpoints: [0, 0.4, 0.6, 0.9],
-        cssClass: 'comment-modal'
-      });
-  
-      return await modal.present();
-    }
+    const modal = await this.modalController.create({
+      component: ContributionStoryComponent,
+      initialBreakpoint: 0.2,
+      breakpoints: [0, 0.4, 0.6, 0.9],
+      cssClass: 'comment-modal'
+    });
+
+    return await modal.present();
+  }
 }

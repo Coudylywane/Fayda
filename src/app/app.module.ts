@@ -26,6 +26,9 @@ import { requestReducer } from './features/demandes/store/request.reducers';
 import { RequestEffects } from './features/demandes/store/request.effects';
 import { adminRequestReducer } from './Admin/pages/demandes/store/demande.reducers';
 import { AdminRequestEffects } from './Admin/pages/demandes/store/demande.effects';
+import { projectReducer } from './Admin/pages/projets/store/project.reducer';
+import { ProjectEffects } from './Admin/pages/projets/store/project.effects';
+import {  provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 @NgModule({
   declarations: [AppComponent],
@@ -35,15 +38,28 @@ import { AdminRequestEffects } from './Admin/pages/demandes/store/demande.effect
     AppRoutingModule,
     SharedModule,
     FormsModule,
-    StoreModule.forRoot({ auth: authReducer, dahira: dahiraReducer, request: requestReducer, adminRequest: adminRequestReducer }),
+    StoreModule.forRoot({
+      auth: authReducer,
+      dahira: dahiraReducer, 
+      request: requestReducer, 
+      adminRequest: adminRequestReducer,
+      project: projectReducer
+     }),
     IonicStorageModule.forRoot(),
-    EffectsModule.forRoot([AuthEffects, DahiraEffects, RequestEffects, AdminRequestEffects]),
+    EffectsModule.forRoot([
+      AuthEffects, 
+      DahiraEffects, 
+      RequestEffects, 
+      AdminRequestEffects,
+      ProjectEffects
+    ]),
     ToastComponent
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideAppInitializer(axiosInitializer()),
-    provideAnimations()
+    provideAnimations(),
+    provideHttpClient(withInterceptorsFromDi())
   ],
   bootstrap: [AppComponent],
 })

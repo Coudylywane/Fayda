@@ -83,7 +83,8 @@
         </div>
         <div class="overflow-hidden h-2 mb-1 text-xs flex rounded bg-gray-200">
           <div style="width: 68%"
-            class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-700"></div>
+            class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-700">
+          </div>
         </div>
       </div>
     </div>
@@ -91,52 +92,40 @@
     <!-- Section levée de fonds -->
     <div class="mb-6">
       <h2 class="text-lg font-semibold mb-3">Levée de fonds</h2>
+
+      <!-- Conteneur scrollable horizontal -->
       <div class="overflow-x-auto pb-2 hide-scrollbar">
-        <div class="flex space-x-4">
-          <!-- Carte 1 -->
-          <div class="min-w-56 bg-white p-3 rounded-xl shadow-sm cursor-pointer" (click)="openCampaignModal()">
-            <h3 class="text-green-700 font-semibold mb-1">Mosquée Medina Baye</h3>
+        <div class="flex space-x-4 flex-nowrap">
+
+          <!-- Cartes de projets -->
+          <div *ngFor="let project of allProjects" class="min-w-64 bg-white p-3 rounded-xl shadow-sm cursor-pointer"
+            (click)="openCampaignModal(project)">
+            <h3 class="text-green-700 font-semibold mb-1 truncate">
+              {{ project.title }}
+            </h3>
+
+            <!-- Barre de progression -->
             <div class="w-full bg-gray-200 rounded-full h-1.5 mb-2">
-              <div class="bg-green-700 h-1.5 rounded-full" style="width: 35%"></div>
+              <div class="bg-green-700 h-1.5 rounded-full" [style.width.%]="project.progressPercentage">
+              </div>
             </div>
+
+            <!-- Détails -->
             <div>
-              <p class="text-base font-bold">1 23 000 000 FCFA</p>
+              <p class="text-base font-bold">{{ project.targetAmount.toLocaleString() }} FCFA</p>
               <p class="text-xs text-gray-500">1240 contributions</p>
             </div>
           </div>
 
-          <!-- Carte 2 -->
-          <div class="min-w-56 bg-white p-3 rounded-xl shadow-sm">
-            <h3 class="text-green-700 font-semibold mb-1">Musée Cheikh Al Islami</h3>
-            <div class="w-full bg-gray-200 rounded-full h-1.5 mb-2">
-              <div class="bg-green-700 h-1.5 rounded-full" style="width: 65%"></div>
-            </div>
-            <div>
-              <p class="text-base font-bold">45 000 000 FCFA</p>
-              <p class="text-xs text-gray-500">340 contributions</p>
-            </div>
-          </div>
-
-          <!-- Carte 3 (partiellement visible) -->
-          <div class="min-w-56 bg-white p-3 rounded-xl shadow-sm">
-            <h3 class="text-green-700 font-semibold mb-1">Daara Serigne...</h3>
-            <div class="w-full bg-gray-200 rounded-full h-1.5 mb-2">
-              <div class="bg-green-700 h-1.5 rounded-full" style="width: 70%"></div>
-            </div>
-            <div>
-              <p class="text-base font-bold">45 000 000 FCFA</p>
-              <p class="text-xs text-gray-500">340 contributions</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
 
+
     <!-- Historique de contribution -->
     <div (click)="openContributionStory()">
       <h2 class="text-lg font-semibold mb-3">Historique de contribution</h2>
-      
+
     </div>
   </div>
-
 </app-base-layout>

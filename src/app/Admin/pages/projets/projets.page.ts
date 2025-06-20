@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
-import { Project } from './models/projet.model';
+import { CreateProjectDTO, ProjectDTO } from './models/projet.model';
 import { ProjectService } from './services/project.service';
 import { EditProjetModalComponent } from './components/edit-projet-modal/edit-projet-modal.component';
 import { AddProjetModalComponent } from './components/add-projet-modal/add-projet-modal.component';
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { selectProjectState } from './store/project.selectors';
+import { ToastService } from 'src/app/shared/components/toast/toast.service';
 
 @Component({
   selector: 'app-projets',
@@ -15,20 +18,24 @@ import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 })
 export class ProjetsPage implements OnInit {
 
-  allProjects: Project[] = [];
-  filteredProjects: Project[] = [];
+  allProjects: ProjectDTO[] = [];
+  filteredProjects: ProjectDTO[] = [];
+  totalFilteredItems: number = 0;
   searchTerm: string = '';
   activeMenuId: string | null = null;
   currentPage: number = 1;
   itemsPerPage: number = 6;
   totalPages: number = 1;
+  error: string | null = null;
+  loading: boolean = false;
   filters: string[] = ['Tous', 'En cours', 'En attente', 'Terminées'];
   activeFilter: string = 'Tous';
+  addLoading: boolean = false;
 
   // Variables pour la modale d'ajout de projet
   showAddModal: boolean = false;
   showEditModal: boolean = false;
-  selectedProject: Project | null = null;
+  selectedProject: ProjectDTO | null = null;
 
   // Pour la recherche
   searchSubject = new Subject<string>();
@@ -36,7 +43,9 @@ export class ProjetsPage implements OnInit {
 
   constructor(
     private projectService: ProjectService,
-    private router: Router
+    private router: Router,
+    private store: Store,
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
@@ -52,13 +61,24 @@ export class ProjetsPage implements OnInit {
       this.currentPage = 1; // Réinitialiser à la première page
       this.applyFilters();
     });
+
+
+    this.store.select(selectProjectState).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(projectState => {
+      this.error = projectState.error;
+      this.loading = projectState.loading;
+
+      if (projectState.projects && Array.isArray(projectState.projects)) {
+        this.allProjects = [...projectState.projects];
+        this.applyFilters();
+        console.log('Projects admin loaded:', this.allProjects.length);
+      }
+    });
   }
 
   loadProjects() {
-    this.projectService.getProjects().subscribe(projects => {
-      this.allProjects = projects;
-      this.applyFilters();
-    });
+    this.projectService.getProjects();
   }
 
   applyFilters() {
@@ -79,11 +99,13 @@ export class ProjetsPage implements OnInit {
       const term = this.searchTerm.toLowerCase();
       filtered = filtered.filter(project =>
         project.title.toLowerCase().includes(term) ||
-        project.description.toLowerCase().includes(term)
+        project.description.toLowerCase().includes(term) ||
+        project.creatorName.toLowerCase().includes(term)
       );
     }
 
     this.filteredProjects = filtered;
+    this.totalFilteredItems = filtered.length;
     this.totalPages = Math.ceil(this.filteredProjects.length / this.itemsPerPage);
     this.currentPage = Math.min(this.currentPage, this.totalPages) || 1;
   }
@@ -157,13 +179,27 @@ export class ProjetsPage implements OnInit {
     this.showAddModal = false;
   }
 
-  onAddProject(project: Project) {
-    this.projectService.addProject(project);
-    this.closeAddModal();
-    this.loadProjects();
+  onAddProject(project: CreateProjectDTO) {
+    this.addLoading = true;
+    console.log('Tentative de création collecte de fonds:', project);
+    this.projectService.addProject(project)
+      .then(response => {
+        this.addLoading = false;
+        console.log('Succès création collecte de fonds:', response);
+        if (response.success) {
+          this.showAddModal = false;
+          this.toastService.showSuccess(response.data.message || "Votre demande a été envoyé");
+        }
+        this.closeAddModal();
+        this.loadProjects();
+      }).catch(error => {
+        this.addLoading = false;
+        console.error('Erreur création collecte de fonds:', error);
+        this.toastService.showError(error.message)
+      });
   }
 
-  openEditModal(project: Project, event: Event) {
+  openEditModal(project: ProjectDTO, event: Event) {
     event.stopPropagation();
     this.closeMenu();
     this.selectedProject = project;
@@ -175,8 +211,8 @@ export class ProjetsPage implements OnInit {
     this.selectedProject = null;
   }
 
-  onEditProject(project: Project) {
-    this.projectService.updateProject(project);
+  onEditProject(project: CreateProjectDTO) {
+    // this.projectService.updateProject(project);
     this.closeEditModal();
     this.loadProjects();
   }
@@ -211,11 +247,26 @@ export class ProjetsPage implements OnInit {
     return statusClasses[status] || '';
   }
 
-  formatDate(date: Date): string {
+  formatDate(date: string): string {
     return new Date(date).toLocaleDateString('fr-FR', {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
     });
+  }
+
+  /**
+  * Rafraîchit les données depuis le serveur
+  */
+  refresh(): void {
+    this.searchTerm = "";
+    this.loadProjects();
+  }
+
+  /**
+   * Vérifie si c'est une recherche vide
+   */
+  isEmptySearch(): boolean {
+    return this.searchTerm.length > 0 && this.totalFilteredItems === 0;
   }
 }

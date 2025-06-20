@@ -1,12 +1,7 @@
 <app-base-layout title="Bibliothèque" [showBackButton]="false">
-  <!-- <ion-button header-end>
-    <ion-icon name="settings-outline"></ion-icon>
-  </ion-button> -->
-
   <div class="">
-    <!-- Contenu principal de la page -->
-    <!-- tafsirs.component.html -->
     <div class="w-full h-full bg-gray-100 overflow-auto pb-16">
+      <!-- Navigation tabs -->
       <div class="flex rounded-md bg-white mt-4 shadow-md overflow-hidden max-w-sm mx-auto">
         <button class="flex-1 py-3 text-center font-bold transition-colors duration-200"
           [ngClass]="activeTab === 'tafsirs' ? 'text-green-700 bg-white' : 'text-gray-400 bg-gray-200'"
@@ -18,15 +13,61 @@
           (click)="setActiveTab('ouvrages')">
           Ouvrages
         </button>
+        <button class="flex-1 py-3 text-center font-bold transition-colors duration-200"
+          [ngClass]="activeTab === 'ressources' ? 'text-green-700 bg-white' : 'text-gray-400 bg-gray-200'"
+          (click)="setActiveTab('ressources')">
+          Ressources
+        </button>
       </div>
-      <!-- Onglets de navigation -->
 
-      <!-- Liste des Tafsirs (visible quand l'onglet Tafsirs est actif) -->
+      <!-- Search bar for Tafsirs -->
+      <div class="px-4 mt-4" *ngIf="activeTab === 'tafsirs'">
+        <div class="relative">
+          <input 
+            type="text" 
+            [(ngModel)]="tafsirSearchTerm"
+            (input)="filterTafsirs()"
+            placeholder="Rechercher un tafsir..."
+            class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 pl-10 text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm"
+          />
+          <ion-icon name="search-outline" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></ion-icon>
+        </div>
+      </div>
+
+      <!-- Search bar for Ouvrages -->
+      <div class="px-4 mt-4" *ngIf="activeTab === 'ouvrages'">
+        <div class="relative">
+          <input 
+            type="text" 
+            [(ngModel)]="ouvrageSearchTerm"
+            (input)="filterOuvrages()"
+            placeholder="Rechercher un ouvrage..."
+            class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 pl-10 text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm"
+          />
+          <ion-icon name="search-outline" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></ion-icon>
+        </div>
+      </div>
+
+      <!-- Search bar for Ressources -->
+      <div class="px-4 mt-4" *ngIf="activeTab === 'ressources'">
+        <div class="relative">
+          <input 
+            type="text" 
+            [(ngModel)]="ressourceSearchTerm"
+            (input)="filterRessources()"
+            placeholder="Rechercher une ressource vidéo..."
+            class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 pl-10 text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm"
+          />
+          <ion-icon name="search-outline" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></ion-icon>
+        </div>
+      </div>
+
+      <!-- Liste des Tafsirs -->
       <div class="mt-6" *ngIf="activeTab === 'tafsirs'">
         <div class="md:grid md:grid-cols-2 md:gap-4">
-          <ng-container *ngFor="let tafsir of tafsirs">
+          <ng-container *ngFor="let tafsir of filteredTafsirs">
             <div (click)="goToTafsirDetail(tafsir.id)"
-              class="mx-4 mb-4 bg-white rounded-2xl shadow-md overflow-hidden transform transition-transform hover:translate-y-px">
+              class="mx-4 mb-4 bg-white rounded-2xl shadow-md overflow-hidden transform transition-transform hover:translate-y-px cursor-pointer">
               <div class="flex justify-between items-center p-4 md:m-0">
                 <div>
                   <h3 class="text-lg font-bold text-gray-800">{{ tafsir.title }}</h3>
@@ -37,19 +78,25 @@
             </div>
           </ng-container>
         </div>
+        
+        <!-- Message si aucun résultat -->
+        <div *ngIf="filteredTafsirs.length === 0" class="text-center py-8">
+          <ion-icon name="document-outline" class="text-4xl text-gray-400 mb-2"></ion-icon>
+          <p class="text-gray-500">Aucun tafsir trouvé</p>
+        </div>
       </div>
 
-      <!-- Liste des Ouvrages (visible quand l'onglet Ouvrages est actif) -->
+      <!-- Liste des Ouvrages -->
       <div class="grid grid-cols-2 md:grid-cols-5 gap-4 p-4 overflow-y-auto" *ngIf="activeTab === 'ouvrages'">
         <div 
-          *ngFor="let book of books" 
-          class="bg-white rounded-lg overflow-hidden cursor-pointer"
+          *ngFor="let book of filteredBooks" 
+          class="bg-white rounded-lg overflow-hidden cursor-pointer transform transition-transform hover:scale-105"
           (click)="goToDetailOuvrage(book.id)"
         >
           <div class="rounded-xl">
             <img 
               [src]="book.coverImage" 
-              alt="book.title" 
+              alt="{{book.title}}" 
               class="w-full h-full max-h-60 object-cover"
             />
           </div>
@@ -59,8 +106,70 @@
             <p class="text-xs text-gray-500 truncate">{{ book.author }}</p>
           </div>
         </div>
+        
+        <!-- Message si aucun résultat pour les ouvrages -->
+        <div *ngIf="filteredBooks.length === 0" class="col-span-full text-center py-8">
+          <ion-icon name="library-outline" class="text-4xl text-gray-400 mb-2"></ion-icon>
+          <p class="text-gray-500">Aucun ouvrage trouvé</p>
+        </div>
+      </div>
+
+      <!-- Liste des Ressources Vidéo -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 overflow-y-auto" *ngIf="activeTab === 'ressources'">
+        <div 
+          *ngFor="let ressource of filteredRessources" 
+          class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200"
+        >
+          <!-- Conteneur vidéo avec ratio 16:9 -->
+          <div class="relative w-full" style="padding-bottom: 56.25%;">
+            <iframe 
+              [src]="ressource.videoUrl" 
+              [title]="ressource.title"
+              class="absolute top-0 left-0 w-full h-full rounded-t-lg"
+              frameborder="0" 
+              allowfullscreen>
+            </iframe>
+          </div>
+          
+          <!-- Informations de la vidéo -->
+          <div class="p-4">
+            <div class="flex items-start justify-between mb-2">
+              <h3 class="text-sm font-semibold text-gray-800 line-clamp-2 flex-1">{{ ressource.title }}</h3>
+              <span class="ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full flex-shrink-0">
+                {{ ressource.duration }}
+              </span>
+            </div>
+            
+            <p class="text-xs text-gray-600 mb-2 line-clamp-2">{{ ressource.description }}</p>
+            
+            <div class="flex items-center justify-between text-xs text-gray-500">
+              <span class="flex items-center">
+                <ion-icon name="person-outline" class="mr-1"></ion-icon>
+                {{ ressource.speaker }}
+              </span>
+              <span class="flex items-center">
+                <ion-icon name="eye-outline" class="mr-1"></ion-icon>
+                {{ ressource.views }}
+              </span>
+            </div>
+            
+            <!-- Bouton de lecture -->
+            <!-- <button 
+              (click)="playVideo(ressource)"
+              class="w-full mt-3 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center"
+            >
+              <ion-icon name="play-outline" class="mr-2"></ion-icon>
+              Regarder
+            </button> -->
+          </div>
+        </div>
+        
+        <!-- Message si aucun résultat pour les ressources -->
+        <div *ngIf="filteredRessources.length === 0" class="col-span-full text-center py-8">
+          <ion-icon name="videocam-outline" class="text-4xl text-gray-400 mb-2"></ion-icon>
+          <p class="text-gray-500">Aucune ressource vidéo trouvée</p>
+        </div>
       </div>
     </div>
   </div>
-
 </app-base-layout>

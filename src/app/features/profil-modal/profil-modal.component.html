@@ -23,18 +23,21 @@
       <p class="text-center text-sm text-gray-600">Rôle principal: {{ primaryRole$ | async }}</p> -->
       
       <!-- Badge de rôle principal -->
-      <div class="mt-2">
-        <div *appShowForPrimaryRole="UserRole.MOUKHADAM" class="px-3 py-1 bg-amber-200 text-amber-600 text-xs font-medium rounded-full">
+      <div class="mt-2 flex flex-row gap-2">
+        <div *appShowForRole="UserRole.MOUKHADAM" class="px-3 py-1 bg-amber-200 text-amber-600 text-xs font-medium rounded-full">
           Moukhadam
         </div>
-        <div *appShowForPrimaryRole="UserRole.DISCIPLE" class="px-3 py-1 bg-green-200 text-green-600 text-xs font-medium rounded-full">
+        <div *appShowForRole="UserRole.DISCIPLE" class="px-3 py-1 bg-green-100 text-green-600 text-xs font-medium rounded-full">
           Disciple
         </div>
         <div *appShowForPrimaryRole="UserRole.VISITEUR" class="px-3 py-1 bg-gray-200 text-gray-600 text-xs font-medium rounded-full">
           Visiteur
         </div>
-        <div *appShowForPrimaryRole="UserRole.G_DAHIRA" class="px-3 py-1 bg-gray-200 text-gray-900 text-xs font-medium rounded-full">
+        <div *appShowForRole="UserRole.G_DAHIRA" class="px-3 py-1 bg-blue-200 text-blue-900 text-xs font-medium rounded-full">
           Gestionnaire Dahira
+        </div>
+        <div *appShowForRole="UserRole.COLLECTE_FONDS" class="px-3 py-1 bg-violet-200 text-violet-900 text-xs font-medium rounded-full">
+          Collecteur de fonds
         </div>
       </div>
     </div>
@@ -156,6 +159,12 @@
           <ion-icon name="person" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Créer Dahira</span>
         </div>
+
+        <!-- Demandes de création de collecte de fonds -->
+        <div (click)="navigateTo('finances/create-collect')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+          <ion-icon name="person" class="mr-3 text-gray-500 text-lg"></ion-icon>
+          <span class="text-sm text-gray-700">Créer une collecte de fonds</span>
+        </div>
         
         <!-- Demande pour devenir Moukhadam (pas pour les admins) -->
         <div *appShowForPrimaryRole="[UserRole.DISCIPLE,UserRole.G_DAHIRA]" (click)="becomeMoukhadam()" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
@@ -173,6 +182,12 @@
         <div *appShowForRole="[UserRole.G_DAHIRA]" (click)="navigateTo('demande-dahira')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="receipt" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Les adhésions de mon Dahira</span>
+        </div>
+        
+        <!-- Mes demandes - visible pour tous les utilisateurs connectés -->
+        <div *appShowForRole="[UserRole.MOUKHADAM]" (click)="navigateTo('demande-dahira')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+          <ion-icon name="receipt" class="mr-3 text-gray-500 text-lg"></ion-icon>
+          <span class="text-sm text-gray-700">Mes disciples</span>
         </div>
       </div>
     </div>

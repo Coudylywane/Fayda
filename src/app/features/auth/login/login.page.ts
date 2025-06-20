@@ -22,11 +22,12 @@ import { PhonenumberInputComponent } from 'src/app/shared/components/phonenumber
   standalone: true,
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
-  imports: [CommonModule,
+  imports: [
+    CommonModule,
     FormsModule,
     IonicModule,
     RouterModule,
-    ReactiveFormsModule, PhonenumberInputComponent],
+    ReactiveFormsModule],
 })
 export class LoginPage {
   loginForm: FormGroup

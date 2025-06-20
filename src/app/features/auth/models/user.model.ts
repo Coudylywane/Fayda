@@ -27,7 +27,8 @@ export enum UserRole {
     MOUKHADAM = 'FAYDA_ROLE_MOUQADAM',
     ADMIN = 'FAYDA_ROLE_ADMIN',
     G_DAHIRA = 'FAYDA_ROLE_DAHIRA',
-    VISITEUR = 'FAYDA_ROLE_USER'
+    VISITEUR = 'FAYDA_ROLE_USER',
+    COLLECTE_FONDS = 'FAYDA_ROLE_COLLECTE_FONDS'
 }
 
 export interface LocationInfo {

@@ -138,8 +138,8 @@ export class DahiraPage implements OnInit {
   }
 
   /**
- * Applique la pagination sur les données filtrées
- */
+   * Applique la pagination sur les données filtrées
+   */
   private applyPagination(): void {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
@@ -304,7 +304,6 @@ export class DahiraPage implements OnInit {
         console.error('Erreur création dahira:', error);
         this.toastService.showError(error.message)
       });
-
   }
 
   onEditDahira(dahira: any): void {

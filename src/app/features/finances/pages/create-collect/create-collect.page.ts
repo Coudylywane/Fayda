@@ -1,32 +1,27 @@
-import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IonicModule, ModalController } from '@ionic/angular';
-import { CreateProjectDTO, ProjectDTO } from '../../models/projet.model';
-import { DateSelector2Component } from "../../../../../shared/components/date-selector2/date-selector2.component";
-import { FormatNumberDirective } from 'src/app/directives/format-number.directive';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { CreateProjectDTO } from 'src/app/Admin/pages/projets/models/projet.model';
+import { ProjectService } from 'src/app/Admin/pages/projets/services/project.service';
+import { ToastService } from 'src/app/shared/components/toast/toast.service';
 
 @Component({
-  selector: 'app-add-projet-modal',
-  templateUrl: './add-projet-modal.component.html',
-  styleUrls: ['./add-projet-modal.component.scss'],
-  imports: [
-    IonicModule, 
-    CommonModule, 
-    ReactiveFormsModule, 
-    DateSelector2Component,
-    FormatNumberDirective
-  ],
+  selector: 'app-create-collect',
+  templateUrl: './create-collect.page.html',
+  styleUrls: ['./create-collect.page.scss'],
+  standalone: false,
 })
-export class AddProjetModalComponent implements OnInit {
+export class CreateCollectPage implements OnInit {
+
   projectForm!: FormGroup;
 
-  @Input() isloading: boolean = false;
-  @Output() cancel = new EventEmitter<void>();
-  @Output() submit = new EventEmitter<CreateProjectDTO>();
+  isloading: boolean = false;
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private router: Router,
+    private projectService: ProjectService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
@@ -45,15 +40,6 @@ export class AddProjetModalComponent implements OnInit {
       endDate: ["", [Validators.required]],
       startDate: ["", [Validators.required]]
     });
-
-    // Mise à jour automatique de la progression en fonction du statut
-    // this.projectForm.get('status')?.valueChanges.subscribe(status => {
-    //   if (status === 'termine') {
-    //     this.projectForm.get('progress')?.setValue(100);
-    //   } else if (status === 'en_attente' && this.projectForm.get('progress')?.value === 0) {
-    //     this.projectForm.get('progress')?.setValue(25);
-    //   }
-    // });
   }
 
   formatDateForInput(date: string): string {
@@ -65,6 +51,7 @@ export class AddProjetModalComponent implements OnInit {
   }
 
   onSubmit() {
+    this.isloading = true;
     if (this.projectForm.valid) {
       const formValue = this.projectForm.value;
 
@@ -77,9 +64,20 @@ export class AddProjetModalComponent implements OnInit {
       };
 
       console.log("tentative de creation de collecte: ", project);
-
-
-      this.submit.emit(project);
+      this.projectService.addProject(project)
+      .then(response => {
+        this.isloading = false;
+        console.log('Succès création collecte de fonds:', response);
+        if (response.success) {
+          this.goHome();
+          this.toastService.showSuccess(response.data.message || "Votre demande a été envoyé");
+        }
+      }).catch(error => {
+        this.isloading = false;
+        console.error('Erreur création collecte de fonds:', error);
+        this.toastService.showError(error.message)
+      });
+      
     } else {
       // Marquer tous les champs comme touchés pour afficher les erreurs
       Object.keys(this.projectForm.controls).forEach(key => {
@@ -90,7 +88,11 @@ export class AddProjetModalComponent implements OnInit {
   }
 
   onCancel() {
-    this.cancel.emit();
+    this.goHome();
+  }
+
+  goHome() {
+    this.router.navigate(['tabs/home'])
   }
 
   /**
@@ -102,11 +104,10 @@ export class AddProjetModalComponent implements OnInit {
   }
 
   /**
-   * Pour modifier la date de début dans le formulaire
-   */
+ * Pour modifier la date de début dans le formulaire
+ */
   onStartDateSelected(date: string | null): void {
     this.projectForm.patchValue({ startDate: date });
     console.log('Date début sélectionnée:', date);
   }
 }
-

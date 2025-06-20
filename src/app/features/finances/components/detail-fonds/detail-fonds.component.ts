@@ -4,6 +4,7 @@ import { ModalController } from '@ionic/angular';
 import { IonContent, IonButton, IonIcon } from "@ionic/angular/standalone";
 import { CampaignData } from '../../model/finances.type';
 import { ButtonComponent } from "../../../../shared/components/button/button.component";
+import { ProjectDTO } from 'src/app/Admin/pages/projets/models/projet.model';
 
 @Component({
   selector: 'app-detail-fonds',
@@ -13,7 +14,7 @@ import { ButtonComponent } from "../../../../shared/components/button/button.com
 })
 export class DetailFondsComponent  implements OnInit {
 
-  @Input() project!: CampaignData;
+  @Input() project!: ProjectDTO;
   @Input() balance: number = 0;
   
   activeTab: string = 'Résumé';

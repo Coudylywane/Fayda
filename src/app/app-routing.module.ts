@@ -59,7 +59,11 @@ const routes: Routes = [
   {
     path: 'dahiras/create',
     loadChildren: () => import('./features/dahiras/pages/create-dahira/create-dahira.module').then( m => m.CreateDahiraPageModule)
-  }
+  },
+    {
+    path: 'finances/create-collect',
+    loadChildren: () => import('./features/finances/pages/create-collect/create-collect.module').then( m => m.CreateCollectPageModule)
+  },
   // Route fallback si aucune correspondance
   // {
   //   path: '**',

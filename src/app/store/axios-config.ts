@@ -16,7 +16,7 @@ let requestsQueue: Array<{
 }> = [];
 
 // Constantes
-const TOKEN_EXPIRY_BUFFER = 1 * 60 * 1000; // 5 minutes en millisecondes
+const TOKEN_EXPIRY_BUFFER = 0 * 60 * 1000; // 5 minutes en millisecondes
 const EXCLUDED_ENDPOINTS = ['auth/login', 'users'];
 const TOKEN_STORAGE_KEY = 'auth_token';
 

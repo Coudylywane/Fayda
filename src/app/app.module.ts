@@ -28,6 +28,7 @@ import { adminRequestReducer } from './Admin/pages/demandes/store/demande.reduce
 import { AdminRequestEffects } from './Admin/pages/demandes/store/demande.effects';
 import { projectReducer } from './Admin/pages/projets/store/project.reducer';
 import { ProjectEffects } from './Admin/pages/projets/store/project.effects';
+import {  provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 @NgModule({
   declarations: [AppComponent],
@@ -57,7 +58,8 @@ import { ProjectEffects } from './Admin/pages/projets/store/project.effects';
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideAppInitializer(axiosInitializer()),
-    provideAnimations()
+    provideAnimations(),
+    provideHttpClient(withInterceptorsFromDi())
   ],
   bootstrap: [AppComponent],
 })

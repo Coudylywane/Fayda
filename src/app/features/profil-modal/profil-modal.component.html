@@ -109,18 +109,23 @@
     </div>
 
     <!-- Section Gestion (Admin et Moukhadam) -->
-    <div *appShowForRole="[UserRole.ADMIN, UserRole.MOUKHADAM]" class="px-6 py-4 bg-white rounded-xl shadow-sm mx-3 mb-3">
+    <div *appShowForRole="[UserRole.COLLECTE_FONDS, UserRole.MOUKHADAM]" class="px-6 py-4 bg-white rounded-xl shadow-sm mx-3 mb-3">
       <h3 class="mb-3 text-sm font-bold text-gray-900">Gestion</h3>
       
       <div class="">
         <div *appShowForPrimaryRole="UserRole.MOUKHADAM" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
-          <ion-icon name="people-circle" class="mr-3 text-amber-500 text-lg"></ion-icon>
+          <ion-icon name="people-circle" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Mes Disciples</span>
         </div>
         
-        <div *appShowForPrimaryRole="UserRole.MOUKHADAM" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
-          <ion-icon name="home" class="mr-3 text-amber-500 text-lg"></ion-icon>
+        <div *appShowForPrimaryRole="UserRole.G_DAHIRA" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+          <ion-icon name="home" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Ma Dahira</span>
+        </div>
+        
+        <div *appShowForPrimaryRole="UserRole.COLLECTE_FONDS" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+          <ion-icon name="home" class="mr-3 text-gray-500 text-lg"></ion-icon>
+          <span class="text-sm text-gray-700">Mes collectes de fonds</span>
         </div>
       </div>
     </div>
@@ -182,12 +187,6 @@
         <div *appShowForRole="[UserRole.G_DAHIRA]" (click)="navigateTo('demande-dahira')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="receipt" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Les adhésions de mon Dahira</span>
-        </div>
-        
-        <!-- Mes demandes - visible pour tous les utilisateurs connectés -->
-        <div *appShowForRole="[UserRole.MOUKHADAM]" (click)="navigateTo('demande-dahira')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
-          <ion-icon name="receipt" class="mr-3 text-gray-500 text-lg"></ion-icon>
-          <span class="text-sm text-gray-700">Mes disciples</span>
         </div>
       </div>
     </div>

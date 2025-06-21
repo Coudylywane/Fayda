@@ -13,7 +13,7 @@ import * as UsersActions from '../../store/users.actions';
   standalone: false
 })
 export class ViewUserModalComponent implements OnInit {
-  @Input() user!: User; // ✅ Correction: Utiliser ! pour indiquer qu'il sera initialisé
+  @Input() user!: User;
   
   // ✅ Propriétés pour l'affichage enrichi
   displayUser: any = {};
@@ -24,7 +24,7 @@ export class ViewUserModalComponent implements OnInit {
     private modalController: ModalController,
     private alertController: AlertController,
     private toastController: ToastController,
-    private actionSheetController: ActionSheetController, // ✅ Ajout ActionSheetController
+    private actionSheetController: ActionSheetController,
     private store: Store<AppState>
   ) {}
 
@@ -34,10 +34,13 @@ export class ViewUserModalComponent implements OnInit {
     }
   }
 
-  // ✅ NOUVELLE MÉTHODE: Préparation des données d'affichage
+  // ✅ MÉTHODE ADAPTÉE: Préparation des données d'affichage
   private initializeDisplayData() {
     this.displayUser = {
       ...this.user,
+      // ✅ Nom complet
+      fullName: `${this.user.firstName} ${this.user.lastName}`,
+      
       // ✅ Formatage de l'email
       emailDisplay: this.user.email || 'Non renseigné',
       
@@ -77,7 +80,7 @@ export class ViewUserModalComponent implements OnInit {
     }
   }
 
-  // ✅ NOUVELLE MÉTHODE: Formatage du numéro de téléphone
+  // ✅ MÉTHODE ADAPTÉE: Formatage du numéro de téléphone
   private formatPhoneNumber(phone: string | undefined): string {
     if (!phone) return '';
     
@@ -92,7 +95,7 @@ export class ViewUserModalComponent implements OnInit {
     return phone;
   }
 
-  // ✅ NOUVELLE MÉTHODE: Formatage de l'adresse complète
+  // ✅ MÉTHODE ADAPTÉE: Formatage de l'adresse complète
   private formatFullAddress(): string {
     if (!this.user.location) return 'Non renseignée';
     
@@ -107,7 +110,7 @@ export class ViewUserModalComponent implements OnInit {
     return parts.length > 0 ? parts.join(', ') : 'Non renseignée';
   }
 
-  // ✅ NOUVELLE MÉTHODE: Formatage des dates
+  // ✅ MÉTHODE ADAPTÉE: Formatage des dates
   private formatDate(dateString: string | undefined): string {
     if (!dateString) return '';
     
@@ -123,7 +126,7 @@ export class ViewUserModalComponent implements OnInit {
     }
   }
 
-  // ✅ NOUVELLE MÉTHODE: Formatage du genre
+  // ✅ MÉTHODE ADAPTÉE: Formatage du genre
   private formatGender(gender: string | undefined): string {
     if (!gender) return 'Non spécifié';
     
@@ -140,7 +143,7 @@ export class ViewUserModalComponent implements OnInit {
     return genderMap[gender.toUpperCase()] || gender;
   }
 
-  // ✅ NOUVELLE MÉTHODE: Calcul de l'âge
+  // ✅ MÉTHODE ADAPTÉE: Calcul de l'âge
   private calculateAge(birthDate: string): number {
     const today = new Date();
     const birth = new Date(birthDate);
@@ -154,7 +157,7 @@ export class ViewUserModalComponent implements OnInit {
     return age;
   }
 
-  // ✅ NOUVELLE MÉTHODE: Calcul de la durée d'adhésion
+  // ✅ MÉTHODE ADAPTÉE: Calcul de la durée d'adhésion
   private calculateMembershipDuration(joinDate: string): string {
     const today = new Date();
     const joined = new Date(joinDate);
@@ -175,44 +178,37 @@ export class ViewUserModalComponent implements OnInit {
     }
   }
 
-  // ✅ MÉTHODE AMÉLIORÉE: Fermeture du modal
+  // ✅ MÉTHODE STANDARD: Fermeture du modal
   dismiss() {
     this.modalController.dismiss();
   }
 
-  // ✅ MÉTHODE AMÉLIORÉE: Édition avec gestion d'erreur
+  // ✅ MÉTHODE STANDARD: Édition avec gestion d'erreur
   async editUser() {
     try {
-      // ✅ Marquer l'utilisateur comme sélectionné dans le store
       this.store.dispatch(UsersActions.selectUser({ user: this.user }));
       
-      // Fermer ce modal
       await this.modalController.dismiss();
       
-      // Ouvrir le modal d'édition
       const modal = await this.modalController.create({
         component: EditUserModalComponent,
         componentProps: {
-          user: { ...this.user } // Copie profonde pour éviter les modifications accidentelles
+          user: { ...this.user }
         },
         cssClass: 'edit-user-modal'
       });
       
       await modal.present();
       
-      // Attendre la fermeture du modal et gérer le résultat
       const { data, role } = await modal.onWillDismiss();
       
       if (data && role === 'save') {
-        // ✅ Dispatcher l'action de mise à jour via le store
         this.store.dispatch(UsersActions.updateUser({ 
           userId: this.user.id, 
           userData: data 
         }));
         
         await this.presentSuccessToast('Utilisateur modifié avec succès');
-        
-        // Retourner les données mises à jour au parent
         this.modalController.dismiss({ success: true, user: data }, 'edit');
       }
     } catch (error) {
@@ -221,13 +217,13 @@ export class ViewUserModalComponent implements OnInit {
     }
   }
 
-  // ✅ MÉTHODE AMÉLIORÉE: Confirmation de suppression
+  // ✅ MÉTHODE STANDARD: Confirmation de suppression
   async confirmDelete() {
     const alert = await this.alertController.create({
       header: 'Confirmation de suppression',
       message: `
         <div style="text-align: center;">
-          <p>Êtes-vous sûr de vouloir supprimer <strong>${this.user.name}</strong> ?</p>
+          <p>Êtes-vous sûr de vouloir supprimer <strong>${this.displayUser.fullName}</strong> ?</p>
           <p style="color: #e74c3c; font-size: 0.9em; margin-top: 10px;">
             ⚠️ Cette action est irréversible
           </p>
@@ -253,15 +249,13 @@ export class ViewUserModalComponent implements OnInit {
     await alert.present();
   }
 
-  // ✅ NOUVELLE MÉTHODE: Suppression avec gestion d'erreur
+  // ✅ MÉTHODE STANDARD: Suppression avec gestion d'erreur
   private async deleteUser() {
     try {
-      // ✅ Dispatcher l'action de suppression via le store
       this.store.dispatch(UsersActions.deleteUser({ userId: this.user.id }));
       
       await this.presentSuccessToast('Utilisateur supprimé avec succès');
       
-      // Fermer le modal avec indication de suppression
       this.modalController.dismiss({ success: true, deleted: true, userId: this.user.id }, 'delete');
     } catch (error) {
       console.error('Erreur lors de la suppression:', error);
@@ -269,29 +263,40 @@ export class ViewUserModalComponent implements OnInit {
     }
   }
 
-  // ✅ NOUVELLE MÉTHODE: Basculer le statut actif/inactif
+  // ✅ MÉTHODE CORRIGÉE: Basculer le statut actif/inactif
   async toggleUserStatus() {
     try {
       const newStatus = !this.user.active;
       const action = newStatus ? 'activé' : 'désactivé';
       
+      // ✅ CORRECTION: Dispatche l'action SANS modifier l'objet user directement
       this.store.dispatch(UsersActions.toggleUserStatus({ 
         userId: this.user.id, 
         active: newStatus 
       }));
       
-      // Mettre à jour l'affichage local
-      this.user.active = newStatus;
-      this.initializeDisplayData();
+      // ✅ CORRECTION: Mettre à jour seulement l'affichage local
+      this.displayUser.statusDisplay = {
+        text: newStatus ? 'Actif' : 'Inactif',
+        color: newStatus ? 'success' : 'danger',
+        icon: newStatus ? 'checkmark-circle' : 'close-circle'
+      };
       
       await this.presentSuccessToast(`Utilisateur ${action} avec succès`);
+      
+      // ✅ Fermer le modal avec les nouvelles données
+      this.modalController.dismiss({ 
+        success: true, 
+        user: { ...this.user, active: newStatus } 
+      }, 'status');
+      
     } catch (error) {
       console.error('Erreur lors du changement de statut:', error);
       await this.presentErrorToast('Erreur lors du changement de statut');
     }
   }
 
-  // ✅ NOUVELLE MÉTHODE: Copier l'email
+  // ✅ MÉTHODE STANDARD: Copier l'email
   async copyEmail() {
     if (this.user.email) {
       try {
@@ -310,7 +315,7 @@ export class ViewUserModalComponent implements OnInit {
     }
   }
 
-  // ✅ NOUVELLE MÉTHODE: Appeler le téléphone
+  // ✅ MÉTHODE STANDARD: Appeler le téléphone
   callPhone() {
     if (this.user.phoneNumber) {
       const cleanPhone = this.user.phoneNumber.replace(/\D/g, '');
@@ -318,14 +323,14 @@ export class ViewUserModalComponent implements OnInit {
     }
   }
 
-  // ✅ NOUVELLE MÉTHODE: Envoyer un email
+  // ✅ MÉTHODE STANDARD: Envoyer un email
   sendEmail() {
     if (this.user.email) {
       window.open(`mailto:${this.user.email}`);
     }
   }
 
-  // ✅ MÉTHODE CORRIGÉE: Action sheet sans icônes (incompatibles avec AlertController)
+  // ✅ MÉTHODE STANDARD: Action sheet
   async presentActionSheet() {
     const actionSheet = await this.actionSheetController.create({
       header: 'Actions rapides',
@@ -361,13 +366,77 @@ export class ViewUserModalComponent implements OnInit {
     await actionSheet.present();
   }
 
-  // ✅ NOUVELLE MÉTHODE: Gestion des erreurs d'image
+  // ✅ MÉTHODE CORRIGÉE: Gestion des erreurs d'image
   onImageError(event: Event) {
     const target = event.target as HTMLImageElement;
     if (target) {
-      const initial = this.user.firstName?.[0] || 'U';
-      target.src = `https://via.placeholder.com/150/4169E1/FFFFFF?text=${initial}`;
+      // ✅ CORRECTION: Utilise l'avatar SVG généré au lieu de via.placeholder.com
+      const avatarSVG = this.generateAvatarSVG({ 
+        firstName: this.user.firstName, 
+        lastName: this.user.lastName 
+      });
+      target.src = avatarSVG;
+      
+      // Empêcher les erreurs en cascade
+      target.onerror = null;
     }
+  }
+
+  // ✅ NOUVELLE MÉTHODE: Générer un avatar SVG avec initiales
+  generateAvatarSVG(user: any, size: number = 150): string {
+    const initials = this.getInitials(user);
+    const backgroundColor = this.getColorForUser(user);
+    
+    const svg = `
+      <svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="${size/2}" cy="${size/2}" r="${size/2}" fill="${backgroundColor}"/>
+        <text x="50%" y="50%" dy="0.35em" text-anchor="middle" 
+              fill="white" font-family="Arial, sans-serif" 
+              font-size="${size * 0.4}" font-weight="600">
+          ${initials}
+        </text>
+      </svg>
+    `;
+    
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  }
+
+  // ✅ NOUVELLE MÉTHODE: Obtenir les initiales
+  getInitials(user: any): string {
+    if (user?.firstName && user?.lastName) {
+      return (user.firstName.charAt(0) + user.lastName.charAt(0)).toUpperCase();
+    }
+    if (user?.firstName) {
+      return user.firstName.charAt(0).toUpperCase();
+    }
+    if (user?.lastName) {
+      return user.lastName.charAt(0).toUpperCase();
+    }
+    return 'U';
+  }
+
+  // ✅ NOUVELLE MÉTHODE: Obtenir une couleur pour l'avatar
+  getColorForUser(user: any): string {
+    const colors = [
+      '#4169E1', '#32CD32', '#FF6347', '#9370DB', 
+      '#20B2AA', '#FF4500', '#DA70D6', '#1E90FF',
+      '#FFD700', '#FF69B4', '#00CED1', '#FFA500'
+    ];
+    
+    const identifier = user?.firstName || user?.lastName || user?.email || 'default';
+    const hash = this.simpleHash(identifier);
+    return colors[hash % colors.length];
+  }
+
+  // ✅ NOUVELLE MÉTHODE: Hash simple
+  private simpleHash(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash);
   }
 
   // ===================================

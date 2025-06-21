@@ -23,45 +23,55 @@
         </svg>
       </div>
     </div>
+    
     <div class="flex space-x-3 ml-4">
+      <!-- Bouton Ajouter -->
       <button (click)="openAddUserModal()"
-        class="ml-auto flex items-center justify-center rounded-full h-10 w-10 bg-green-600 text-white hover:bg-green-700 focus:outline-none">
+        class="ml-auto flex items-center justify-center rounded-full h-10 w-10 bg-green-600 text-white hover:bg-green-700 focus:outline-none transition-colors"
+        title="Ajouter un utilisateur">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
       </button>
+      
+      <!-- Bouton Filtrer -->
       <button (click)="openFilterModal()"
-        class="flex items-center justify-center rounded-full h-10 w-10 bg-white shadow text-gray-700 hover:bg-gray-100 focus:outline-none">
+        class="flex items-center justify-center rounded-full h-10 w-10 bg-white shadow text-gray-700 hover:bg-gray-100 focus:outline-none transition-colors"
+        title="Filtrer">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
           <path
             d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" />
         </svg>
       </button>
-      <button (click)="refreshUsers()" [disabled]="(loading$ | async) || false"
-            class="bg-black/70 hover:opacity-90 disabled:opacity-50 text-white p-3 rounded-lg transition-colors duration-200 flex items-center justify-center">
-            <svg class="w-5 h-5" [class.animate-spin]="(loading$ | async) || false" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-          </button>
+      
+      <!-- Bouton Actualiser -->
+      <button (click)="refreshUsers()" 
+              [disabled]="(loading$ | async) || false"
+              class="bg-black/70 hover:opacity-90 disabled:opacity-50 text-white p-3 rounded-lg transition-colors duration-200 flex items-center justify-center"
+              title="Actualiser">
+        <svg class="w-5 h-5" [class.animate-spin]="(loading$ | async) || false" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+      </button>
     </div>
   </div>
 
-  <!-- Filtres rapides -->
+  <!-- ✅ FILTRES SIMPLES ET DIRECTS -->
   <div class="flex space-x-3 mb-6 overflow-x-auto pb-2">
     <button *ngFor="let filter of filters"
         (click)="setFilter(filter)"
-        [ngClass]="{
-          'bg-gray-800 text-white': (category$ | async) === filter, 
-          'bg-gray-100 text-gray-800': (category$ | async) !== filter
-        }"
-        class="px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap">
+        [class]="isFilterActive(filter) ? 
+          'bg-gray-800 text-white shadow-lg' : 
+          'bg-gray-100 text-gray-800 hover:bg-gray-700 hover:text-white'"
+        class="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap">
         {{ filter }}
-        <span *ngIf="filter === (category$ | async) && ((filteredUsersCount$ | async) || 0) > 0"
-          class="ml-2 bg-white text-gray-800 px-2 py-1 rounded-full text-xs">
+        <!-- Badge avec le nombre seulement pour le filtre actif -->
+        <span *ngIf="isFilterActive(filter)"
+          class="ml-2 bg-white text-gray-800 px-2 py-1 rounded-full text-xs font-bold">
           {{ filteredUsersCount$ | async }}
         </span>
-      </button>
+    </button>
   </div>
 
   <!-- Indicateur de chargement -->
@@ -70,65 +80,175 @@
     <span class="ml-3 text-gray-600">Chargement des utilisateurs...</span>
   </div>
 
-  <!-- Message si aucun utilisateur -->
+  <!-- ✅ MESSAGES D'ÉTAT SIMPLES -->
   <ng-container *ngIf="!(loading$ | async)">
-    <div *ngIf="((usersCount$ | async) || 0) === 0" class="text-center py-8">
+    <!-- Aucun utilisateur du tout -->
+    <div *ngIf="((usersCount$ | async) || 0) === 0" class="text-center py-12">
       <ion-icon name="people-outline" class="text-6xl text-gray-300 mb-4"></ion-icon>
-      <h3 class="text-lg font-medium text-gray-600 mb-2">Aucun utilisateur trouvé</h3>
-      <p class="text-gray-500">Commencez par ajouter votre premier utilisateur</p>
+      <h3 class="text-xl font-medium text-gray-600 mb-2">Aucun utilisateur trouvé</h3>
+      <p class="text-gray-500 mb-6">Commencez par ajouter votre premier utilisateur</p>
       <button (click)="openAddUserModal()"
-        class="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+        class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
         Ajouter un utilisateur
       </button>
     </div>
 
-    <!-- Message si aucun résultat après filtrage -->
-    <div *ngIf="((usersCount$ | async) || 0) > 0 && ((filteredUsersCount$ | async) || 0) === 0" class="text-center py-8">
+    <!-- Aucun résultat après filtrage -->
+    <div *ngIf="((usersCount$ | async) || 0) > 0 && ((filteredUsersCount$ | async) || 0) === 0" class="text-center py-12">
       <ion-icon name="search-outline" class="text-6xl text-gray-300 mb-4"></ion-icon>
-      <h3 class="text-lg font-medium text-gray-600 mb-2">Aucun résultat trouvé</h3>
-      <p class="text-gray-500">Essayez de modifier vos critères de recherche ou de filtrage</p>
+      <h3 class="text-xl font-medium text-gray-600 mb-2">Aucun résultat trouvé</h3>
+      <p class="text-gray-500 mb-2">
+        Aucun utilisateur ne correspond au filtre 
+        <span class="font-semibold text-gray-700">"{{ activeFilter }}"</span>
+      </p>
+      <p *ngIf="currentSearchTerm" class="text-gray-500 mb-6">
+        et au terme de recherche <span class="font-semibold text-gray-700">"{{ currentSearchTerm }}"</span>
+      </p>
       <button (click)="resetFilters()"
-        class="mt-4 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
-        Réinitialiser les filtres
+        class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium">
+        Voir tous les utilisateurs
       </button>
     </div>
   </ng-container>
 
-  <!-- Liste des utilisateurs -->
+  <!-- ✅ LISTE DES UTILISATEURS SIMPLIFIÉE -->
   <div *ngIf="!(loading$ | async) && ((filteredUsersCount$ | async) || 0) > 0" 
        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <div *ngFor="let user of (filteredUsers$ | async)"
-      class="relative bg-white rounded-lg p-4 border border-gray-200 flex items-center transition-shadow hover:shadow-md cursor-pointer">
+    <div *ngFor="let user of (filteredUsers$ | async); trackBy: trackByUserId"
+      class="relative bg-white rounded-lg p-4 border border-gray-200 flex items-center transition-all duration-200 hover:shadow-md hover:border-gray-300 cursor-pointer group"
+      (click)="viewUser(user)">
+      
       <!-- Avatar -->
-      <div class="relative overflow-hidden w-14 h-14 rounded-full mr-4 bg-gray-200">
-        <img title="{{user.id}}" [src]="user.image || 'assets/images/1.png'" [alt]="user.name"
-          class="w-full h-full object-cover" (error)="onImageError($event)" />
+      <div class="relative overflow-hidden w-14 h-14 rounded-full mr-4 bg-gray-200 flex-shrink-0">
+        <img 
+          [src]="getAvatarUrl(user)" 
+          [alt]="user.name || user.firstName + ' ' + user.lastName || user.email"
+          class="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105" 
+          (error)="onImageError($event, user)" />
+        
         <!-- Indicateur de statut -->
-        <div class="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white"
-          [ngClass]="{'bg-green-500': user.active, 'bg-red-500': !user.active}"></div>
+        <div class="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white shadow-sm"
+          [ngClass]="{'bg-green-500': user.active, 'bg-red-500': !user.active}"
+          [title]="user.active ? 'Utilisateur actif' : 'Utilisateur inactif'"></div>
       </div>
 
       <!-- Informations utilisateur -->
-      <div class="flex-grow">
-        <h3 class="text-lg font-medium text-gray-800">{{ user.name || (user.firstName + ' ' + user.lastName) }}</h3>
-        <p class="text-sm text-gray-600">{{ user.email }}</p>
-        <div class="flex items-center space-x-2 mt-1">
-          <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
-            {{ user.category || 'Utilisateur' }}
+      <div class="flex-grow min-w-0">
+        <h3 class="text-lg font-medium text-gray-800 truncate">
+          {{ user.firstName + ' ' + user.lastName }}
+        </h3>
+        <p class="text-sm text-gray-600 truncate">{{ user.email }}</p>
+        
+        <div class="flex items-center space-x-2 mt-2">
+          <!-- ✅ AFFICHAGE DU STATUT AVEC COULEURS APPROPRIÉES -->
+          <span class="text-xs px-2 py-1 rounded-full font-medium"
+                [ngClass]="{
+                  'bg-green-100 text-green-700': user.active,
+                  'bg-red-100 text-red-700': !user.active
+                }">
+            {{ getStatusLabel(user) }}
           </span>
-          <span class="text-xs text-gray-500">{{ user.gender }}</span>
+          
+          <span *ngIf="user.gender" class="text-xs text-gray-500">
+            {{ user.gender }}
+          </span>
+          <span *ngIf="user.location?.country" class="text-xs text-gray-500">
+            📍 {{ user.location.country }}
+          </span>
+          <span *ngIf="user.phoneNumber" class="text-xs text-gray-500">
+            📱 {{ user.phoneNumber }}
+          </span>
         </div>
       </div>
 
       <!-- Menu d'options -->
-      <button (click)="openUserOptions(user)" class="text-gray-500 hover:text-gray-700 p-2" title="Options">
+      <button (click)="openUserOptions(user); $event.stopPropagation()" 
+              class="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors flex-shrink-0" 
+              title="Options">
         <ion-icon name="ellipsis-vertical-outline" class="text-xl"></ion-icon>
       </button>
+
+      <!-- Badge si inactif -->
+      <div *ngIf="!user.active" 
+           class="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-white shadow-sm"
+           title="Compte désactivé"></div>
     </div>
   </div>
 
-  <!-- Résumé en bas de page -->
-  <div *ngIf="!(loading$ | async) && ((usersCount$ | async) || 0) > 0" class="mt-6 text-center text-sm text-gray-500">
-    Affichage de {{ filteredUsersCount$ | async }} sur {{ usersCount$ | async }} utilisateur(s)
+  <!-- ✅ RÉSUMÉ SIMPLE EN BAS DE PAGE -->
+  <div *ngIf="!(loading$ | async) && ((usersCount$ | async) || 0) > 0" 
+       class="mt-8 flex flex-col sm:flex-row items-center justify-between bg-gray-50 rounded-lg p-4">
+    
+    <!-- Statistiques -->
+    <div class="text-sm text-gray-600 mb-4 sm:mb-0">
+      <span class="font-medium">
+        {{ filteredUsersCount$ | async }} utilisateur(s) 
+        <span *ngIf="activeFilter !== 'Tous'">
+          • Filtre: <span class="font-semibold">{{ activeFilter }}</span>
+        </span>
+        <span *ngIf="currentSearchTerm">
+          • Recherche: <span class="font-semibold">"{{ currentSearchTerm }}"</span>
+        </span>
+      </span>
+    </div>
+
+    
+  
   </div>
+
+ 
 </div>
+
+<!-- ✅ STYLES SIMPLES ET EFFICACES -->
+<style>
+  /* Animation pour les cartes */
+  .user-card {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .user-card:hover {
+    transform: translateY(-2px);
+  }
+  
+  /* Animation du spinner */
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Responsive */
+  @media (max-width: 640px) {
+    .grid { grid-template-columns: 1fr; }
+    .flex-col.sm\\:flex-row { flex-direction: column; }
+  }
+  
+  /* Truncate text */
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ✅ Styles pour les filtres actifs */
+  .filter-button-active {
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* ✅ Badges de rôles colorés */
+  .role-visiteur { background-color: #dbeafe; color: #1e40af; }
+  .role-disciple { background-color: #dcfce7; color: #15803d; }
+  .role-mouqadam { background-color: #fef3c7; color: #d97706; }
+  .role-dahira { background-color: #fecaca; color: #dc2626; }
+  .role-admin { background-color: #e9d5ff; color: #7c3aed; }
+
+  /* ✅ Section debug */
+  .debug-section {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  }
+</style>

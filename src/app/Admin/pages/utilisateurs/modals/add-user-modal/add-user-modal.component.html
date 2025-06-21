@@ -2,191 +2,222 @@
 <ion-header>
   <ion-toolbar>
     <div class="flex justify-between items-center px-4">
-      <ion-title class="text-lg font-semibold">Ajouter un utilisateur</ion-title>
+      <div class="flex items-center">
+        <ion-title class="text-lg font-semibold">Ajouter un utilisateur</ion-title>
+        <div class="ml-4 text-sm text-gray-500">
+          Étape {{ currentStep }} sur 3
+        </div>
+      </div>
       <ion-button fill="clear" (click)="dismiss()" [disabled]="isSubmitting">
         <ion-icon name="close-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </div>
   </ion-toolbar>
+  
+  <!-- Indicateur de progression -->
+  <div class="progress-indicator px-4 pb-2">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <div [class]="getStepClass(1)" class="step-circle">1</div>
+        <span [class]="getStepLabelClass(1)">Informations personnelles</span>
+      </div>
+      <div class="flex-1 mx-2 h-1 bg-gray-200 rounded">
+        <div class="h-full bg-green-500 rounded transition-all duration-300" 
+             [style.width.%]="(currentStep - 1) * 50"></div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <div [class]="getStepClass(2)" class="step-circle">2</div>
+        <span [class]="getStepLabelClass(2)">Coordonnées</span>
+      </div>
+      <div class="flex-1 mx-2 h-1 bg-gray-200 rounded">
+        <div class="h-full bg-green-500 rounded transition-all duration-300" 
+             [style.width.%]="currentStep === 3 ? 100 : 0"></div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <div [class]="getStepClass(3)" class="step-circle">3</div>
+        <span [class]="getStepLabelClass(3)">Localisation</span>
+      </div>
+    </div>
+  </div>
 </ion-header>
 
 <ion-content>
   <div class="px-6 py-4">
-    <!-- Photo de profil cliquable -->
-    <div class="mb-6 flex justify-center">
-      <div class="relative w-24 h-24 rounded-full overflow-hidden bg-gray-200 border-2 border-green-500 cursor-pointer"
-           (click)="onImageClick()">
-        <img [src]="imagePreview" alt="Avatar" class="w-full h-full object-cover" />
-        <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 flex items-center justify-center transition-all">
-          <ion-icon name="camera-outline" class="text-white text-2xl opacity-0 hover:opacity-100"></ion-icon>
+    
+    <!-- ÉTAPE 1: Informations personnelles -->
+    <div *ngIf="currentStep === 1" class="step-content">
+      <h2 class="text-xl font-semibold mb-4 text-center text-green-600">
+        1️⃣ Informations personnelles
+      </h2>
+
+      <!-- Photo de profil cliquable -->
+      <div class="mb-6 flex justify-center">
+        <div class="relative w-24 h-24 rounded-full overflow-hidden bg-gray-200 border-2 border-green-500 cursor-pointer"
+             (click)="onImageClick()">
+          <img [src]="imagePreview" alt="Avatar" class="w-full h-full object-cover" />
+          <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 flex items-center justify-center transition-all">
+            <ion-icon name="camera-outline" class="text-white text-2xl opacity-0 hover:opacity-100"></ion-icon>
+          </div>
+          <div class="absolute bottom-0 right-0 bg-green-600 rounded-full p-1.5 text-white">
+            <ion-icon name="camera-outline" class="text-sm"></ion-icon>
+          </div>
         </div>
-        <div class="absolute bottom-0 right-0 bg-green-600 rounded-full p-1.5 text-white">
-          <ion-icon name="camera-outline" class="text-sm"></ion-icon>
+      </div>
+      <p class="text-center text-xs text-gray-500 mb-6">Cliquez sur la photo pour changer</p>
+
+      <div class="space-y-4">
+        <!-- Prénom -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Prénom <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="newUser.firstName"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Prénom"
+            [class.border-red-500]="newUser.firstName && !newUser.firstName.trim() && newUser.firstName.length > 0"
+          />
+        </div>
+
+        <!-- Nom -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Nom de famille <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="newUser.lastName"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Nom de famille"
+            [class.border-red-500]="newUser.lastName && !newUser.lastName.trim() && newUser.lastName.length > 0"
+          />
+        </div>
+
+        <!-- Genre -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Genre <span class="text-red-500">*</span>
+          </label>
+          <select
+            [(ngModel)]="newUser.gender"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          >
+            <option value="">Sélectionnez un genre</option>
+            <option *ngFor="let gender of genderOptions" [value]="gender.value">
+              {{ gender.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Date de naissance -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Date de naissance <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="date"
+            [(ngModel)]="newUser.dateOfBirth"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            [max]="today"
+          />
         </div>
       </div>
     </div>
-    <p class="text-center text-xs text-gray-500 mb-4">Cliquez sur la photo pour changer</p>
 
-    <div class="space-y-4">
-      <!-- Prénom -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Prénom <span class="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          [(ngModel)]="newUser.firstName"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-          placeholder="Prénom"
-          [class.border-red-500]="newUser.firstName && !newUser.firstName.trim() && newUser.firstName.length > 0"
-        />
+    <!-- ÉTAPE 2: Coordonnées -->
+    <div *ngIf="currentStep === 2" class="step-content">
+      <h2 class="text-xl font-semibold mb-4 text-center text-green-600">
+        2️⃣ Coordonnées
+      </h2>
+
+      <div class="space-y-4">
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Adresse email <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="email"
+            [(ngModel)]="newUser.email"
+            (ngModelChange)="onEmailChange()"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="exemple@email.com"
+            [class.border-red-500]="newUser.email && !isValidEmail(newUser.email) && newUser.email.length > 0"
+          />
+          <small class="text-red-500" *ngIf="newUser.email && !isValidEmail(newUser.email) && newUser.email.length > 0">
+            Format d'email invalide
+          </small>
+        </div>
+
+        <!-- Téléphone -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Numéro de téléphone <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="tel"
+            [(ngModel)]="newUser.phoneNumber"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="+221 77 123 45 67"
+            [class.border-red-500]="newUser.phoneNumber && !isValidPhone(newUser.phoneNumber) && newUser.phoneNumber.length > 0"
+          />
+          <small class="text-red-500" *ngIf="newUser.phoneNumber && !isValidPhone(newUser.phoneNumber) && newUser.phoneNumber.length > 0">
+            Format de téléphone invalide
+          </small>
+        </div>
+
+        <!-- Nom d'utilisateur -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Nom d'utilisateur
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="newUser.username"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Généré automatiquement depuis l'email"
+          />
+          <small class="text-gray-500">Laissez vide pour générer automatiquement</small>
+        </div>
+
+        <!-- Mot de passe -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Mot de passe temporaire
+          </label>
+          <input
+            type="password"
+            [(ngModel)]="newUser.password"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Laissez vide pour générer automatiquement"
+          />
+          <small class="text-gray-500">Un mot de passe temporaire sera généré si vide</small>
+        </div>
       </div>
+    </div>
 
-      <!-- Nom -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Nom <span class="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          [(ngModel)]="newUser.lastName"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-          placeholder="Nom de famille"
-          [class.border-red-500]="newUser.lastName && !newUser.lastName.trim() && newUser.lastName.length > 0"
-        />
-      </div>
+    <!-- ÉTAPE 3: Localisation -->
+    <div *ngIf="currentStep === 3" class="step-content">
+      <h2 class="text-xl font-semibold mb-4 text-center text-green-600">
+        3️⃣ Informations géographiques
+      </h2>
 
-      <!-- Email -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Email <span class="text-red-500">*</span>
-        </label>
-        <input
-          type="email"
-          [(ngModel)]="newUser.email"
-          (ngModelChange)="onEmailChange()"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-          placeholder="exemple@email.com"
-          [class.border-red-500]="newUser.email && !isValidEmail(newUser.email) && newUser.email.length > 0"
-        />
-        <small class="text-red-500" *ngIf="newUser.email && !isValidEmail(newUser.email) && newUser.email.length > 0">
-          Format d'email invalide
-        </small>
-      </div>
-
-      <!-- Nom d'utilisateur -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Nom d'utilisateur
-        </label>
-        <input
-          type="text"
-          [(ngModel)]="newUser.username"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-          placeholder="Généré automatiquement depuis l'email"
-        />
-        <small class="text-gray-500">Laissez vide pour générer automatiquement</small>
-      </div>
-
-      <!-- Mot de passe -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Mot de passe
-        </label>
-        <input
-          type="password"
-          [(ngModel)]="newUser.password"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-          placeholder="Laissez vide pour générer automatiquement"
-        />
-        <small class="text-gray-500">Un mot de passe temporaire sera généré si vide</small>
-      </div>
-
-      <!-- Téléphone -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
-        <input
-          type="tel"
-          [(ngModel)]="newUser.phoneNumber"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-          placeholder="+221 77 123 45 67"
-          [class.border-red-500]="newUser.phoneNumber && !isValidPhone(newUser.phoneNumber) && newUser.phoneNumber.length > 0"
-        />
-        <small class="text-red-500" *ngIf="newUser.phoneNumber && !isValidPhone(newUser.phoneNumber) && newUser.phoneNumber.length > 0">
-          Format de téléphone invalide
-        </small>
-      </div>
-
-      <!-- Genre -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Genre <span class="text-red-500">*</span>
-        </label>
-        <select
-          [(ngModel)]="newUser.gender"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-        >
-          <option value="">Sélectionnez un genre</option>
-          <option *ngFor="let gender of genderOptions" [value]="gender.value">
-            {{ gender.label }}
-          </option>
-        </select>
-      </div>
-
-      <!-- Date de naissance -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Date de naissance <span class="text-red-500">*</span>
-        </label>
-        <input
-          type="date"
-          [(ngModel)]="newUser.dateOfBirth"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-          [max]="today"
-        />
-      </div>
-
-      <!-- Catégorie -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Catégorie <span class="text-red-500">*</span>
-        </label>
-        <select
-          [(ngModel)]="newUser.category"
-          (ngModelChange)="onCategoryChange()"
-          class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-        >
-          <option value="">Sélectionnez une catégorie</option>
-          <option *ngFor="let cat of categoryOptions" [value]="cat.value">
-            {{ cat.label }}
-          </option>
-        </select>
-      </div>
-
-      <!-- Statut actif -->
-      <div class="flex items-center justify-between">
-        <label class="text-sm font-medium text-gray-700">Compte actif</label>
-        <ion-toggle [(ngModel)]="newUser.active" color="success"></ion-toggle>
-      </div>
-
-      <!-- Section Localisation -->
-      <div class="border-t pt-4 mt-6">
-        <h3 class="text-md font-medium text-gray-800 mb-4">Informations géographiques</h3>
-
+      <div class="space-y-4">
         <!-- Nationalité -->
-        <div class="mb-4">
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Nationalité</label>
           <input
             type="text"
             [ngModel]="newUser.location?.nationality"
             (ngModelChange)="updateLocation('nationality', $event)"
-            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder="Sénégalaise"
           />
         </div>
 
         <!-- Pays -->
-        <div class="mb-4">
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">
             Pays <span class="text-red-500">*</span>
           </label>
@@ -194,13 +225,13 @@
             type="text"
             [ngModel]="newUser.location?.country"
             (ngModelChange)="updateLocation('country', $event)"
-            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder="Sénégal"
           />
         </div>
 
         <!-- Région -->
-        <div class="mb-4">
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">
             Région <span class="text-red-500">*</span>
           </label>
@@ -208,51 +239,72 @@
             type="text"
             [ngModel]="newUser.location?.region"
             (ngModelChange)="updateLocation('region', $event)"
-            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder="Dakar"
           />
         </div>
 
         <!-- Département -->
-        <div class="mb-4">
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Département</label>
           <input
             type="text"
             [ngModel]="newUser.location?.department"
             (ngModelChange)="updateLocation('department', $event)"
-            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder="Dakar"
           />
         </div>
 
-        <!-- Adresse -->
-        <div class="mb-4">
+        <!-- Adresse complète -->
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">
-            Adresse <span class="text-red-500">*</span>
+            Adresse complète <span class="text-red-500">*</span>
           </label>
           <textarea
             [ngModel]="newUser.location?.address"
             (ngModelChange)="updateLocation('address', $event)"
-            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-            placeholder="Adresse complète"
-            rows="2"
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Adresse complète (rue, quartier, ville...)"
+            rows="3"
           ></textarea>
         </div>
       </div>
     </div>
 
-    <!-- Bouton de validation -->
-    <div class="mt-8">
+    <!-- Boutons de navigation -->
+    <div class="mt-8 flex justify-between space-x-4">
+      <!-- Bouton Précédent -->
       <button
-        (click)="saveUser()"
-        [disabled]="!isFormValid() || isSubmitting"
-        class="w-full py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
+        *ngIf="currentStep > 1"
+        (click)="previousStep()"
+        [disabled]="isSubmitting"
+        class="flex-1 py-3 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
       >
-        <ion-spinner name="circular" *ngIf="isSubmitting" class="mr-2"></ion-spinner>
-        {{ isSubmitting ? 'Création en cours...' : 'Ajouter l\'utilisateur' }}
+        <ion-icon name="chevron-back-outline" class="mr-2"></ion-icon>
+        Précédent
       </button>
 
-      <p class="text-xs text-gray-500 mt-2 text-center">* Champs obligatoires</p>
+      <!-- Bouton Suivant/Terminer -->
+      <button
+        (click)="nextStep()"
+        [disabled]="!isCurrentStepValid() || isSubmitting"
+        class="flex-1 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
+      >
+        <ion-spinner name="circular" *ngIf="isSubmitting" class="mr-2"></ion-spinner>
+        <span *ngIf="!isSubmitting">
+          {{ currentStep === 3 ? 'Créer l\'utilisateur' : 'Suivant' }}
+          <ion-icon *ngIf="currentStep < 3" name="chevron-forward-outline" class="ml-2"></ion-icon>
+        </span>
+        <span *ngIf="isSubmitting">
+          Création en cours...
+        </span>
+      </button>
     </div>
+
+    <!-- Indicateur de champs requis -->
+    <p class="text-xs text-gray-500 mt-4 text-center">
+      * Champs requis pour cette étape
+    </p>
   </div>
 </ion-content>

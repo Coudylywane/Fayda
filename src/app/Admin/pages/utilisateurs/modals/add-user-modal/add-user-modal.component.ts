@@ -1,3 +1,4 @@
+// add-user-modal.component.ts
 import { Component, OnInit } from '@angular/core';
 import { ModalController, AlertController, LoadingController } from '@ionic/angular';
 import { Store } from '@ngrx/store';
@@ -12,17 +13,14 @@ import { UserFormData } from '../../modals/users.model';
   standalone: false,
 })
 export class AddUserModalComponent implements OnInit {
+  // Configuration des étapes
+  currentStep: number = 1;
+  totalSteps: number = 3;
+
   genderOptions = [
     { label: 'Homme', value: 'HOMME' },
     { label: 'Femme', value: 'FEMME' },
     { label: 'Non spécifié', value: 'NON_SPECIFIED' }
-  ];
-
-  categoryOptions = [
-    { label: 'Disciple', value: 'DISCIPLE' },
-    { label: 'Responsable Dahira', value: 'RESP_DAHIRA' },
-    { label: 'Visiteur', value: 'VISITEUR' },
-    { label: 'Mouqadam', value: 'MOUQADAM' }
   ];
 
   newUser: UserFormData = {
@@ -41,16 +39,16 @@ export class AddUserModalComponent implements OnInit {
       department: '',
       address: ''
     },
-    category: 'DISCIPLE',
+    category: 'DISCIPLE', // Valeur par défaut même si non affichée
     role: 'DISCIPLE',
-    active: true,
+    active: true, // Valeur par défaut même si non affichée
     userIdKeycloak: ''
   };
 
   selectedFile: File | null = null;
   imagePreview: string = 'assets/images/default-avatar.png';
   isSubmitting = false;
-  hasSubmitted = false; // ✅ Flag pour éviter les doubles soumissions
+  hasSubmitted = false;
   today: string = new Date().toISOString().split('T')[0];
 
   constructor(
@@ -63,6 +61,118 @@ export class AddUserModalComponent implements OnInit {
   ngOnInit() {
     this.newUser.userIdKeycloak = this.generateUUID();
   }
+
+  // ================================
+  // GESTION DES ÉTAPES
+  // ================================
+
+  /**
+   * Passer à l'étape suivante ou sauvegarder si dernière étape
+   */
+  async nextStep() {
+    if (!this.isCurrentStepValid()) {
+      await this.presentAlert('Validation', 'Veuillez remplir correctement tous les champs requis pour cette étape.');
+      return;
+    }
+
+    if (this.currentStep < this.totalSteps) {
+      this.currentStep++;
+    } else {
+      // Dernière étape - sauvegarder l'utilisateur
+      await this.saveUser();
+    }
+  }
+
+  /**
+   * Retourner à l'étape précédente
+   */
+  previousStep() {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+
+  /**
+   * Vérifier si l'étape courante est valide
+   */
+  isCurrentStepValid(): boolean {
+    switch (this.currentStep) {
+      case 1:
+        return this.isStep1Valid();
+      case 2:
+        return this.isStep2Valid();
+      case 3:
+        return this.isStep3Valid();
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Validation de l'étape 1 : Informations personnelles
+   */
+  private isStep1Valid(): boolean {
+    const u = this.newUser;
+    return !!(
+      u.firstName?.trim() &&
+      u.lastName?.trim() &&
+      u.gender &&
+      u.dateOfBirth
+    );
+  }
+
+  /**
+   * Validation de l'étape 2 : Coordonnées
+   */
+  private isStep2Valid(): boolean {
+    const u = this.newUser;
+    return !!(
+      u.email?.trim() &&
+      this.isValidEmail(u.email) &&
+      u.phoneNumber?.trim() &&
+      this.isValidPhone(u.phoneNumber)
+    );
+  }
+
+  /**
+   * Validation de l'étape 3 : Localisation
+   */
+  private isStep3Valid(): boolean {
+    const location = this.newUser.location;
+    return !!(
+      location?.country?.trim() &&
+      location?.region?.trim() &&
+      location?.address?.trim()
+    );
+  }
+
+  // ================================
+  // CLASSES CSS POUR LES INDICATEURS
+  // ================================
+
+  getStepClass(step: number): string {
+    if (step < this.currentStep) {
+      return 'step-circle step-completed';
+    } else if (step === this.currentStep) {
+      return 'step-circle step-active';
+    } else {
+      return 'step-circle step-inactive';
+    }
+  }
+
+  getStepLabelClass(step: number): string {
+    if (step < this.currentStep) {
+      return 'step-label label-completed';
+    } else if (step === this.currentStep) {
+      return 'step-label label-active';
+    } else {
+      return 'step-label label-inactive';
+    }
+  }
+
+  // ================================
+  // GESTION DES DONNÉES
+  // ================================
 
   updateLocation(field: string, value: string) {
     if (!this.newUser.location) {
@@ -77,26 +187,15 @@ export class AddUserModalComponent implements OnInit {
     this.newUser.location[field as keyof typeof this.newUser.location] = value;
   }
 
-  dismiss() {
-    this.modalController.dismiss();
-  }
-
-  private generateUUID(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-      const r = Math.random() * 16 | 0;
-      const v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  }
-
-  private generateTempPassword(): string {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%';
-    let pass = '';
-    for (let i = 0; i < 12; i++) {
-      pass += chars.charAt(Math.floor(Math.random() * chars.length));
+  onEmailChange() {
+    if (!this.newUser.username && this.newUser.email?.includes('@')) {
+      this.newUser.username = this.newUser.email.split('@')[0];
     }
-    return pass + '1A!';
   }
+
+  // ================================
+  // VALIDATION
+  // ================================
 
   isValidEmail(email: string | undefined): boolean {
     if (!email) return false;
@@ -110,45 +209,22 @@ export class AddUserModalComponent implements OnInit {
     return phoneRegex.test(phone);
   }
 
-  isFormValid(): boolean {
-    const u = this.newUser;
-    if (!u.firstName?.trim() || !u.lastName?.trim()) {
-      return false;
-    }
-    if (!u.email?.trim() || !this.isValidEmail(u.email)) {
-      return false;
-    }
-    if (!u.gender || !u.dateOfBirth) {
-      return false;
-    }
-    if (!u.location?.country || !u.location?.region || !u.location?.address?.trim()) {
-      return false;
-    }
-    if (u.phoneNumber && !this.isValidPhone(u.phoneNumber)) {
-      return false;
-    }
-    return true;
-  }
+  // ================================
+  // SAUVEGARDE
+  // ================================
 
-  async presentAlert(header: string, message: string) {
-    const alert = await this.alertController.create({
-      header,
-      message,
-      buttons: ['OK'],
-    });
-    await alert.present();
-  }
-
-  // ✅ MÉTHODE PRINCIPALE: Éviter le double dispatch
+  /**
+   * Sauvegarder l'utilisateur - appelée uniquement à la dernière étape
+   */
   async saveUser() {
-    // ✅ Protection contre les doubles soumissions
     if (this.isSubmitting || this.hasSubmitted) {
       console.warn('⚠️ Soumission déjà en cours ou déjà effectuée');
       return;
     }
 
-    if (!this.isFormValid()) {
-      await this.presentAlert('Validation', 'Veuillez remplir correctement tous les champs obligatoires.');
+    // Validation finale de tous les champs
+    if (!this.isStep1Valid() || !this.isStep2Valid() || !this.isStep3Valid()) {
+      await this.presentAlert('Validation', 'Veuillez remplir correctement tous les champs requis.');
       return;
     }
 
@@ -159,13 +235,13 @@ export class AddUserModalComponent implements OnInit {
     await loading.present();
 
     this.isSubmitting = true;
-    this.hasSubmitted = true; // ✅ Marquer comme soumis
+    this.hasSubmitted = true;
 
     try {
       const username = this.newUser.username?.trim() || (this.newUser.email ? this.newUser.email.split('@')[0] : '');
       const password = this.newUser.password || this.generateTempPassword();
 
-      // ✅ Création d'un objet UserFormData propre
+      // Préparation des données utilisateur
       const userData: UserFormData = {
         firstName: this.newUser.firstName?.trim() || '',
         lastName: this.newUser.lastName?.trim() || '',
@@ -191,9 +267,9 @@ export class AddUserModalComponent implements OnInit {
           department: 'Dakar',
           address: 'Adresse non spécifiée'
         },
-        category: this.newUser.category || 'DISCIPLE',
-        role: this.newUser.category || 'DISCIPLE',
-        active: this.newUser.active !== false
+        category: 'DISCIPLE', // Valeur par défaut
+        role: 'DISCIPLE',
+        active: true // Valeur par défaut
       };
 
       console.log('=== COMPONENT DEBUG ===');
@@ -205,11 +281,11 @@ export class AddUserModalComponent implements OnInit {
         await this.presentAlert('Erreur', 'Les champs Prénom, Nom et Email sont obligatoires.');
         await loading.dismiss();
         this.isSubmitting = false;
-        this.hasSubmitted = false; // ✅ Reset en cas d'erreur
+        this.hasSubmitted = false;
         return;
       }
 
-      // ✅ Objet sérialisable pour NgRx (sans références circulaires)
+      // Objet sérialisable pour NgRx
       const cleanUserData = {
         firstName: userData.firstName,
         lastName: userData.lastName,
@@ -228,12 +304,12 @@ export class AddUserModalComponent implements OnInit {
 
       console.log('🔍 COMPONENT - cleanUserData:', cleanUserData);
 
-      // ✅ Validation finale
+      // Validation finale
       if (typeof cleanUserData !== 'object' || !cleanUserData.firstName) {
         throw new Error('Données utilisateur invalides');
       }
 
-      // ✅ Dispatch unique de l'action
+      // Dispatch unique de l'action
       this.store.dispatch(UsersActions.createUser({
         userData: cleanUserData,
         file: this.selectedFile || undefined
@@ -241,8 +317,7 @@ export class AddUserModalComponent implements OnInit {
 
       await loading.dismiss();
 
-      // ✅ SOLUTION: Fermer le modal avec un flag de succès seulement
-      // Ne pas passer les données utilisateur pour éviter le double dispatch
+      // Fermer le modal avec un flag de succès
       this.modalController.dismiss({ success: true });
 
     } catch (error) {
@@ -250,10 +325,10 @@ export class AddUserModalComponent implements OnInit {
       console.error('❌ Erreur création utilisateur:', error);
       await this.presentAlert('Erreur', 'Une erreur est survenue lors de la création de l\'utilisateur.');
       
-      // ✅ Reset les flags en cas d'erreur
+      // Reset les flags en cas d'erreur
       this.hasSubmitted = false;
       
-      // ✅ Fermer le modal avec l'erreur
+      // Fermer le modal avec l'erreur
       this.modalController.dismiss({
         success: false,
         error: error instanceof Error ? error.message : 'Erreur inconnue'
@@ -262,6 +337,10 @@ export class AddUserModalComponent implements OnInit {
       this.isSubmitting = false;
     }
   }
+
+  // ================================
+  // GESTION DES IMAGES
+  // ================================
 
   async onImageClick() {
     const input = document.createElement('input');
@@ -277,7 +356,7 @@ export class AddUserModalComponent implements OnInit {
   }
 
   handleImageSelection(file: File) {
-    // ✅ Validation renforcée du fichier
+    // Validation du fichier
     if (file.size > 5 * 1024 * 1024) {
       this.presentAlert('Erreur', 'L\'image ne doit pas dépasser 5MB');
       return;
@@ -295,13 +374,37 @@ export class AddUserModalComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  onCategoryChange() {
-    this.newUser.role = this.newUser.category;
+  // ================================
+  // MÉTHODES UTILITAIRES
+  // ================================
+
+  dismiss() {
+    this.modalController.dismiss();
   }
 
-  onEmailChange() {
-    if (!this.newUser.username && this.newUser.email?.includes('@')) {
-      this.newUser.username = this.newUser.email.split('@')[0];
+  private generateUUID(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  private generateTempPassword(): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%';
+    let pass = '';
+    for (let i = 0; i < 12; i++) {
+      pass += chars.charAt(Math.floor(Math.random() * chars.length));
     }
+    return pass + '1A!';
+  }
+
+  async presentAlert(header: string, message: string) {
+    const alert = await this.alertController.create({
+      header,
+      message,
+      buttons: ['OK'],
+    });
+    await alert.present();
   }
 }

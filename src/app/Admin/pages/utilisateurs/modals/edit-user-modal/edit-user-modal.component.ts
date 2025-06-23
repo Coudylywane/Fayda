@@ -1,6 +1,33 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalController, AlertController, LoadingController } from '@ionic/angular';
+import { Store } from '@ngrx/store';
+import { AppState } from '../../app.state';
+import * as UsersActions from '../../store/users.actions';
 import { User, UserFormData } from '../../modals/users.model';
+
+// ✅ Interface pour l'API d'édition (basée sur votre documentation API)
+interface UpdateUserRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  username: string;
+  password?: string;
+  phoneNumber?: string;
+  gender: string;
+  userIdKeycloak: string;
+  img?: string;
+  dateOfBirth: string; // Format ISO: "2025-06-21T16:43:21.529Z"
+  location: {
+    locationInfoId: string;
+    nationality?: string;
+    country: string;
+    region: string;
+    department?: string;
+    address: string;
+  };
+  role: string;
+  active: boolean;
+}
 
 @Component({
   selector: 'app-edit-user-modal',
@@ -54,6 +81,7 @@ export class EditUserModalComponent implements OnInit {
   selectedFile: File | null = null;
   imagePreview: string = 'assets/images/default-avatar.png';
   isSubmitting = false;
+  hasSubmitted = false; // ✅ Ajout du flag comme dans add-user
   today: string = new Date().toISOString().split('T')[0];
 
   // Validation par étape
@@ -66,7 +94,8 @@ export class EditUserModalComponent implements OnInit {
   constructor(
     private modalController: ModalController,
     private alertController: AlertController,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit() {
@@ -78,7 +107,7 @@ export class EditUserModalComponent implements OnInit {
     if (this.user) {
       console.log('📋 INITIALISATION DES DONNÉES UTILISATEUR');
       
-      // ✅ CORRECTION: Gestion plus robuste des noms
+      // ✅ Gestion robuste des noms (comme dans votre code)
       let firstName = '';
       let lastName = '';
       
@@ -99,7 +128,7 @@ export class EditUserModalComponent implements OnInit {
         lastName: lastName,
         email: this.user.email || '',
         username: this.user.username || '',
-        password: '',
+        password: '', // Toujours vide par défaut
         phoneNumber: this.user.phoneNumber || '',
         gender: this.user.gender || 'NON_SPECIFIED',
         userIdKeycloak: this.user.userIdKeycloak || this.user.id || this.generateUUID(),
@@ -118,7 +147,13 @@ export class EditUserModalComponent implements OnInit {
         active: this.user.active !== false
       };
 
-      this.imagePreview = this.user.image || 'assets/images/default-avatar.png';
+      // ✅ Gestion image sécurisée
+      if (this.user.image && !this.isPlaceholderUrl(this.user.image)) {
+        this.imagePreview = this.user.image;
+      } else {
+        this.imagePreview = 'assets/images/default-avatar.png';
+      }
+      
       this.validateAllSteps();
       
       console.log('✅ DONNÉES MAPPÉES:', JSON.stringify(this.editedUser, null, 2));
@@ -132,7 +167,7 @@ export class EditUserModalComponent implements OnInit {
     if (!date) return '';
     try {
       const d = new Date(date);
-      if (isNaN(d.getTime())) {
+      if (isNaN(d.getTime()) || d.getFullYear() > 3000) {
         console.warn('⚠️ Date invalide:', date);
         return '';
       }
@@ -151,17 +186,24 @@ export class EditUserModalComponent implements OnInit {
     });
   }
 
-  // ✅ Formater la date pour l'API
+  // ✅ Format de date pour l'API (corrigé)
   private formatDateForAPI(dateString: string | undefined): string {
     if (!dateString) {
       return new Date().toISOString();
     }
     
     try {
+      // Si déjà au format ISO complet
+      if (dateString.includes('T') && dateString.endsWith('Z')) {
+        return dateString;
+      }
+      
+      // Convertir YYYY-MM-DD vers ISO
       const date = new Date(dateString + 'T00:00:00.000Z');
       if (isNaN(date.getTime())) {
         throw new Error('Date invalide');
       }
+      
       return date.toISOString();
     } catch (error) {
       console.error('❌ Erreur format date:', error);
@@ -169,13 +211,19 @@ export class EditUserModalComponent implements OnInit {
     }
   }
 
-  // Navigation entre les étapes
-  nextStep() {
-    if (this.currentStep < this.totalSteps && this.isCurrentStepValid()) {
+  // ✅ Navigation basée sur add-user qui fonctionne
+  async nextStep() {
+    if (!this.isCurrentStepValid()) {
+      await this.presentAlert('Validation', 'Veuillez remplir correctement tous les champs requis pour cette étape.');
+      return;
+    }
+
+    if (this.currentStep < this.totalSteps) {
       this.currentStep++;
       console.log(`➡️ Passage à l'étape ${this.currentStep}`);
-    } else if (!this.isCurrentStepValid()) {
-      this.presentAlert('Validation', 'Veuillez remplir tous les champs obligatoires de cette étape.');
+    } else {
+      // Dernière étape - sauvegarder
+      await this.saveUser();
     }
   }
 
@@ -265,22 +313,23 @@ export class EditUserModalComponent implements OnInit {
     return phoneRegex.test(phone);
   }
 
-  updateLocation(field: string, value: string) {
+  updateLocation(field: string, value: string | null | undefined) {
     if (!this.editedUser.location) {
       this.editedUser.location = {
         locationInfoId: this.user.location?.locationInfoId || this.generateUUID(),
-        nationality: this.user.location?.nationality || '',
-        country: this.user.location?.country || '',
-        region: this.user.location?.region || '',
-        department: this.user.location?.department || '',
-        address: this.user.location?.address || ''
+        nationality: '',
+        country: '',
+        region: '',
+        department: '',
+        address: ''
       };
     }
     
-    (this.editedUser.location as any)[field] = value;
+    const cleanValue = value?.toString().trim() || '';
+    (this.editedUser.location as any)[field] = cleanValue;
     this.validateAllSteps();
     
-    console.log(`📍 Location ${field} mis à jour:`, value);
+    console.log(`📍 Location ${field} mis à jour:`, cleanValue);
   }
 
   onEmailChange() {
@@ -295,7 +344,7 @@ export class EditUserModalComponent implements OnInit {
     this.validateAllSteps();
   }
 
-  // Gestion des images
+  // ✅ Gestion des images (identique à add-user)
   async onImageClick() {
     const actionSheet = await this.alertController.create({
       header: 'Changer la photo de profil',
@@ -431,16 +480,16 @@ export class EditUserModalComponent implements OnInit {
     }, 2000);
   }
 
-  // ✅ SAUVEGARDE FINALE CORRIGÉE ET SIMPLIFIÉE
+  // ✅ SAUVEGARDE BASÉE SUR ADD-USER AVEC FORMAT API CORRECT
   async saveUser() {
-    if (this.isSubmitting) {
-      console.warn('⚠️ Soumission déjà en cours');
+    if (this.isSubmitting || this.hasSubmitted) {
+      console.warn('⚠️ Soumission déjà en cours ou déjà effectuée');
       return;
     }
 
-    this.validateAllSteps();
-    if (!this.stepValidation.step1 || !this.stepValidation.step2 || !this.stepValidation.step3) {
-      await this.presentAlert('Validation', 'Veuillez compléter toutes les étapes avant de sauvegarder.');
+    // Validation finale de tous les champs
+    if (!this.isStep1Valid() || !this.isStep2Valid() || !this.isStep3Valid()) {
+      await this.presentAlert('Validation', 'Veuillez remplir correctement tous les champs requis.');
       return;
     }
 
@@ -454,105 +503,119 @@ export class EditUserModalComponent implements OnInit {
     await loading.present();
 
     this.isSubmitting = true;
+    this.hasSubmitted = true;
 
     try {
-      // ✅ DONNÉES SIMPLES ET SÛRES - Format API conforme AVEC PROTECTION
-      const updateData: any = {
-        firstName: (this.editedUser.firstName && this.editedUser.firstName !== 'undefined') ? 
-                   this.editedUser.firstName.trim() : '',
-        lastName: (this.editedUser.lastName && this.editedUser.lastName !== 'undefined') ? 
-                  this.editedUser.lastName.trim() : '',
-        email: (this.editedUser.email && this.editedUser.email !== 'undefined') ? 
-               this.editedUser.email.trim().toLowerCase() : '',
-        username: (this.editedUser.username && this.editedUser.username !== 'undefined') ? 
-                  this.editedUser.username.trim() : '',
+      // ✅ STRUCTURE EXACTE DE VOTRE API D'ÉDITION
+      const updateData: UpdateUserRequest = {
+        firstName: this.cleanString(this.editedUser.firstName!),
+        lastName: this.cleanString(this.editedUser.lastName!),
+        email: this.cleanString(this.editedUser.email!).toLowerCase(),
+        username: this.cleanString(this.editedUser.username!),
         gender: this.editedUser.gender || 'NON_SPECIFIED',
+        userIdKeycloak: this.cleanString(this.editedUser.userIdKeycloak!),
+        dateOfBirth: this.formatDateForAPI(this.editedUser.dateOfBirth),
         role: this.editedUser.role || 'FAYDA_ROLE_USER',
         active: Boolean(this.editedUser.active),
-        dateOfBirth: this.formatDateForAPI(this.editedUser.dateOfBirth),
+        
+        // ✅ Location selon votre API
         location: {
-          country: (this.editedUser.location?.country && this.editedUser.location.country !== 'undefined') ? 
-                   this.editedUser.location.country.trim() : 'Senegal',
-          region: (this.editedUser.location?.region && this.editedUser.location.region !== 'undefined') ? 
-                  this.editedUser.location.region.trim() : 'Dakar',
-          address: (this.editedUser.location?.address && this.editedUser.location.address !== 'undefined') ? 
-                   this.editedUser.location.address.trim() : 'Adresse par défaut'
+          locationInfoId: this.cleanString(this.editedUser.location?.locationInfoId) || this.generateUUID(),
+          country: this.cleanString(this.editedUser.location?.country) || 'Sénégal',
+          region: this.cleanString(this.editedUser.location?.region) || 'Dakar',
+          address: this.cleanString(this.editedUser.location?.address) || 'Adresse non spécifiée'
         }
       };
 
-      // ✅ Ajouter les champs optionnels seulement s'ils existent et sont valides
-      if (this.editedUser.phoneNumber?.trim() && this.editedUser.phoneNumber !== 'undefined') {
-        updateData.phoneNumber = this.editedUser.phoneNumber.trim();
+      // ✅ Champs optionnels
+      const phoneNumber = this.cleanString(this.editedUser.phoneNumber);
+      if (phoneNumber) {
+        updateData.phoneNumber = phoneNumber;
       }
 
-      if (this.editedUser.password?.trim() && this.editedUser.password !== 'undefined') {
-        updateData.password = this.editedUser.password.trim();
+      const password = this.cleanString(this.editedUser.password);
+      if (password) {
+        updateData.password = password;
         console.log('🔑 Mot de passe inclus dans la mise à jour');
       }
 
-      if (this.editedUser.userIdKeycloak?.trim() && this.editedUser.userIdKeycloak !== 'undefined') {
-        updateData.userIdKeycloak = this.editedUser.userIdKeycloak.trim();
+      const nationality = this.cleanString(this.editedUser.location?.nationality);
+      if (nationality) {
+        updateData.location.nationality = nationality;
       }
 
-      // ✅ Ajouter les champs location optionnels avec protection
-      if (this.editedUser.location?.locationInfoId?.trim() && this.editedUser.location.locationInfoId !== 'undefined') {
-        updateData.location.locationInfoId = this.editedUser.location.locationInfoId.trim();
+      const department = this.cleanString(this.editedUser.location?.department);
+      if (department) {
+        updateData.location.department = department;
       }
 
-      if (this.editedUser.location?.nationality?.trim() && this.editedUser.location.nationality !== 'undefined') {
-        updateData.location.nationality = this.editedUser.location.nationality.trim();
+      // ✅ Gestion image
+      if (this.selectedFile) {
+        updateData.img = ''; // Sera géré par l'upload
+      } else if (this.user.image && !this.isPlaceholderUrl(this.user.image)) {
+        updateData.img = this.user.image;
       }
 
-      if (this.editedUser.location?.department?.trim() && this.editedUser.location.department !== 'undefined') {
-        updateData.location.department = this.editedUser.location.department.trim();
-      }
+      console.log('=== UPDATE COMPONENT DEBUG ===');
+      console.log('updateData à envoyer:', updateData);
+      console.log('file à envoyer:', this.selectedFile);
+      console.log('user.id:', this.user.id);
 
-      // ✅ Gestion de l'image - éviter les placeholders
-      if (!this.selectedFile) {
-        // Si pas de nouveau fichier, inclure l'image existante seulement si ce n'est pas un placeholder
-        if (this.user.image && !this.isPlaceholderUrl(this.user.image)) {
-          updateData.img = this.user.image;
-        } else {
-          updateData.img = '';
-        }
-      } else {
-        updateData.img = ''; // Sera mis à jour lors de l'upload
-      }
-
-      console.log('📤 DONNÉES FINALES SIMPLIFIÉES:', JSON.stringify(updateData, null, 2));
-
-      // ✅ Validation basique seulement
+      // ✅ Validation finale stricte
       if (!updateData.firstName || !updateData.lastName || !updateData.email || !updateData.username) {
+        await this.presentAlert('Erreur', 'Les champs Prénom, Nom, Email et Username sont obligatoires.');
         await loading.dismiss();
         this.isSubmitting = false;
-        await this.presentAlert('Erreur', 'Champs obligatoires manquants (prénom, nom, email, username).');
+        this.hasSubmitted = false;
         return;
       }
 
       if (!this.isValidEmail(updateData.email)) {
+        await this.presentAlert('Erreur', 'Format d\'email invalide.');
         await loading.dismiss();
         this.isSubmitting = false;
-        await this.presentAlert('Erreur', 'Format d\'email invalide.');
+        this.hasSubmitted = false;
         return;
       }
 
+      // ✅ DISPATCH ACTION UPDATE (comme add-user mais avec updateUser)
+      this.store.dispatch(UsersActions.updateUser({
+        userId: this.user.id,
+        userData: updateData
+        // Note: pas de paramètre file si votre action ne le supporte pas
+      }));
+
       await loading.dismiss();
 
-      this.modalController.dismiss({
-        userData: updateData,
-        file: this.selectedFile || undefined,
-        hasImageChanged: !!this.selectedFile,
-        originalUser: this.user,
-        timestamp: new Date().toISOString()
-      }, 'save');
+      // Fermer le modal avec succès
+      this.modalController.dismiss({ 
+        success: true, 
+        action: 'update',
+        userId: this.user.id 
+      });
 
     } catch (error) {
       await loading.dismiss();
-      console.error('❌ Erreur lors de la modification:', error);
-      await this.presentAlert('Erreur', 'Une erreur est survenue lors de la modification.');
+      console.error('❌ Erreur modification utilisateur:', error);
+      await this.presentAlert('Erreur', 'Une erreur est survenue lors de la modification de l\'utilisateur.');
+      
+      this.hasSubmitted = false;
+      
+      this.modalController.dismiss({
+        success: false,
+        error: error instanceof Error ? error.message : 'Erreur inconnue'
+      });
     } finally {
       this.isSubmitting = false;
     }
+  }
+
+  // ✅ Fonction utilitaire pour nettoyer les chaînes
+  private cleanString(value: any): string {
+    if (!value || value === 'undefined' || value === 'null') {
+      return '';
+    }
+    return String(value).trim();
   }
 
   // ✅ Vérifier si c'est une URL placeholder
@@ -561,7 +624,9 @@ export class EditUserModalComponent implements OnInit {
     return url.includes('placeholder') || 
            url.includes('via.placeholder') || 
            url.includes('default-avatar') ||
-           url.includes('assets/images/');
+           url.includes('assets/images/') ||
+           url.includes('FFFFFF') ||
+           url.includes('4169E1');
   }
 
   dismiss() {
@@ -602,11 +667,12 @@ export class EditUserModalComponent implements OnInit {
           role: 'destructive',
           handler: () => {
             console.log('🗑️ Suppression confirmée pour:', userName);
+            this.store.dispatch(UsersActions.deleteUser({ userId: this.user.id }));
             this.modalController.dismiss({ 
-              delete: true, 
-              userId: this.user.id,
-              userName 
-            }, 'delete');
+              success: true, 
+              action: 'delete',
+              userId: this.user.id 
+            });
           }
         }
       ]
@@ -614,7 +680,7 @@ export class EditUserModalComponent implements OnInit {
     await alert.present();
   }
 
-  // ✅ DEBUG SIMPLIFIÉ ET EFFICACE
+  // ✅ DEBUG optimisé
   debugUserData() {
     console.log('🔍 ===== DEBUG UTILISATEUR =====');
     console.log('📊 User original:', JSON.stringify(this.user, null, 2));
@@ -624,59 +690,55 @@ export class EditUserModalComponent implements OnInit {
     console.log('🖼️ Image preview:', this.imagePreview);
     console.log('📎 Selected file:', this.selectedFile);
     
-    // ✅ CORRECTION: Vérifier les données avant simulation
-    console.log('🔍 VÉRIFICATION DONNÉES BRUTES:');
-    console.log('- editedUser.firstName:', this.editedUser.firstName, 'Type:', typeof this.editedUser.firstName);
-    console.log('- editedUser.lastName:', this.editedUser.lastName, 'Type:', typeof this.editedUser.lastName);
-    console.log('- editedUser.email:', this.editedUser.email, 'Type:', typeof this.editedUser.email);
-    console.log('- editedUser.username:', this.editedUser.username, 'Type:', typeof this.editedUser.username);
-    
-    // ✅ Simuler les données exactes qui seront envoyées AVEC PROTECTION
-    const simulatedData: any = {
-      firstName: (this.editedUser.firstName && this.editedUser.firstName !== 'undefined') ? 
-                 this.editedUser.firstName.trim() : '',
-      lastName: (this.editedUser.lastName && this.editedUser.lastName !== 'undefined') ? 
-                this.editedUser.lastName.trim() : '',
-      email: (this.editedUser.email && this.editedUser.email !== 'undefined') ? 
-             this.editedUser.email.trim().toLowerCase() : '',
-      username: (this.editedUser.username && this.editedUser.username !== 'undefined') ? 
-                this.editedUser.username.trim() : '',
+    // ✅ Simuler les données exactes qui seront envoyées
+    const simulatedData: UpdateUserRequest = {
+      firstName: this.cleanString(this.editedUser.firstName!),
+      lastName: this.cleanString(this.editedUser.lastName!),
+      email: this.cleanString(this.editedUser.email!).toLowerCase(),
+      username: this.cleanString(this.editedUser.username!),
       gender: this.editedUser.gender || 'NON_SPECIFIED',
+      userIdKeycloak: this.cleanString(this.editedUser.userIdKeycloak!),
+      dateOfBirth: this.formatDateForAPI(this.editedUser.dateOfBirth),
       role: this.editedUser.role || 'FAYDA_ROLE_USER',
       active: Boolean(this.editedUser.active),
-      dateOfBirth: this.formatDateForAPI(this.editedUser.dateOfBirth),
       location: {
-        country: (this.editedUser.location?.country && this.editedUser.location.country !== 'undefined') ? 
-                 this.editedUser.location.country.trim() : 'Senegal',
-        region: (this.editedUser.location?.region && this.editedUser.location.region !== 'undefined') ? 
-                this.editedUser.location.region.trim() : 'Dakar',
-        address: (this.editedUser.location?.address && this.editedUser.location.address !== 'undefined') ? 
-                 this.editedUser.location.address.trim() : 'Adresse par défaut'
+        locationInfoId: this.cleanString(this.editedUser.location?.locationInfoId) || this.generateUUID(),
+        country: this.cleanString(this.editedUser.location?.country) || 'Sénégal',
+        region: this.cleanString(this.editedUser.location?.region) || 'Dakar',
+        address: this.cleanString(this.editedUser.location?.address) || 'Adresse non spécifiée'
       }
     };
+
+    // Ajouter les champs optionnels
+    const phoneNumber = this.cleanString(this.editedUser.phoneNumber);
+    if (phoneNumber) {
+      simulatedData.phoneNumber = phoneNumber;
+    }
     
-    // Ajouter les champs optionnels avec protection
-    if (this.editedUser.phoneNumber?.trim() && this.editedUser.phoneNumber !== 'undefined') {
-      simulatedData.phoneNumber = this.editedUser.phoneNumber.trim();
+    const password = this.cleanString(this.editedUser.password);
+    if (password) {
+      simulatedData.password = password;
     }
-    if (this.editedUser.password?.trim() && this.editedUser.password !== 'undefined') {
-      simulatedData.password = this.editedUser.password.trim();
+
+    const nationality = this.cleanString(this.editedUser.location?.nationality);
+    if (nationality) {
+      simulatedData.location.nationality = nationality;
     }
-    if (this.editedUser.userIdKeycloak?.trim() && this.editedUser.userIdKeycloak !== 'undefined') {
-      simulatedData.userIdKeycloak = this.editedUser.userIdKeycloak.trim();
+
+    const department = this.cleanString(this.editedUser.location?.department);
+    if (department) {
+      simulatedData.location.department = department;
     }
     
     console.log('🧪 DONNÉES SIMULÉES POUR API:', JSON.stringify(simulatedData, null, 2));
     
-    // ✅ Checks basiques
+    // ✅ Validation structure
     console.log('🔍 ===== VALIDATION RAPIDE =====');
-    console.log('- FirstName:', !!simulatedData.firstName && simulatedData.firstName !== 'undefined');
-    console.log('- LastName:', !!simulatedData.lastName && simulatedData.lastName !== 'undefined');
+    console.log('- Tous les champs requis:', !!(simulatedData.firstName && simulatedData.lastName && simulatedData.email && simulatedData.username));
     console.log('- Email valide:', this.isValidEmail(simulatedData.email));
-    console.log('- Username:', !!simulatedData.username && simulatedData.username !== 'undefined');
-    console.log('- Date format ISO:', simulatedData.dateOfBirth.endsWith('Z'));
-    console.log('- Active est boolean:', typeof simulatedData.active === 'boolean');
-    console.log('- Location minimale:', !!(simulatedData.location.country && simulatedData.location.region && simulatedData.location.address));
+    console.log('- Date format ISO:', simulatedData.dateOfBirth.includes('T') && simulatedData.dateOfBirth.endsWith('Z'));
+    console.log('- Location complète:', !!(simulatedData.location.country && simulatedData.location.region && simulatedData.location.address));
+    console.log('- LocationInfoId UUID format:', /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(simulatedData.location.locationInfoId));
     
     const dataSize = JSON.stringify(simulatedData).length;
     console.log('📏 Taille des données:', dataSize, 'caractères');

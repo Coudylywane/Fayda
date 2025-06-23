@@ -154,13 +154,13 @@
         </div>
 
         <!-- Demandes d'adhésion Dahira -->
-        <div (click)="navigateTo('dahiras')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+        <div *appShowForPrimaryRole="[UserRole.VISITEUR,UserRole.DISCIPLE]" (click)="navigateTo('dahiras')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="person" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Adhérer à une Dahira</span>
         </div>
 
         <!-- Demandes de création de Dahira -->
-        <div (click)="navigateTo('dahiras/create')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+        <div *appHideForRole="[UserRole.G_DAHIRA]" (click)="navigateTo('dahiras/create')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="person" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Créer Dahira</span>
         </div>

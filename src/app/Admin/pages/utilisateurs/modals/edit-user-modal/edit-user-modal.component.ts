@@ -1,6 +1,33 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalController, AlertController, LoadingController } from '@ionic/angular';
+import { Store } from '@ngrx/store';
+import { AppState } from '../../app.state';
+import * as UsersActions from '../../store/users.actions';
 import { User, UserFormData } from '../../modals/users.model';
+
+// ✅ Interface pour l'API d'édition (basée sur votre documentation API)
+interface UpdateUserRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  username: string;
+  password?: string;
+  phoneNumber?: string;
+  gender: string;
+  userIdKeycloak: string;
+  img?: string;
+  dateOfBirth: string; // Format ISO: "2025-06-21T16:43:21.529Z"
+  location: {
+    locationInfoId: string;
+    nationality?: string;
+    country: string;
+    region: string;
+    department?: string;
+    address: string;
+  };
+  role: string;
+  active: boolean;
+}
 
 @Component({
   selector: 'app-edit-user-modal',
@@ -10,6 +37,10 @@ import { User, UserFormData } from '../../modals/users.model';
 })
 export class EditUserModalComponent implements OnInit {
   @Input() user!: User;
+  
+  // État du stepper
+  currentStep = 1;
+  totalSteps = 3;
   
   editedUser: UserFormData = {
     firstName: '',
@@ -40,21 +71,31 @@ export class EditUserModalComponent implements OnInit {
   ];
 
   roleOptions = [
-    { label: 'Disciple', value: 'DISCIPLE' },
-    { label: 'Responsable Dahira', value: 'RESP_DAHIRA' },
-    { label: 'Visiteur', value: 'VISITEUR' },
-    { label: 'Mouqadam', value: 'MOUQADAM' }
+    { label: 'Utilisateur', value: 'FAYDA_ROLE_USER' },
+    { label: 'Disciple', value: 'FAYDA_ROLE_DISCIPLE' },
+    { label: 'Responsable Dahira', value: 'FAYDA_ROLE_DAHIRA' },
+    { label: 'Mouqadam', value: 'FAYDA_ROLE_MOUQADAM' },
+    { label: 'Administrateur', value: 'FAYDA_ROLE_ADMIN' }
   ];
 
   selectedFile: File | null = null;
   imagePreview: string = 'assets/images/default-avatar.png';
   isSubmitting = false;
+  hasSubmitted = false; // ✅ Ajout du flag comme dans add-user
   today: string = new Date().toISOString().split('T')[0];
+
+  // Validation par étape
+  stepValidation = {
+    step1: false,
+    step2: false,
+    step3: false
+  };
 
   constructor(
     private modalController: ModalController,
     private alertController: AlertController,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit() {
@@ -66,41 +107,59 @@ export class EditUserModalComponent implements OnInit {
     if (this.user) {
       console.log('📋 INITIALISATION DES DONNÉES UTILISATEUR');
       
-      // ✅ MAPPING ROBUSTE: Gérer toutes les variations possibles
+      // ✅ Gestion robuste des noms (comme dans votre code)
+      let firstName = '';
+      let lastName = '';
+      
+      if (this.user.firstName) {
+        firstName = this.user.firstName;
+      } else if (this.user.name) {
+        const nameParts = this.user.name.split(' ').filter((part: string) => part.length > 0);
+        firstName = nameParts[0] || '';
+        lastName = nameParts.slice(1).join(' ') || '';
+      }
+      
+      if (this.user.lastName) {
+        lastName = this.user.lastName;
+      }
+      
       this.editedUser = {
-        // Informations de base avec fallbacks
-        firstName: this.user.firstName || (this.user.name ? this.user.name.split(' ')[0] : '') || '',
-        lastName: this.user.lastName || (this.user.name ? this.user.name.split(' ').slice(1).join(' ') : '') || '',
+        firstName: firstName,
+        lastName: lastName,
         email: this.user.email || '',
         username: this.user.username || '',
-        password: '', // Jamais pré-remplir pour la sécurité
+        password: '', // Toujours vide par défaut
         phoneNumber: this.user.phoneNumber || '',
         gender: this.user.gender || 'NON_SPECIFIED',
         userIdKeycloak: this.user.userIdKeycloak || this.user.id || this.generateUUID(),
-        
-        // Date de naissance avec gestion d'erreur
         dateOfBirth: this.user.dateOfBirth ? this.formatDateSafe(this.user.dateOfBirth) : '',
         
-        // Location avec mapping complet
         location: {
           locationInfoId: this.user.location?.locationInfoId || this.generateUUID(),
-          nationality: this.user.location?.nationality || 'Sénégalaise',
-          country: this.user.location?.country || 'Sénégal',
-          region: this.user.location?.region || 'Dakar',
-          department: this.user.location?.department || this.user.location?.region || 'Dakar',
+          nationality: this.user.location?.nationality || '',
+          country: this.user.location?.country || '',
+          region: this.user.location?.region || '',
+          department: this.user.location?.department || '',
           address: this.user.location?.address || ''
         },
         
-        // Rôle et statut
-        role: this.user.role || this.user.category || 'DISCIPLE',
-        active: this.user.active !== false // true par défaut sauf si explicitement false
+        role: this.user.role || this.user.category || 'FAYDA_ROLE_USER',
+        active: this.user.active !== false
       };
 
-      // Image avec source unique
-      this.imagePreview = this.user.image || 'assets/images/default-avatar.png';
+      // ✅ Gestion image sécurisée
+      if (this.user.image && !this.isPlaceholderUrl(this.user.image)) {
+        this.imagePreview = this.user.image;
+      } else {
+        this.imagePreview = 'assets/images/default-avatar.png';
+      }
       
-      console.log('✅ DONNÉES MAPPÉES:', this.editedUser);
-      console.log('🖼️ IMAGE PREVIEW:', this.imagePreview);
+      this.validateAllSteps();
+      
+      console.log('✅ DONNÉES MAPPÉES:', JSON.stringify(this.editedUser, null, 2));
+      console.log('🔍 VÉRIFICATION FirstName:', firstName, 'Type:', typeof firstName);
+      console.log('🔍 VÉRIFICATION LastName:', lastName, 'Type:', typeof lastName);
+      console.log('🔍 VÉRIFICATION Email:', this.user.email, 'Type:', typeof this.user.email);
     }
   }
 
@@ -108,7 +167,7 @@ export class EditUserModalComponent implements OnInit {
     if (!date) return '';
     try {
       const d = new Date(date);
-      if (isNaN(d.getTime())) {
+      if (isNaN(d.getTime()) || d.getFullYear() > 3000) {
         console.warn('⚠️ Date invalide:', date);
         return '';
       }
@@ -127,23 +186,119 @@ export class EditUserModalComponent implements OnInit {
     });
   }
 
-  updateLocation(field: string, value: string) {
-    if (!this.editedUser.location) {
-      this.editedUser.location = {
-        locationInfoId: this.generateUUID(),
-        nationality: 'Sénégalaise',
-        country: 'Sénégal',
-        region: 'Dakar',
-        department: '',
-        address: ''
-      };
+  // ✅ Format de date pour l'API (corrigé)
+  private formatDateForAPI(dateString: string | undefined): string {
+    if (!dateString) {
+      return new Date().toISOString();
     }
-    this.editedUser.location[field as keyof typeof this.editedUser.location] = value;
-    console.log(`📍 Location ${field} mis à jour:`, value);
+    
+    try {
+      // Si déjà au format ISO complet
+      if (dateString.includes('T') && dateString.endsWith('Z')) {
+        return dateString;
+      }
+      
+      // Convertir YYYY-MM-DD vers ISO
+      const date = new Date(dateString + 'T00:00:00.000Z');
+      if (isNaN(date.getTime())) {
+        throw new Error('Date invalide');
+      }
+      
+      return date.toISOString();
+    } catch (error) {
+      console.error('❌ Erreur format date:', error);
+      return new Date().toISOString();
+    }
   }
 
-  dismiss() {
-    this.modalController.dismiss();
+  // ✅ Navigation basée sur add-user qui fonctionne
+  async nextStep() {
+    if (!this.isCurrentStepValid()) {
+      await this.presentAlert('Validation', 'Veuillez remplir correctement tous les champs requis pour cette étape.');
+      return;
+    }
+
+    if (this.currentStep < this.totalSteps) {
+      this.currentStep++;
+      console.log(`➡️ Passage à l'étape ${this.currentStep}`);
+    } else {
+      // Dernière étape - sauvegarder
+      await this.saveUser();
+    }
+  }
+
+  previousStep() {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+      console.log(`⬅️ Retour à l'étape ${this.currentStep}`);
+    }
+  }
+
+  goToStep(step: number) {
+    for (let i = 1; i < step; i++) {
+      if (!this.isStepValid(i)) {
+        this.presentAlert('Navigation', `Veuillez d'abord compléter l'étape ${i}.`);
+        return;
+      }
+    }
+    this.currentStep = step;
+    console.log(`🎯 Navigation directe vers l'étape ${step}`);
+  }
+
+  // Validation par étape
+  isStepValid(step: number): boolean {
+    switch (step) {
+      case 1:
+        return this.isStep1Valid();
+      case 2:
+        return this.isStep2Valid();
+      case 3:
+        return this.isStep3Valid();
+      default:
+        return false;
+    }
+  }
+
+  isCurrentStepValid(): boolean {
+    return this.isStepValid(this.currentStep);
+  }
+
+  isStep1Valid(): boolean {
+    const u = this.editedUser;
+    return !!(
+      u.firstName?.trim() &&
+      u.lastName?.trim() &&
+      u.email?.trim() &&
+      this.isValidEmail(u.email) &&
+      u.gender &&
+      u.dateOfBirth &&
+      u.role
+    );
+  }
+
+  isStep2Valid(): boolean {
+    const u = this.editedUser;
+    return !!(
+      u.username?.trim() &&
+      (!u.phoneNumber || this.isValidPhone(u.phoneNumber))
+    );
+  }
+
+  isStep3Valid(): boolean {
+    const u = this.editedUser;
+    return !!(
+      u.location?.country?.trim() &&
+      u.location?.region?.trim() &&
+      u.location?.address?.trim()
+    );
+  }
+
+  validateAllSteps() {
+    this.stepValidation = {
+      step1: this.isStep1Valid(),
+      step2: this.isStep2Valid(),
+      step3: this.isStep3Valid()
+    };
   }
 
   isValidEmail(email: string | undefined): boolean {
@@ -158,130 +313,38 @@ export class EditUserModalComponent implements OnInit {
     return phoneRegex.test(phone);
   }
 
-  isFormValid(): boolean {
-    const u = this.editedUser;
-    
-    // Vérifier les champs obligatoires
-    if (!u.firstName?.trim() || !u.lastName?.trim()) {
-      console.log('❌ Validation: Nom/Prénom manquant');
-      return false;
-    }
-    
-    if (!u.email?.trim() || !this.isValidEmail(u.email)) {
-      console.log('❌ Validation: Email invalide');
-      return false;
-    }
-    
-    if (!u.gender || !u.dateOfBirth) {
-      console.log('❌ Validation: Genre/Date naissance manquant');
-      return false;
-    }
-    
-    if (!u.location?.country || !u.location?.region || !u.location?.address?.trim()) {
-      console.log('❌ Validation: Localisation incomplète');
-      return false;
-    }
-    
-    if (u.phoneNumber && !this.isValidPhone(u.phoneNumber)) {
-      console.log('❌ Validation: Téléphone invalide');
-      return false;
-    }
-    
-    console.log('✅ Validation: Formulaire valide');
-    return true;
-  }
-
-  async saveUser() {
-    if (this.isSubmitting) {
-      console.warn('⚠️ Soumission déjà en cours');
-      return;
-    }
-
-    console.log('💾 DÉBUT SAUVEGARDE');
-    console.log('📝 Données avant validation:', this.editedUser);
-
-    if (!this.isFormValid()) {
-      await this.presentAlert('Validation', 'Veuillez remplir correctement tous les champs obligatoires.');
-      return;
-    }
-
-    const loading = await this.loadingController.create({
-      message: 'Modification en cours...',
-      spinner: 'circular'
-    });
-    await loading.present();
-
-    this.isSubmitting = true;
-
-    try {
-      // ✅ PRÉPARATION DES DONNÉES COMPLÈTES
-      const updateData: any = {
-        // ID original (CRUCIAL pour l'update)
-        id: this.user.id,
-        
-        // Informations personnelles (fallback vers valeurs originales si vides)
-        firstName: this.editedUser.firstName?.trim() || this.user.firstName || '',
-        lastName: this.editedUser.lastName?.trim() || this.user.lastName || '',
-        email: this.editedUser.email?.trim().toLowerCase() || this.user.email || '',
-        username: this.editedUser.username?.trim() || this.user.username || this.editedUser.email?.split('@')[0] || '',
-        phoneNumber: this.editedUser.phoneNumber?.trim() || this.user.phoneNumber || '',
-        gender: this.editedUser.gender || this.user.gender || 'NON_SPECIFIED',
-        userIdKeycloak: this.editedUser.userIdKeycloak || this.user.userIdKeycloak || this.user.id,
-        
-        // Date de naissance
-        dateOfBirth: this.editedUser.dateOfBirth || this.user.dateOfBirth || '',
-        
-        // Location complète avec préservation des données existantes
-        location: {
-          locationInfoId: this.editedUser.location?.locationInfoId || this.user.location?.locationInfoId || this.generateUUID(),
-          nationality: this.editedUser.location?.nationality || this.user.location?.nationality || 'Sénégalaise',
-          country: this.editedUser.location?.country || this.user.location?.country || 'Sénégal',
-          region: this.editedUser.location?.region || this.user.location?.region || 'Dakar',
-          department: this.editedUser.location?.department || this.user.location?.department || '',
-          address: this.editedUser.location?.address || this.user.location?.address || ''
-        },
-        
-        // Rôle et statut
-        role: this.editedUser.role || this.user.role || 'DISCIPLE',
-        active: this.editedUser.active,
-        
-        // ✅ PRÉSERVATION DES MÉTADONNÉES
-        createdAt: this.user.createdAt,
-        updatedAt: new Date().toISOString(),
-        
-        // Préserver autres champs possibles
-        category: this.editedUser.role || this.user.category || this.user.role
+  updateLocation(field: string, value: string | null | undefined) {
+    if (!this.editedUser.location) {
+      this.editedUser.location = {
+        locationInfoId: this.user.location?.locationInfoId || this.generateUUID(),
+        nationality: '',
+        country: '',
+        region: '',
+        department: '',
+        address: ''
       };
-
-      // Inclure le mot de passe seulement s'il a été modifié
-      if (this.editedUser.password && this.editedUser.password.trim()) {
-        updateData.password = this.editedUser.password.trim();
-        console.log('🔑 Mot de passe inclus dans la mise à jour');
-      }
-
-      console.log('📤 DONNÉES FINALES À ENVOYER:', updateData);
-      console.log('📎 FICHIER IMAGE:', this.selectedFile);
-
-      await loading.dismiss();
-
-      // ✅ RETOUR ENRICHI avec toutes les informations nécessaires
-      this.modalController.dismiss({
-        userData: updateData,
-        file: this.selectedFile || undefined,
-        hasImageChanged: !!this.selectedFile,
-        originalUser: this.user, // Pour comparaison côté parent
-        timestamp: new Date().toISOString()
-      }, 'save');
-
-    } catch (error) {
-      await loading.dismiss();
-      console.error('❌ Erreur lors de la modification:', error);
-      await this.presentAlert('Erreur', 'Une erreur est survenue lors de la modification.');
-    } finally {
-      this.isSubmitting = false;
     }
+    
+    const cleanValue = value?.toString().trim() || '';
+    (this.editedUser.location as any)[field] = cleanValue;
+    this.validateAllSteps();
+    
+    console.log(`📍 Location ${field} mis à jour:`, cleanValue);
   }
 
+  onEmailChange() {
+    if (!this.editedUser.username && this.editedUser.email?.includes('@')) {
+      this.editedUser.username = this.editedUser.email.split('@')[0];
+      console.log('📧 Username auto-généré:', this.editedUser.username);
+    }
+    this.validateAllSteps();
+  }
+
+  onFieldChange() {
+    this.validateAllSteps();
+  }
+
+  // ✅ Gestion des images (identique à add-user)
   async onImageClick() {
     const actionSheet = await this.alertController.create({
       header: 'Changer la photo de profil',
@@ -351,7 +414,6 @@ export class EditUserModalComponent implements OnInit {
   handleImageSelection(file: File) {
     console.log('📷 Sélection d\'image:', file.name, file.size);
     
-    // Validation renforcée du fichier
     if (file.size > 5 * 1024 * 1024) {
       this.presentAlert('Erreur', 'L\'image ne doit pas dépasser 5MB');
       return;
@@ -362,7 +424,6 @@ export class EditUserModalComponent implements OnInit {
       return;
     }
 
-    // Vérifier les dimensions de l'image
     this.validateImageDimensions(file).then(isValid => {
       if (!isValid) {
         this.presentAlert('Erreur', 'L\'image doit avoir une résolution minimale de 100x100 pixels');
@@ -377,7 +438,6 @@ export class EditUserModalComponent implements OnInit {
       };
       reader.readAsDataURL(file);
 
-      // Feedback utilisateur
       this.presentInfoMessage(`Image sélectionnée: ${file.name} (${this.formatFileSize(file.size)})`);
     });
   }
@@ -415,18 +475,162 @@ export class EditUserModalComponent implements OnInit {
     });
     await alert.present();
     
-    // Auto-dismiss après 2 secondes
     setTimeout(() => {
       alert.dismiss();
     }, 2000);
   }
 
-  onEmailChange() {
-    // Mettre à jour automatiquement le nom d'utilisateur si vide
-    if (!this.editedUser.username && this.editedUser.email?.includes('@')) {
-      this.editedUser.username = this.editedUser.email.split('@')[0];
-      console.log('📧 Username auto-généré:', this.editedUser.username);
+  // ✅ SAUVEGARDE BASÉE SUR ADD-USER AVEC FORMAT API CORRECT
+  async saveUser() {
+    if (this.isSubmitting || this.hasSubmitted) {
+      console.warn('⚠️ Soumission déjà en cours ou déjà effectuée');
+      return;
     }
+
+    // Validation finale de tous les champs
+    if (!this.isStep1Valid() || !this.isStep2Valid() || !this.isStep3Valid()) {
+      await this.presentAlert('Validation', 'Veuillez remplir correctement tous les champs requis.');
+      return;
+    }
+
+    console.log('💾 DÉBUT SAUVEGARDE');
+    console.log('📝 Données editedUser avant sauvegarde:', JSON.stringify(this.editedUser, null, 2));
+
+    const loading = await this.loadingController.create({
+      message: 'Modification en cours...',
+      spinner: 'circular'
+    });
+    await loading.present();
+
+    this.isSubmitting = true;
+    this.hasSubmitted = true;
+
+    try {
+      // ✅ STRUCTURE EXACTE DE VOTRE API D'ÉDITION
+      const updateData: UpdateUserRequest = {
+        firstName: this.cleanString(this.editedUser.firstName!),
+        lastName: this.cleanString(this.editedUser.lastName!),
+        email: this.cleanString(this.editedUser.email!).toLowerCase(),
+        username: this.cleanString(this.editedUser.username!),
+        gender: this.editedUser.gender || 'NON_SPECIFIED',
+        userIdKeycloak: this.cleanString(this.editedUser.userIdKeycloak!),
+        dateOfBirth: this.formatDateForAPI(this.editedUser.dateOfBirth),
+        role: this.editedUser.role || 'FAYDA_ROLE_USER',
+        active: Boolean(this.editedUser.active),
+        
+        // ✅ Location selon votre API
+        location: {
+          locationInfoId: this.cleanString(this.editedUser.location?.locationInfoId) || this.generateUUID(),
+          country: this.cleanString(this.editedUser.location?.country) || 'Sénégal',
+          region: this.cleanString(this.editedUser.location?.region) || 'Dakar',
+          address: this.cleanString(this.editedUser.location?.address) || 'Adresse non spécifiée'
+        }
+      };
+
+      // ✅ Champs optionnels
+      const phoneNumber = this.cleanString(this.editedUser.phoneNumber);
+      if (phoneNumber) {
+        updateData.phoneNumber = phoneNumber;
+      }
+
+      const password = this.cleanString(this.editedUser.password);
+      if (password) {
+        updateData.password = password;
+        console.log('🔑 Mot de passe inclus dans la mise à jour');
+      }
+
+      const nationality = this.cleanString(this.editedUser.location?.nationality);
+      if (nationality) {
+        updateData.location.nationality = nationality;
+      }
+
+      const department = this.cleanString(this.editedUser.location?.department);
+      if (department) {
+        updateData.location.department = department;
+      }
+
+      // ✅ Gestion image
+      if (this.selectedFile) {
+        updateData.img = ''; // Sera géré par l'upload
+      } else if (this.user.image && !this.isPlaceholderUrl(this.user.image)) {
+        updateData.img = this.user.image;
+      }
+
+      console.log('=== UPDATE COMPONENT DEBUG ===');
+      console.log('updateData à envoyer:', updateData);
+      console.log('file à envoyer:', this.selectedFile);
+      console.log('user.id:', this.user.id);
+
+      // ✅ Validation finale stricte
+      if (!updateData.firstName || !updateData.lastName || !updateData.email || !updateData.username) {
+        await this.presentAlert('Erreur', 'Les champs Prénom, Nom, Email et Username sont obligatoires.');
+        await loading.dismiss();
+        this.isSubmitting = false;
+        this.hasSubmitted = false;
+        return;
+      }
+
+      if (!this.isValidEmail(updateData.email)) {
+        await this.presentAlert('Erreur', 'Format d\'email invalide.');
+        await loading.dismiss();
+        this.isSubmitting = false;
+        this.hasSubmitted = false;
+        return;
+      }
+
+      // ✅ DISPATCH ACTION UPDATE (comme add-user mais avec updateUser)
+      this.store.dispatch(UsersActions.updateUser({
+        userId: this.user.id,
+        userData: updateData
+        // Note: pas de paramètre file si votre action ne le supporte pas
+      }));
+
+      await loading.dismiss();
+
+      // Fermer le modal avec succès
+      this.modalController.dismiss({ 
+        success: true, 
+        action: 'update',
+        userId: this.user.id 
+      });
+
+    } catch (error) {
+      await loading.dismiss();
+      console.error('❌ Erreur modification utilisateur:', error);
+      await this.presentAlert('Erreur', 'Une erreur est survenue lors de la modification de l\'utilisateur.');
+      
+      this.hasSubmitted = false;
+      
+      this.modalController.dismiss({
+        success: false,
+        error: error instanceof Error ? error.message : 'Erreur inconnue'
+      });
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  // ✅ Fonction utilitaire pour nettoyer les chaînes
+  private cleanString(value: any): string {
+    if (!value || value === 'undefined' || value === 'null') {
+      return '';
+    }
+    return String(value).trim();
+  }
+
+  // ✅ Vérifier si c'est une URL placeholder
+  private isPlaceholderUrl(url: string | undefined): boolean {
+    if (!url) return false;
+    return url.includes('placeholder') || 
+           url.includes('via.placeholder') || 
+           url.includes('default-avatar') ||
+           url.includes('assets/images/') ||
+           url.includes('FFFFFF') ||
+           url.includes('4169E1');
+  }
+
+  dismiss() {
+    this.modalController.dismiss();
   }
 
   async presentAlert(header: string, message: string) {
@@ -463,11 +667,12 @@ export class EditUserModalComponent implements OnInit {
           role: 'destructive',
           handler: () => {
             console.log('🗑️ Suppression confirmée pour:', userName);
+            this.store.dispatch(UsersActions.deleteUser({ userId: this.user.id }));
             this.modalController.dismiss({ 
-              delete: true, 
-              userId: this.user.id,
-              userName 
-            }, 'delete');
+              success: true, 
+              action: 'delete',
+              userId: this.user.id 
+            });
           }
         }
       ]
@@ -475,27 +680,69 @@ export class EditUserModalComponent implements OnInit {
     await alert.present();
   }
 
-  async toggleStatus() {
-    const newStatus = !this.editedUser.active;
-    const action = newStatus ? 'activer' : 'désactiver';
+  // ✅ DEBUG optimisé
+  debugUserData() {
+    console.log('🔍 ===== DEBUG UTILISATEUR =====');
+    console.log('📊 User original:', JSON.stringify(this.user, null, 2));
+    console.log('📝 EditedUser:', JSON.stringify(this.editedUser, null, 2));
+    console.log('🎯 Étape actuelle:', this.currentStep);
+    console.log('✅ Validation étapes:', this.stepValidation);
+    console.log('🖼️ Image preview:', this.imagePreview);
+    console.log('📎 Selected file:', this.selectedFile);
     
-    const alert = await this.alertController.create({
-      header: 'Confirmation',
-      message: `Êtes-vous sûr de vouloir ${action} cet utilisateur ?`,
-      buttons: [
-        {
-          text: 'Annuler',
-          role: 'cancel'
-        },
-        {
-          text: action.charAt(0).toUpperCase() + action.slice(1),
-          handler: () => {
-            this.editedUser.active = newStatus;
-            console.log(`🔄 Statut utilisateur changé: ${newStatus ? 'Actif' : 'Inactif'}`);
-          }
-        }
-      ]
-    });
-    await alert.present();
+    // ✅ Simuler les données exactes qui seront envoyées
+    const simulatedData: UpdateUserRequest = {
+      firstName: this.cleanString(this.editedUser.firstName!),
+      lastName: this.cleanString(this.editedUser.lastName!),
+      email: this.cleanString(this.editedUser.email!).toLowerCase(),
+      username: this.cleanString(this.editedUser.username!),
+      gender: this.editedUser.gender || 'NON_SPECIFIED',
+      userIdKeycloak: this.cleanString(this.editedUser.userIdKeycloak!),
+      dateOfBirth: this.formatDateForAPI(this.editedUser.dateOfBirth),
+      role: this.editedUser.role || 'FAYDA_ROLE_USER',
+      active: Boolean(this.editedUser.active),
+      location: {
+        locationInfoId: this.cleanString(this.editedUser.location?.locationInfoId) || this.generateUUID(),
+        country: this.cleanString(this.editedUser.location?.country) || 'Sénégal',
+        region: this.cleanString(this.editedUser.location?.region) || 'Dakar',
+        address: this.cleanString(this.editedUser.location?.address) || 'Adresse non spécifiée'
+      }
+    };
+
+    // Ajouter les champs optionnels
+    const phoneNumber = this.cleanString(this.editedUser.phoneNumber);
+    if (phoneNumber) {
+      simulatedData.phoneNumber = phoneNumber;
+    }
+    
+    const password = this.cleanString(this.editedUser.password);
+    if (password) {
+      simulatedData.password = password;
+    }
+
+    const nationality = this.cleanString(this.editedUser.location?.nationality);
+    if (nationality) {
+      simulatedData.location.nationality = nationality;
+    }
+
+    const department = this.cleanString(this.editedUser.location?.department);
+    if (department) {
+      simulatedData.location.department = department;
+    }
+    
+    console.log('🧪 DONNÉES SIMULÉES POUR API:', JSON.stringify(simulatedData, null, 2));
+    
+    // ✅ Validation structure
+    console.log('🔍 ===== VALIDATION RAPIDE =====');
+    console.log('- Tous les champs requis:', !!(simulatedData.firstName && simulatedData.lastName && simulatedData.email && simulatedData.username));
+    console.log('- Email valide:', this.isValidEmail(simulatedData.email));
+    console.log('- Date format ISO:', simulatedData.dateOfBirth.includes('T') && simulatedData.dateOfBirth.endsWith('Z'));
+    console.log('- Location complète:', !!(simulatedData.location.country && simulatedData.location.region && simulatedData.location.address));
+    console.log('- LocationInfoId UUID format:', /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(simulatedData.location.locationInfoId));
+    
+    const dataSize = JSON.stringify(simulatedData).length;
+    console.log('📏 Taille des données:', dataSize, 'caractères');
+    
+    console.log('🔍 ===== FIN DEBUG =====');
   }
 }

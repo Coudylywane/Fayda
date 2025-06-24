@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Observable, Subject, combineLatest } from 'rxjs';
+import { takeUntil, map } from 'rxjs/operators';
 import { ModalController, AlertController, ActionSheetController, LoadingController, ToastController } from '@ionic/angular';
 
 import { AppState } from './app.state';
@@ -27,11 +27,16 @@ export class UtilisateursPage implements OnInit, OnDestroy {
   loading$: Observable<boolean>;
   error$: Observable<any>;
   searchTerm$: Observable<string>;
-  category$: Observable<string>;
   usersCount$: Observable<number>;
   filteredUsersCount$: Observable<number>;
   
-  filters = ['Tous', 'Disciples', 'Visiteurs', 'Mouqadam', 'Resp. Dahira'];
+  // ✅ FILTRES PAR STATUT
+  filters = ['Tous', 'Actifs', 'Inactifs'];
+  
+  // ✅ SIMPLE: Filtre actuel sélectionné
+  activeFilter: string = 'Tous';
+  currentSearchTerm: string = '';
+  
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -42,15 +47,52 @@ export class UtilisateursPage implements OnInit, OnDestroy {
     private loadingController: LoadingController,
     private toastController: ToastController
   ) {
-    // Initialisation des observables
+    // Initialisation des observables de base
     this.users$ = this.store.select(UsersSelectors.selectAllUsers);
-    this.filteredUsers$ = this.store.select(UsersSelectors.selectFilteredUsers);
     this.loading$ = this.store.select(UsersSelectors.selectUsersLoading);
     this.error$ = this.store.select(UsersSelectors.selectUsersError);
     this.searchTerm$ = this.store.select(UsersSelectors.selectSearchTerm);
-    this.category$ = this.store.select(UsersSelectors.selectCategory);
     this.usersCount$ = this.store.select(UsersSelectors.selectUsersCount);
-    this.filteredUsersCount$ = this.store.select(UsersSelectors.selectFilteredUsersCount);
+
+    // ✅ FILTRAGE PAR STATUT ACTIF/INACTIF
+    this.filteredUsers$ = combineLatest([
+      this.users$,
+      this.searchTerm$
+    ]).pipe(
+      map(([users, searchTerm]) => {
+        let filtered = [...users];
+        this.currentSearchTerm = searchTerm || '';
+
+        // 1️⃣ FILTRAGE PAR RECHERCHE
+        if (searchTerm && searchTerm.trim()) {
+          const term = searchTerm.toLowerCase().trim();
+          filtered = filtered.filter(user => 
+            (user.name?.toLowerCase().includes(term)) ||
+            (user.firstName?.toLowerCase().includes(term)) ||
+            (user.lastName?.toLowerCase().includes(term)) ||
+            (user.email?.toLowerCase().includes(term))
+          );
+        }
+
+        // 2️⃣ FILTRAGE PAR STATUT ACTIF/INACTIF
+        if (this.activeFilter !== 'Tous') {
+          filtered = filtered.filter(user => {
+            if (this.activeFilter === 'Actifs') {
+              return user.active === true;
+            } else if (this.activeFilter === 'Inactifs') {
+              return user.active === false;
+            }
+            return false;
+          });
+        }
+
+        return filtered;
+      })
+    );
+
+    this.filteredUsersCount$ = this.filteredUsers$.pipe(
+      map(users => users.length)
+    );
   }
 
   ngOnInit() {
@@ -69,6 +111,33 @@ export class UtilisateursPage implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  // ✅ NOUVEAU: Obtenir le statut d'un utilisateur
+  getStatusLabel(user: User): string {
+    return user.active ? 'Actif' : 'Inactif';
+  }
+
+  // ✅ NOUVEAU: Obtenir la couleur du statut
+  getStatusColor(user: User): string {
+    return user.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+  }
+
+  // ✅ MÉTHODE SIMPLE: Changer de filtre
+  setFilter(filterName: string) {
+    this.activeFilter = filterName;
+    this.store.dispatch(UsersActions.setCategory({ category: filterName }));
+  }
+
+  // ✅ MÉTHODE SIMPLE: Vérifier si un filtre est actif
+  isFilterActive(filterName: string): boolean {
+    return this.activeFilter === filterName;
+  }
+
+  // ✅ MÉTHODE SIMPLE: Réinitialiser
+  resetFilters() {
+    this.activeFilter = 'Tous';
+    this.store.dispatch(UsersActions.resetFilters());
+  }
+
   loadUsers() {
     this.store.dispatch(UsersActions.loadUsers({}));
   }
@@ -77,19 +146,95 @@ export class UtilisateursPage implements OnInit, OnDestroy {
     this.store.dispatch(UsersActions.loadUsers({}));
   }
 
-  setFilter(category: string) {
-    this.store.dispatch(UsersActions.setCategory({ category }));
-  }
-
   onSearchTermChange(searchTerm: string) {
     this.store.dispatch(UsersActions.setSearchTerm({ searchTerm }));
   }
 
-  resetFilters() {
-    this.store.dispatch(UsersActions.resetFilters());
+  onImageError(event: Event, user?: any) {
+    const target = event.target as HTMLImageElement;
+    if (target) {
+      // ✅ CORRECTION: Utilise l'avatar SVG généré au lieu d'une URL externe
+      target.src = this.generateAvatarSVG(user || { firstName: 'U', lastName: '' });
+      target.onerror = null;
+    }
   }
 
-  // ✅ CORRECTION MAJEURE: Supprimer le double dispatch
+  // ✅ MÉTHODE CORRIGÉE: Générer un avatar SVG avec initiales
+  generateAvatarSVG(user: any, size: number = 56): string {
+    const initials = this.getInitials(user);
+    const backgroundColor = this.getColorForUser(user);
+    
+    const svg = `
+      <svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="${size/2}" cy="${size/2}" r="${size/2}" fill="${backgroundColor}"/>
+        <text x="50%" y="50%" dy="0.35em" text-anchor="middle" 
+              fill="white" font-family="Arial, sans-serif" 
+              font-size="${size * 0.35}" font-weight="600">
+          ${initials}
+        </text>
+      </svg>
+    `;
+    
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  }
+
+  getInitials(user: any): string {
+    if (user?.firstName && user?.lastName) {
+      return (user.firstName.charAt(0) + user.lastName.charAt(0)).toUpperCase();
+    }
+    if (user?.firstName) {
+      return user.firstName.charAt(0).toUpperCase();
+    }
+    if (user?.lastName) {
+      return user.lastName.charAt(0).toUpperCase();
+    }
+    if (user?.name) {
+      const parts = user.name.split(' ').filter((p: string) => p.length > 0);
+      if (parts.length >= 2) {
+        return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+      }
+      return parts[0]?.charAt(0).toUpperCase() || 'U';
+    }
+    if (user?.email) {
+      return user.email.charAt(0).toUpperCase();
+    }
+    return 'U';
+  }
+
+  getColorForUser(user: any): string {
+    const colors = [
+      '#4169E1', '#32CD32', '#FF6347', '#9370DB', 
+      '#20B2AA', '#FF4500', '#DA70D6', '#1E90FF',
+      '#FFD700', '#FF69B4', '#00CED1', '#FFA500'
+    ];
+    
+    const identifier = user?.firstName || user?.lastName || user?.email || user?.name || 'default';
+    const hash = this.simpleHash(identifier);
+    return colors[hash % colors.length];
+  }
+
+  private simpleHash(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash);
+  }
+
+  getAvatarUrl(user: any): string {
+    // Si l'utilisateur a une image et qu'elle n'est pas l'image par défaut
+    if (user?.image && 
+        user.image !== 'assets/images/default-avatar.png' && 
+        user.image !== 'assets/images/1.png') {
+      return user.image;
+    }
+    
+    // ✅ CORRECTION: Génère toujours un avatar SVG au lieu d'utiliser une image par défaut
+    return this.generateAvatarSVG(user);
+  }
+
   async openAddUserModal() {
     const modal = await this.modalController.create({
       component: AddUserModalComponent,
@@ -99,28 +244,22 @@ export class UtilisateursPage implements OnInit, OnDestroy {
     await modal.present();
     const { data } = await modal.onWillDismiss();
     
-    // ✅ SOLUTION: Ne plus dispatcher createUser ici
-    // Le modal fait déjà le dispatch dans sa méthode saveUser()
     if (data && data.success) {
-      console.log('✅ Modal fermée avec succès - utilisateur créé');
-      // Optionnel: recharger la liste des utilisateurs
       this.store.dispatch(UsersActions.loadUsers({}));
       await this.presentSuccessToast('Utilisateur créé avec succès');
     } else if (data && data.error) {
-      console.error('❌ Erreur lors de la création:', data.error);
       await this.presentErrorToast(data.error);
     }
   }
 
   async openFilterModal() {
     const currentSearchTerm = await this.getFirstValue(this.searchTerm$);
-    const currentCategory = await this.getFirstValue(this.category$);
     
     const modal = await this.modalController.create({
       component: FilterUsersModalComponent,
       cssClass: 'filter-users-modal',
       componentProps: {
-        currentFilter: currentCategory,
+        currentFilter: this.activeFilter,
         currentSearchTerm: currentSearchTerm
       }
     });
@@ -130,7 +269,7 @@ export class UtilisateursPage implements OnInit, OnDestroy {
     
     if (data) {
       if (data.category) {
-        this.store.dispatch(UsersActions.setCategory({ category: data.category }));
+        this.setFilter(data.category);
       }
       if (data.searchTerm !== undefined) {
         this.store.dispatch(UsersActions.setSearchTerm({ searchTerm: data.searchTerm }));
@@ -140,7 +279,7 @@ export class UtilisateursPage implements OnInit, OnDestroy {
 
   async openUserOptions(user: User) {
     const actionSheet = await this.actionSheetController.create({
-      header: `Options pour ${user.name}`,
+      header: `Options pour ${user.firstName} ${user.lastName}`,
       buttons: [
         {
           text: 'Voir les détails',
@@ -184,7 +323,6 @@ export class UtilisateursPage implements OnInit, OnDestroy {
     await actionSheet.present();
   }
 
-  // ✅ NOUVELLE MÉTHODE: Appeler un utilisateur
   callUser(user: User) {
     if (user.phoneNumber) {
       const cleanPhone = user.phoneNumber.replace(/\D/g, '');
@@ -195,7 +333,6 @@ export class UtilisateursPage implements OnInit, OnDestroy {
     }
   }
 
-  // ✅ NOUVELLE MÉTHODE: Envoyer un email à un utilisateur
   emailUser(user: User) {
     if (user.email) {
       window.open(`mailto:${user.email}`);
@@ -204,243 +341,7 @@ export class UtilisateursPage implements OnInit, OnDestroy {
     }
   }
 
-  // ✅ NOUVELLE MÉTHODE: Recherche avancée
-  async openAdvancedSearch() {
-    const alert = await this.alertController.create({
-      header: 'Recherche avancée',
-      inputs: [
-        {
-          name: 'name',
-          type: 'text',
-          placeholder: 'Nom complet...'
-        },
-        {
-          name: 'email',
-          type: 'email',
-          placeholder: 'Email...'
-        },
-        {
-          name: 'phone',
-          type: 'tel',
-          placeholder: 'Téléphone...'
-        },
-        {
-          name: 'location',
-          type: 'text',
-          placeholder: 'Localisation...'
-        }
-      ],
-      buttons: [
-        {
-          text: 'Annuler',
-          role: 'cancel'
-        },
-        {
-          text: 'Rechercher',
-          handler: (data) => {
-            this.performAdvancedSearch(data);
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  // ✅ NOUVELLE MÉTHODE: Effectuer une recherche avancée
-  private performAdvancedSearch(criteria: any) {
-    // Combiner tous les critères de recherche
-    const searchTerms = Object.values(criteria)
-      .filter(term => term && typeof term === 'string' && term.trim().length > 0)
-      .join(' ');
-    
-    if (searchTerms) {
-      this.store.dispatch(UsersActions.setSearchTerm({ searchTerm: searchTerms }));
-      this.presentSuccessToast(`Recherche effectuée pour: "${searchTerms}"`);
-    } else {
-      this.presentErrorToast('Veuillez saisir au moins un critère de recherche');
-    }
-  }
-
-  // ✅ NOUVELLE MÉTHODE: Exporter les données
-  async exportUsers() {
-    const actionSheet = await this.actionSheetController.create({
-      header: 'Exporter les utilisateurs',
-      buttons: [
-        {
-          text: 'Exporter tous les utilisateurs',
-          icon: 'download-outline',
-          handler: () => this.performExport('all')
-        },
-        {
-          text: 'Exporter les utilisateurs filtrés',
-          icon: 'filter-outline',
-          handler: () => this.performExport('filtered')
-        },
-        {
-          text: 'Exporter les utilisateurs actifs',
-          icon: 'checkmark-circle-outline',
-          handler: () => this.performExport('active')
-        },
-        {
-          text: 'Annuler',
-          icon: 'close',
-          role: 'cancel'
-        }
-      ]
-    });
-
-    await actionSheet.present();
-  }
-
-  // ✅ NOUVELLE MÉTHODE: Effectuer l'export
-  private async performExport(type: 'all' | 'filtered' | 'active') {
-    try {
-      const loading = await this.loadingController.create({
-        message: 'Préparation de l\'export...',
-        spinner: 'crescent'
-      });
-      await loading.present();
-
-      // Récupérer les données selon le type d'export
-      let usersToExport: User[] = [];
-      
-      switch (type) {
-        case 'all':
-          usersToExport = await this.getFirstValue(this.users$);
-          break;
-        case 'filtered':
-          usersToExport = await this.getFirstValue(this.filteredUsers$);
-          break;
-        case 'active':
-          const allUsers = await this.getFirstValue(this.users$);
-          usersToExport = allUsers.filter(user => user.active);
-          break;
-      }
-
-      // Convertir en CSV
-      const csvContent = this.convertToCSV(usersToExport);
-      
-      // Télécharger le fichier
-      this.downloadCSV(csvContent, `utilisateurs_${type}_${new Date().toISOString().split('T')[0]}.csv`);
-      
-      await loading.dismiss();
-      await this.presentSuccessToast(`Export de ${usersToExport.length} utilisateur(s) terminé`);
-    } catch (error) {
-      console.error('Erreur lors de l\'export:', error);
-      await this.presentErrorToast('Erreur lors de l\'export');
-    }
-  }
-
-  // ✅ NOUVELLE MÉTHODE: Convertir en CSV
-  private convertToCSV(users: User[]): string {
-    const headers = [
-      'ID', 'Prénom', 'Nom', 'Email', 'Téléphone', 'Genre', 
-      'Date de naissance', 'Catégorie', 'Statut', 'Nationalité', 
-      'Pays', 'Région', 'Adresse', 'Date d\'inscription'
-    ];
-
-    const csvRows = [
-      headers.join(','),
-      ...users.map(user => [
-        user.id,
-        `"${user.firstName || ''}"`,
-        `"${user.lastName || ''}"`,
-        `"${user.email || ''}"`,
-        `"${user.phoneNumber || ''}"`,
-        `"${user.gender || ''}"`,
-        `"${user.dateOfBirth || ''}"`,
-        `"${user.category || ''}"`,
-        user.active ? 'Actif' : 'Inactif',
-        `"${user.location?.nationality || ''}"`,
-        `"${user.location?.country || ''}"`,
-        `"${user.location?.region || ''}"`,
-        `"${user.location?.address || ''}"`,
-        `"${user.createdAt || ''}"`
-      ].join(','))
-    ];
-
-    return csvRows.join('\n');
-  }
-
-  // ✅ NOUVELLE MÉTHODE: Télécharger le CSV
-  private downloadCSV(content: string, filename: string) {
-    const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', filename);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  }
-
-  // ✅ NOUVELLE MÉTHODE: Statistiques rapides
-  async showUserStats() {
-    const allUsers = await this.getFirstValue(this.users$);
-    const activeUsers = allUsers.filter(user => user.active);
-    const inactiveUsers = allUsers.filter(user => !user.active);
-    
-    // Statistiques par catégorie
-    const statsByCategory = this.filters.slice(1).map(category => {
-      const count = allUsers.filter(user => user.category === category).length;
-      return { category, count };
-    });
-
-    // Statistiques par genre
-    const maleCount = allUsers.filter(user => 
-      user.gender?.toLowerCase().includes('homme') || 
-      user.gender?.toLowerCase().includes('male') ||
-      user.gender?.toLowerCase().includes('m')
-    ).length;
-    const femaleCount = allUsers.filter(user => 
-      user.gender?.toLowerCase().includes('femme') || 
-      user.gender?.toLowerCase().includes('female') ||
-      user.gender?.toLowerCase().includes('f')
-    ).length;
-
-    const alert = await this.alertController.create({
-      header: 'Statistiques des utilisateurs',
-      message: `
-        <div style="text-align: left;">
-          <h4>📊 Vue d'ensemble</h4>
-          <p><strong>Total:</strong> ${allUsers.length} utilisateurs</p>
-          <p><strong>Actifs:</strong> ${activeUsers.length} (${Math.round(activeUsers.length/allUsers.length*100)}%)</p>
-          <p><strong>Inactifs:</strong> ${inactiveUsers.length} (${Math.round(inactiveUsers.length/allUsers.length*100)}%)</p>
-          
-          <h4>👥 Par catégorie</h4>
-          ${statsByCategory.map(stat => 
-            `<p><strong>${stat.category}:</strong> ${stat.count}</p>`
-          ).join('')}
-          
-          <h4>🚻 Par genre</h4>
-          <p><strong>Hommes:</strong> ${maleCount}</p>
-          <p><strong>Femmes:</strong> ${femaleCount}</p>
-          <p><strong>Non spécifié:</strong> ${allUsers.length - maleCount - femaleCount}</p>
-        </div>
-      `,
-      buttons: [
-        {
-          text: 'Exporter',
-          handler: () => this.exportUsers()
-        },
-        {
-          text: 'Fermer',
-          role: 'cancel'
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  // ✅ MÉTHODE AMÉLIORÉE: Visualisation utilisateur avec gestion des actions
   async viewUser(user: User) {
-    // Marquer l'utilisateur comme sélectionné dans le store
     this.store.dispatch(UsersActions.selectUser({ user }));
     
     const modal = await this.modalController.create({
@@ -451,25 +352,19 @@ export class UtilisateursPage implements OnInit, OnDestroy {
     
     await modal.present();
     
-    // ✅ NOUVEAU: Gérer les actions retournées par le modal
     const { data, role } = await modal.onWillDismiss();
     
     if (data && data.success) {
       switch (role) {
         case 'edit':
-          // L'utilisateur a été modifié
           await this.presentSuccessToast('Utilisateur modifié avec succès');
           this.refreshUsers();
           break;
-          
         case 'delete':
-          // L'utilisateur a été supprimé
           await this.presentSuccessToast('Utilisateur supprimé avec succès');
           this.refreshUsers();
           break;
-          
         case 'status':
-          // Le statut a été modifié
           const action = data.user?.active ? 'activé' : 'désactivé';
           await this.presentSuccessToast(`Utilisateur ${action} avec succès`);
           this.refreshUsers();
@@ -480,7 +375,6 @@ export class UtilisateursPage implements OnInit, OnDestroy {
     }
   }
 
-  // ✅ MÉTHODE AMÉLIORÉE: Édition avec retour de données
   async editUser(user: User) {
     const modal = await this.modalController.create({
       component: EditUserModalComponent,
@@ -492,24 +386,25 @@ export class UtilisateursPage implements OnInit, OnDestroy {
     const { data, role } = await modal.onWillDismiss();
     
     if (data && role === 'save') {
-      // ✅ Dispatch de l'action de mise à jour
       this.store.dispatch(UsersActions.updateUser({ 
         userId: user.id, 
-        userData: data 
+        userData: data.userData 
       }));
       
       await this.presentSuccessToast('Utilisateur modifié avec succès');
+    } else if (data && role === 'delete') {
+      this.store.dispatch(UsersActions.deleteUser({ userId: user.id }));
+      await this.presentSuccessToast('Utilisateur supprimé avec succès');
     }
   }
 
-  // ✅ MÉTHODE AMÉLIORÉE: Basculer le statut avec feedback
   async toggleUserStatus(user: User) {
     const newStatus = !user.active;
     const action = newStatus ? 'activer' : 'désactiver';
     
     const alert = await this.alertController.create({
       header: 'Confirmation',
-      message: `Êtes-vous sûr de vouloir ${action} ${user.name} ?`,
+      message: `Êtes-vous sûr de vouloir ${action} ${user.firstName} ${user.lastName} ?`,
       buttons: [
         {
           text: 'Annuler',
@@ -534,11 +429,13 @@ export class UtilisateursPage implements OnInit, OnDestroy {
   }
 
   async confirmDeleteUser(user: User) {
+    const userName = user.firstName + ' ' + user.lastName;
+    
     const alert = await this.alertController.create({
       header: 'Confirmation de suppression',
       message: `
         <div style="text-align: center;">
-          <p>Êtes-vous sûr de vouloir supprimer <strong>${user.name}</strong> ?</p>
+          <p>Êtes-vous sûr de vouloir supprimer <strong>${userName}</strong> ?</p>
           <p style="color: #e74c3c; font-size: 0.9em; margin-top: 10px;">
             ⚠️ Cette action est irréversible
           </p>
@@ -563,24 +460,11 @@ export class UtilisateursPage implements OnInit, OnDestroy {
     await alert.present();
   }
 
-  // ✅ NOUVELLE MÉTHODE: Gestion des erreurs d'image
-  onImageError(event: Event) {
-    const target = event.target as HTMLImageElement;
-    if (target) {
-      // ✅ Utiliser des placeholders en ligne au lieu de fichiers locaux
-      const isUser = target.alt?.includes('femme') || target.alt?.includes('female');
-      target.src = isUser ? 
-        'https://via.placeholder.com/150/FF69B4/FFFFFF?text=F' : 
-        'https://via.placeholder.com/150/4169E1/FFFFFF?text=M';
-    }
-  }
-
-  // ✅ NOUVELLE MÉTHODE: Actions rapides depuis la liste
   async quickActions(user: User, event: Event) {
-    event.stopPropagation(); // Empêcher l'ouverture du modal de vue
+    event.stopPropagation();
     
     const actionSheet = await this.actionSheetController.create({
-      header: `Actions rapides - ${user.name}`,
+      header: `Actions rapides - ${user.firstName} ${user.lastName}`,
       buttons: [
         {
           text: 'Voir les détails',
@@ -614,7 +498,7 @@ export class UtilisateursPage implements OnInit, OnDestroy {
     await actionSheet.present();
   }
 
-  // Méthodes utilitaires (conservées et améliorées)
+  // Méthodes utilitaires
   private async getFirstValue<T>(observable: Observable<T>): Promise<T> {
     return new Promise(resolve => {
       const subscription = observable.pipe(takeUntil(this.destroy$)).subscribe(value => {
@@ -624,7 +508,6 @@ export class UtilisateursPage implements OnInit, OnDestroy {
     });
   }
 
-  // ✅ MÉTHODES DE NOTIFICATION AMÉLIORÉES
   private async presentSuccessToast(message: string) {
     const toast = await this.toastController.create({
       message,
@@ -659,7 +542,10 @@ export class UtilisateursPage implements OnInit, OnDestroy {
     await toast.present();
   }
 
-  // ✅ NOUVELLE MÉTHODE: Toast informatif
+  trackByUserId(index: number, user: User): string {
+    return user.id;
+  }
+
   private async presentInfoToast(message: string) {
     const toast = await this.toastController.create({
       message,
@@ -675,37 +561,5 @@ export class UtilisateursPage implements OnInit, OnDestroy {
       ]
     });
     await toast.present();
-  }
-
-  // ✅ NOUVELLE MÉTHODE: Actions en lot
-  async bulkActions() {
-    // Cette méthode peut être développée pour gérer les actions en lot
-    const actionSheet = await this.actionSheetController.create({
-      header: 'Actions en lot',
-      buttons: [
-        {
-          text: 'Sélectionner plusieurs utilisateurs',
-          icon: 'checkbox-outline',
-          handler: () => this.presentInfoToast('Fonctionnalité à venir...')
-        },
-        {
-          text: 'Exporter la sélection',
-          icon: 'download-outline',
-          handler: () => this.exportUsers()
-        },
-        {
-          text: 'Voir les statistiques',
-          icon: 'bar-chart-outline',
-          handler: () => this.showUserStats()
-        },
-        {
-          text: 'Annuler',
-          icon: 'close',
-          role: 'cancel'
-        }
-      ]
-    });
-
-    await actionSheet.present();
   }
 }

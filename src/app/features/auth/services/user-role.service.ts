@@ -8,45 +8,64 @@ import { selectCurrentUser, selectUserRoles } from '../store/auth.selectors';
   providedIn: 'root'
 })
 export class UserRoleService {
-  
+
   public currentUser$: Observable<User | null>;
   public userRoles$: Observable<string[]>;
+  public hasMultipleRoles$: Observable<boolean>;
+  public isOnlyVisiteur$: Observable<boolean>;
   public primaryRole$: Observable<UserRole | null>;
 
   constructor(private store: Store) {
     this.currentUser$ = this.store.select(selectCurrentUser);
     this.userRoles$ = this.store.select(selectUserRoles);
-    
+
     // Observable du rôle principal (le premier rôle ou le plus élevé)
     this.primaryRole$ = this.userRoles$.pipe(
       map(roles => this.getPrimaryRole(roles))
     );
+
+    // Observable pour vérifier si l'utilisateur a plusieurs rôles
+    this.hasMultipleRoles$ = this.userRoles$.pipe(
+      map(roles => this.hasMultipleNonVisiteurRoles(roles))
+    );
+
+    // Observable pour vérifier si l'utilisateur est seulement visiteur
+    this.isOnlyVisiteur$ = this.userRoles$.pipe(
+      map(roles => this.isUserOnlyVisiteur(roles))
+    );
   }
 
   /**
-   * Détermine le rôle principal basé sur la hiérarchie
+   * Vérifie si l'utilisateur a plusieurs rôles (excluant VISITEUR)
    */
-  private getPrimaryRole(roles: string[]): UserRole | null {
-    if (!roles || roles.length === 0) {
-      return UserRole.VISITEUR;
-    }
+  private hasMultipleNonVisiteurRoles(roles: string[]): boolean {
+    if (!roles || roles.length === 0) return false;
 
-    // Ordre de priorité des rôles (du plus élevé au plus bas)
-    const roleHierarchy = [
-      UserRole.ADMIN,
-      UserRole.MOUKHADAM,
-      UserRole.G_DAHIRA,
-      UserRole.DISCIPLE,
-      UserRole.VISITEUR
-    ];
+    const nonVisiteurRoles = roles.filter(role => role !== UserRole.VISITEUR);
+    return nonVisiteurRoles.length > 1;
+  }
 
-    for (const role of roleHierarchy) {
-      if (roles.includes(role)) {
-        return role;
-      }
-    }
+  /**
+   * Vérifie si l'utilisateur est uniquement visiteur
+   */
+  private isUserOnlyVisiteur(roles: string[]): boolean {
+    if (!roles || roles.length === 0) return true;
 
-    return UserRole.VISITEUR;
+    // Si l'utilisateur n'a que le rôle VISITEUR ou aucun rôle
+    return roles.length === 1 && roles[0] === UserRole.VISITEUR ||
+      roles.every(role => role === UserRole.VISITEUR);
+  }
+
+  /**
+   * Vérifie si l'utilisateur a des rôles privilégiés (autres que VISITEUR)
+   */
+  hasPrivilegedRoles(): Observable<boolean> {
+    return this.userRoles$.pipe(
+      map(roles => {
+        if (!roles || roles.length === 0) return false;
+        return roles.some(role => role !== UserRole.VISITEUR);
+      })
+    );
   }
 
   /**
@@ -54,7 +73,7 @@ export class UserRoleService {
    */
   hasRole(role: UserRole): Observable<boolean> {
     return this.userRoles$.pipe(
-      map(roles => roles.includes(role))
+      map(roles => roles && roles.includes(role))
     );
   }
 
@@ -63,7 +82,10 @@ export class UserRoleService {
    */
   hasAnyRole(roles: UserRole[]): Observable<boolean> {
     return this.userRoles$.pipe(
-      map(userRoles => roles.some(role => userRoles.includes(role)))
+      map(userRoles => {
+        if (!userRoles || userRoles.length === 0) return false;
+        return roles.some(role => userRoles.includes(role));
+      })
     );
   }
 
@@ -72,8 +94,19 @@ export class UserRoleService {
    */
   hasAllRoles(roles: UserRole[]): Observable<boolean> {
     return this.userRoles$.pipe(
-      map(userRoles => roles.every(role => userRoles.includes(role)))
+      map(userRoles => {
+        if (!userRoles || userRoles.length === 0) return false;
+        return roles.every(role => userRoles.includes(role));
+      })
     );
+  }
+
+  /**
+   * Vérifie si l'utilisateur peut accéder aux fonctionnalités visiteur
+   * (uniquement s'il n'a que le rôle visiteur)
+   */
+  canAccessVisiteurFeatures(): Observable<boolean> {
+    return this.isOnlyVisiteur$;
   }
 
   /**
@@ -95,10 +128,15 @@ export class UserRoleService {
     return this.hasRole(UserRole.G_DAHIRA);
   }
 
-  get isVisiteur$(): Observable<boolean> {
-    return this.userRoles$.pipe(
-      map(roles => !roles || roles.length === 0 || roles.includes(UserRole.VISITEUR))
-    );
+  get isCollecteFonds$(): Observable<boolean> {
+    return this.hasRole(UserRole.COLLECTE_FONDS);
+  }
+
+  /**
+   * Retourne true seulement si l'utilisateur n'a QUE le rôle visiteur
+   */
+  get isVisiteurOnly$(): Observable<boolean> {
+    return this.isOnlyVisiteur$;
   }
 
   /**
@@ -115,8 +153,35 @@ export class UserRoleService {
   getCurrentRolesSync(): string[] {
     let currentRoles: string[] = [];
     this.userRoles$.pipe(
-      map(roles => currentRoles = roles)
+      map(roles => currentRoles = roles || [])
     ).subscribe().unsubscribe();
     return currentRoles;
+  }
+
+  /**
+   * Détermine le rôle principal basé sur la hiérarchie
+   */
+  private getPrimaryRole(roles: string[]): UserRole | null {
+    if (!roles || roles.length === 0) {
+      return UserRole.VISITEUR;
+    }
+
+    // Ordre de priorité des rôles (du plus élevé au plus bas)
+    const roleHierarchy = [
+      UserRole.ADMIN,
+      UserRole.MOUKHADAM,
+      UserRole.G_DAHIRA,
+      UserRole.COLLECTE_FONDS,
+      UserRole.DISCIPLE,
+      UserRole.VISITEUR
+    ];
+
+    for (const role of roleHierarchy) {
+      if (roles.includes(role)) {
+        return role;
+      }
+    }
+
+    return UserRole.VISITEUR;
   }
 }

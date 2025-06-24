@@ -1,15 +1,15 @@
-// DIRECTIVE POUR MASQUER SELON LE RÔLE (INVERSE)
+// DIRECTIVE POUR MASQUER SELON LE RÔLE
 
 import { Directive, Input, TemplateRef, ViewContainerRef, OnInit, OnDestroy } from '@angular/core';
 import { UserRoleService } from '../services/user-role.service';
 import { Subscription } from 'rxjs';
 import { UserRole } from '../models/user.model';
-
 @Directive({
   selector: '[appHideForRole]'
 })
 export class RoleHideDirective implements OnInit, OnDestroy {
   @Input() appHideForRole: UserRole | UserRole[] | string | string[] = UserRole.VISITEUR;
+  @Input() hideForPrivilegedUsers: boolean = false; // Cache pour les utilisateurs avec des rôles privilégiés
   
   private subscription!: Subscription;
 
@@ -22,9 +22,17 @@ export class RoleHideDirective implements OnInit, OnDestroy {
   ngOnInit() {
     const hiddenRoles = this.normalizeRoles(this.appHideForRole);
     
-    this.subscription = this.userRoleService.hasAnyRole(hiddenRoles).subscribe(hasHiddenRole => {
-      this.updateVisibility(!hasHiddenRole);
-    });
+    if (this.hideForPrivilegedUsers) {
+      // Cacher pour tous les utilisateurs ayant des rôles privilégiés
+      this.subscription = this.userRoleService.hasPrivilegedRoles().subscribe(hasPrivilegedRoles => {
+        this.updateVisibility(!hasPrivilegedRoles);
+      });
+    } else {
+      // Logique normale
+      this.subscription = this.userRoleService.hasAnyRole(hiddenRoles).subscribe(hasHiddenRole => {
+        this.updateVisibility(!hasHiddenRole);
+      });
+    }
   }
 
   ngOnDestroy() {

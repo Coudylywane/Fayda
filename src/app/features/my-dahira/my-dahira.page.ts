@@ -1,20 +1,16 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DahiraMember, MemberRole } from '../../models/dahira.model';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { DahiraService } from 'src/app/features/dahiras/services/dahira.service';
-import { Dahira } from 'src/app/features/dahiras/models/dahira.model';
-import { User, UserRole } from 'src/app/features/auth/models/user.model';
-import { DahiraServiceAdmin } from '../../services/dahira.service';
+import { DahiraServiceAdmin } from 'src/app/Admin/pages/dahira/services/dahira.service';
+import { User, UserRole } from '../auth/models/user.model';
+import { Dahira } from '../dahiras/models/dahira.model';
 
 @Component({
-  selector: 'app-dahira-details',
-  templateUrl: './dahira-details.component.html',
-  styleUrls: ['./dahira-details.component.scss'],
-  imports: [CommonModule, FormsModule]
+  selector: 'app-my-dahira',
+  templateUrl: './my-dahira.page.html',
+  styleUrls: ['./my-dahira.page.scss'],
+  standalone: false
 })
-export class DahiraDetailsComponent implements OnInit {
+export class MyDahiraPage implements OnInit {
   dahiraId: string = '';
   dahira: Dahira | null = null;
   members: User[] = [];
@@ -30,20 +26,11 @@ export class DahiraDetailsComponent implements OnInit {
   usersWithoutDahira: User[] = [];
   selectedUser: User | null = null;
   selectedMember: User | null = null;
-  selectedRole: UserRole = UserRole.DISCIPLE;
-
-  roleOptions = [
-    { value: UserRole.DISCIPLE, label: 'Disciple' },
-    { value: UserRole.MOUKHADAM, label: 'Moukhadam' },
-    { value: UserRole.VISITEUR, label: 'Visiteur' }
-  ];
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private dahiraService: DahiraServiceAdmin,
-    // private userService: UserService,
-    // private dahiraService: DahiraService,
   ) { }
 
   ngOnInit(): void {
@@ -52,7 +39,7 @@ export class DahiraDetailsComponent implements OnInit {
     if (this.dahiraId) {
       this.loadDahiraDetails();
     } else {
-      this.router.navigate(['admin/dahiras']);
+      // this.goBack();
     }
   }
 
@@ -123,27 +110,6 @@ export class DahiraDetailsComponent implements OnInit {
   //     }
   //   });
   // }
-
-  selectUser(user: User): void {
-    this.selectedUser = user;
-  }
-
-  addMember(): void {
-    if (this.selectedUser && this.selectedRole) {
-      // this.dahiraService.addMemberToDahira(this.dahiraId, this.selectedUser.userId, this.selectedRole).subscribe({
-      //   next: (success: any) => {
-      //     if (success) {
-      //       this.showAddMemberModal = false;
-      //       this.selectedUser = null;
-      //       this.loadDahiraMembers();
-      //     }
-      //   },
-      //   error: (error: any) => {
-      //     console.error('Erreur lors de l\'ajout du membre', error);
-      //   }
-      // });
-    }
-  }
 
   toggleMemberActions(member: any, event?: Event): void {
     if (event) {
@@ -216,31 +182,7 @@ export class DahiraDetailsComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['admin/dahira']);
-  }
-
-  getRoleBadgeClass(role: MemberRole): string {
-    switch (role) {
-      case MemberRole.RESPONSIBLE:
-        return 'bg-purple-100 text-purple-800';
-      case MemberRole.MOUKHADAM:
-        return 'bg-blue-100 text-blue-800';
-      case MemberRole.DISCIPLE:
-      default:
-        return 'bg-green-100 text-green-800';
-    }
-  }
-
-  getRoleLabel(role: MemberRole): string {
-    switch (role) {
-      case MemberRole.RESPONSIBLE:
-        return 'Responsable';
-      case MemberRole.MOUKHADAM:
-        return 'Moukhadam';
-      case MemberRole.DISCIPLE:
-      default:
-        return 'Disciple';
-    }
+    this.router.navigate(['home']);
   }
 
   getResponsable(): string {

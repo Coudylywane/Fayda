@@ -35,7 +35,7 @@ export class RequestEffects {
         this.actions$.pipe(
             ofType(RequestActions.loadAdhesionRequests),
             mergeMap(action =>
-                from(RequestApiService.getRequestByTargetUser(action.userId)).pipe(
+                from(RequestApiService.getRequestByTargetUser(action.dahiraId)).pipe(
                     mergeMap((response) => {
                         console.log("resultat demandeAdhesion: ", response.data);
 

@@ -17,6 +17,7 @@ export interface User {
     active: boolean,
     updatedAt: string,
     dahira?: Dahira;
+    dahiraId?: string;
     mouqadam?: User;
     disciples?: User[];
     roles?: UserRole[];

@@ -18,7 +18,7 @@ export const loadRequestsFailure = createAction(
 
 export const loadAdhesionRequests = createAction(
   '[Requests] Load Request',
-  props<{ userId: string }>()
+  props<{ dahiraId: string }>()
 );
 
 export const loadAdhesionRequestsSuccess = createAction(

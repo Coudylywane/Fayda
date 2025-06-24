@@ -22,9 +22,9 @@ export class RequestService {
     }
 
     // Récupérer les demandes d'un gestionnaire de Dahira
-    getRequestByTargetUser(userId: string) {
-        this.store.dispatch(RequestActions.loadAdhesionRequests({ userId }));
-        console.log("loading service", userId!);
+    getRequestByTargetUser(dahiraId: string) {
+        this.store.dispatch(RequestActions.loadAdhesionRequests({ dahiraId }));
+        console.log("loading service", dahiraId!);
     }
 
     /**

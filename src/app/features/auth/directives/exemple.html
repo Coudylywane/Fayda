@@ -1,0 +1,112 @@
+<!-- Exemples d'utilisation des directives modifiées -->
+
+<!-- 1. Afficher UNIQUEMENT pour les visiteurs exclusifs (sans autres rôles) -->
+<div *appShowForVisiteurOnly>
+  <p>Contenu visible uniquement pour les visiteurs purs (sans autres rôles)</p>
+  <button>Devenir membre</button>
+</div>
+
+<!-- 2. Afficher pour les utilisateurs privilégiés (ayant au moins un rôle autre que visiteur) -->
+<div *appShowForPrivileged>
+  <p>Contenu pour les utilisateurs ayant des privilèges</p>
+  <button>Accéder au tableau de bord</button>
+</div>
+
+<!-- 3. Afficher pour un rôle spécifique (logique classique) -->
+<div *appShowForRole="'FAYDA_ROLE_ADMIN'">
+  <p>Contenu visible uniquement pour les administrateurs</p>
+</div>
+
+<!-- 4. Afficher pour plusieurs rôles (au moins un) -->
+<div *appShowForRole="['FAYDA_ROLE_ADMIN', 'FAYDA_ROLE_MOUQADAM']">
+  <p>Contenu visible pour les admins OU les mouqadams</p>
+</div>
+
+<!-- 5. Afficher pour plusieurs rôles (tous requis) -->
+<div *appShowForRole="['FAYDA_ROLE_ADMIN', 'FAYDA_ROLE_COLLECTE_FONDS']; requireAllRoles: true">
+  <p>Contenu visible pour les admins ET collecteurs de fonds</p>
+</div>
+
+<!-- 6. Afficher pour visiteur UNIQUEMENT si c'est son seul rôle -->
+<div *appShowForRole="'FAYDA_ROLE_USER'; visiteurOnly: true">
+  <p>Contenu visible uniquement pour les visiteurs exclusifs</p>
+</div>
+
+<!-- 7. Afficher pour visiteur même s'il a d'autres rôles -->
+<div *appShowForRole="'FAYDA_ROLE_USER'; visiteurOnly: false">
+  <p>Contenu visible pour tous ceux qui ont le rôle visiteur</p>
+</div>
+
+<!-- 8. Masquer pour les utilisateurs privilégiés -->
+<div *appHideForRole="''; hideForPrivilegedUsers: true">
+  <p>Contenu masqué pour les utilisateurs ayant des privilèges</p>
+  <p>Visible uniquement pour les visiteurs purs</p>
+</div>
+
+<!-- 9. Masquer pour un rôle spécifique -->
+<div *appHideForRole="'FAYDA_ROLE_ADMIN'">
+  <p>Contenu masqué pour les administrateurs</p>
+</div>
+
+<!-- 10. Masquer pour plusieurs rôles -->
+<div *appHideForRole="['FAYDA_ROLE_ADMIN', 'FAYDA_ROLE_MOUQADAM']">
+  <p>Contenu masqué pour les admins et mouqadams</p>
+</div>
+
+<!-- Exemples d'utilisation dans des menus -->
+<nav>
+  <ul>
+    <!-- Lien visible uniquement pour les visiteurs exclusifs -->
+    <li *appShowForVisiteurOnly>
+      <a routerLink="/inscription">S'inscrire</a>
+    </li>
+    
+    <!-- Lien visible pour les utilisateurs privilégiés -->
+    <li *appShowForPrivileged>
+      <a routerLink="/dashboard">Tableau de bord</a>
+    </li>
+    
+    <!-- Lien visible uniquement pour les admins -->
+    <li *appShowForRole="'FAYDA_ROLE_ADMIN'">
+      <a routerLink="/admin">Administration</a>
+    </li>
+    
+    <!-- Lien visible pour les gestionnaires de dahira -->
+    <li *appShowForRole="'FAYDA_ROLE_DAHIRA'">
+      <a routerLink="/dahira">Gestion Dahira</a>
+    </li>
+    
+    <!-- Lien visible pour les collecteurs de fonds -->
+    <li *appShowForRole="'FAYDA_ROLE_COLLECTE_FONDS'">
+      <a routerLink="/collecte">Collecte de fonds</a>
+    </li>
+  </ul>
+</nav>
+
+<!-- Exemple de formulaire conditionnel -->
+<form>
+  <!-- Champs visibles pour tous les utilisateurs connectés -->
+  <div *appShowForPrivileged>
+    <input type="text" placeholder="Nom d'utilisateur" />
+    <input type="email" placeholder="Email" />
+  </div>
+  
+  <!-- Champs supplémentaires pour les administrateurs -->
+  <div *appShowForRole="'FAYDA_ROLE_ADMIN'">
+    <select>
+      <option>Assigner un rôle</option>
+      <option value="FAYDA_ROLE_DISCIPLE">Disciple</option>
+      <option value="FAYDA_ROLE_MOUQADAM">Mouqadam</option>
+    </select>
+  </div>
+  
+  <!-- Bouton visible uniquement pour les utilisateurs non-privilégiés -->
+  <button type="button" *appShowForVisiteurOnly>
+    Demander une adhésion
+  </button>
+  
+  <!-- Bouton pour les utilisateurs privilégiés -->
+  <button type="submit" *appShowForPrivileged>
+    Enregistrer
+  </button>
+</form>

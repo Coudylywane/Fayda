@@ -1,6 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 import { User } from '../models/user.model';
 import { Login, Register, Token } from '../models/auth.model';
+import { Dahira } from '../../dahiras/models/dahira.model';
 
 export const login = createAction(
   '[Auth] Login',
@@ -52,6 +53,21 @@ export const loadUserFromTokenSuccess = createAction(
 
 export const loadUserFromTokenFailure = createAction(
   '[Auth] Load User From Token Failure',
+  props<{ error: string }>()
+);
+
+// actions pour la Dahira
+export const getDahira = createAction(
+  '[Auth] Get Dahira'
+);
+
+export const getDahiraSuccess = createAction(
+  '[Auth] Get Dahira Success',
+  props<{ dahira: Dahira }>()
+);
+
+export const getDahiraFailure = createAction(
+  '[Auth] Get Dahira Failure',
   props<{ error: string }>()
 );
 

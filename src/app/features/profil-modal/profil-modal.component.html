@@ -30,7 +30,7 @@
         <div *appShowForRole="UserRole.DISCIPLE" class="px-3 py-1 bg-green-100 text-green-600 text-xs font-medium rounded-full">
           Disciple
         </div>
-        <div *appShowForPrimaryRole="UserRole.VISITEUR" class="px-3 py-1 bg-gray-200 text-gray-600 text-xs font-medium rounded-full">
+        <div *appShowForVisiteurOnly class="px-3 py-1 bg-gray-200 text-gray-600 text-xs font-medium rounded-full">
           Visiteur
         </div>
         <div *appShowForRole="UserRole.G_DAHIRA" class="px-3 py-1 bg-blue-200 text-blue-900 text-xs font-medium rounded-full">
@@ -109,21 +109,21 @@
     </div>
 
     <!-- Section Gestion (Admin et Moukhadam) -->
-    <div *appShowForRole="[UserRole.COLLECTE_FONDS, UserRole.MOUKHADAM]" class="px-6 py-4 bg-white rounded-xl shadow-sm mx-3 mb-3">
+    <div *appShowForRole="[UserRole.MOUKHADAM, UserRole.G_DAHIRA, UserRole.COLLECTE_FONDS]" class="px-6 py-4 bg-white rounded-xl shadow-sm mx-3 mb-3">
       <h3 class="mb-3 text-sm font-bold text-gray-900">Gestion</h3>
       
       <div class="">
-        <div *appShowForPrimaryRole="UserRole.MOUKHADAM" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+        <div *appShowForRole="UserRole.MOUKHADAM" (click)="navigateTo('disciples')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="people-circle" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Mes Disciples</span>
         </div>
         
-        <div *appShowForPrimaryRole="UserRole.G_DAHIRA" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+        <div *appShowForRole="UserRole.G_DAHIRA" (click)="navigateTo('mydahira/'+user?.dahiraId!)" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="home" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Ma Dahira</span>
         </div>
         
-        <div *appShowForPrimaryRole="UserRole.COLLECTE_FONDS" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+        <div *appShowForRole="UserRole.COLLECTE_FONDS" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="home" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Mes collectes de fonds</span>
         </div>
@@ -148,31 +148,31 @@
       
       <div class="">
         <!-- Demandes pour les visiteurs et disciples -->
-        <div *appShowForPrimaryRole="UserRole.VISITEUR" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+        <div *appHideForRole="[UserRole.MOUKHADAM, UserRole.ADMIN]" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="person" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Devenir disciple d'un Moukhadam</span>
         </div>
 
         <!-- Demandes d'adhésion Dahira -->
-        <div *appShowForPrimaryRole="[UserRole.VISITEUR,UserRole.DISCIPLE]" (click)="navigateTo('dahiras')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+        <div *appHideForRole="[UserRole.G_DAHIRA, UserRole.ADMIN]" (click)="navigateTo('dahiras')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="person" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Adhérer à une Dahira</span>
         </div>
 
         <!-- Demandes de création de Dahira -->
-        <div *appHideForRole="[UserRole.G_DAHIRA]" (click)="navigateTo('dahiras/create')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+        <div *appHideForRole="[UserRole.G_DAHIRA, UserRole.ADMIN]" (click)="navigateTo('dahiras/create')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="person" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Créer Dahira</span>
         </div>
 
         <!-- Demandes de création de collecte de fonds -->
-        <div (click)="navigateTo('finances/create-collect')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+        <div *appHideForRole="[UserRole.COLLECTE_FONDS, UserRole.ADMIN]" (click)="navigateTo('finances/create-collect')" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="person" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Créer une collecte de fonds</span>
         </div>
         
         <!-- Demande pour devenir Moukhadam (pas pour les admins) -->
-        <div *appShowForPrimaryRole="[UserRole.DISCIPLE,UserRole.G_DAHIRA]" (click)="becomeMoukhadam()" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+        <div *appHideForRole="[UserRole.VISITEUR, UserRole.MOUKHADAM, UserRole.DISCIPLE]" (click)="becomeMoukhadam()" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="person-circle" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Devenir Moukhadam</span>
         </div>
@@ -192,7 +192,7 @@
     </div>
   
     <!-- Activities Section -->
-    <div class="px-6 py-4 bg-white rounded-xl shadow-sm mx-3 mb-3">
+    <div *appHideForRole="UserRole.VISITEUR" class="px-6 py-4 bg-white rounded-xl shadow-sm mx-3 mb-3">
       <h3 class="mb-3 text-sm font-bold text-gray-900">Activités de la Faydah</h3>
       
       <div class="">
@@ -207,7 +207,7 @@
         </div>
         
         <!-- Contenu avancé pour les membres connectés -->
-        <div *appHideForRole="UserRole.VISITEUR" class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
+        <div  class="flex items-center p-2.5 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer">
           <ion-icon name="calendar" class="mr-3 text-gray-500 text-lg"></ion-icon>
           <span class="text-sm text-gray-700">Événements à venir</span>
         </div>

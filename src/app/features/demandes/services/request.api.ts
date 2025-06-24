@@ -15,11 +15,11 @@ export class RequestApiService {
         return axios.post(`approval`, data);
     }
 
-    static getRequestByTargetUser(userId: string) {
+    static getRequestByTargetUser(dahiraId: string) {
         console.log("RequestApiService");
         // user-requests/dahira/{dahiraId}
 
-        return axios.get(`user-requests/requester/${userId}`);
+        return axios.get(`user-requests/dahira/${dahiraId}`);
     }
 
     static getAllRequest() {

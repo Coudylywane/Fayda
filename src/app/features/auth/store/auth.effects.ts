@@ -7,6 +7,7 @@ import { AuthApi } from '../services/auth.api';
 import { jwtDecode } from "jwt-decode";
 import { User, UserRole } from '../models/user.model';
 import { Token } from '../models/auth.model';
+import { DahiraApiService } from '../../dahiras/services/dahira-api.service';
 
 @Injectable()
 export class AuthEffects {
@@ -35,13 +36,32 @@ export class AuthEffects {
                             // 🔁 Appel API pour récupérer les détails de l'utilisateur
                             return from(AuthApi.getUserInfo(userId!)).pipe(
                                 map((userDetailsResponse) => {
-                                    const user: User = userDetailsResponse.data.data;
+                                    let user: User = userDetailsResponse.data.data;
                                     user.roles = roles.filter(
                                         (role: any): role is UserRole => Object.values(UserRole).includes(role as UserRole)
                                     ); // Ajouter les rôles à l'utilisateur
                                     const isAdmin: boolean = [UserRole.ADMIN, UserRole.MOUKHADAM].some(role => user.roles!.includes(role))
                                     console.log(" is Admin?", user.roles);
 
+                                    if(user?.dahiraId) {
+                                        console.log("dahiraId");
+                                        
+                                        from(DahiraApiService.getDahira(user.dahiraId)).pipe(
+                                            map((dahiraResponse) => {
+                                                console.log("dahira: ",dahiraResponse);
+                                                user = {...user, dahira: dahiraResponse.data.data};
+                                                
+                                                const messageLogin = isAdmin ? 'Connexion réussie en tant qu\'administrateur' : 'Connexion réussie en tant qu\'utilisateur';
+                                                return AuthActions.loginSuccess({ token, user, isAdmin, message: messageLogin });
+                                            })
+                                        ),
+                                            catchError((e) => {
+                                                console.log("Erreur de récupération de dahira: ", e);
+                                                
+                                                const messageLogin = isAdmin ? 'Connexion réussie en tant qu\'administrateur' : 'Connexion réussie en tant qu\'utilisateur';
+                                                return of(AuthActions.loginSuccess({ token, user, isAdmin, message: messageLogin }));
+                                            });
+                                    }
                                     const messageLogin = isAdmin ? 'Connexion réussie en tant qu\'administrateur' : 'Connexion réussie en tant qu\'utilisateur';
                                     return AuthActions.loginSuccess({ token, user, isAdmin, message: messageLogin });
                                 }),
@@ -136,12 +156,12 @@ export class AuthEffects {
                             const user = userDetailsResponse.data.data;
                             // Stocker is_admin
                             user.roles = roles.filter(
-                                        (role: any): role is UserRole => Object.values(UserRole).includes(role as UserRole)
-                                    ); // Ajouter les rôles à l'utilisateur
-                                    const isAdmin: boolean = [UserRole.ADMIN, UserRole.MOUKHADAM].some(role => user.roles!.includes(role))
-                                    console.log(" is Admin?", user.roles);
+                                (role: any): role is UserRole => Object.values(UserRole).includes(role as UserRole)
+                            ); // Ajouter les rôles à l'utilisateur
+                            const isAdmin: boolean = [UserRole.ADMIN, UserRole.MOUKHADAM].some(role => user.roles!.includes(role))
+                            console.log(" is Admin?", user.roles);
 
-                                    const message = isAdmin ? 'recupération de l\'administrateur' : 'Récupération de l\'utilisateur';
+                            const message = isAdmin ? 'recupération de l\'administrateur' : 'Récupération de l\'utilisateur';
                             console.log('Informations utilisateur chargées avec succès:', user);
                             return AuthActions.loadUserFromTokenSuccess({ token, isAdmin, user, message });
                         }),

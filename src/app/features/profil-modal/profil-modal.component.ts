@@ -17,6 +17,7 @@ import { PrimaryRoleVisibilityDirective } from '../auth/directives/primary-role-
 import { RoleHideDirective } from '../auth/directives/role-hide.directive';
 import { RoleVisibilityDirective } from '../auth/directives/role-visibility.directive';
 import { ProfilModalService } from './services/profil-modal.service';
+import { VisiteurOnlyDirective } from '../auth/directives/role-visitor-only.directive';
 
 @Component({
   selector: 'app-profil-modal',
@@ -28,7 +29,7 @@ import { ProfilModalService } from './services/profil-modal.service';
     ButtonComponent,
     RoleVisibilityDirective,
     RoleHideDirective,
-    PrimaryRoleVisibilityDirective],
+    VisiteurOnlyDirective],
 })
 export class ProfilModalComponent implements OnInit, OnDestroy {
   UserRole = UserRole;
@@ -50,7 +51,6 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private store: Store<AppState>,
-    private confettiService: ConfettiService,
     private toastService: ToastService,
     private profilModalService: ProfilModalService
   ) {
@@ -125,6 +125,10 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
     // this.dismiss();
   }
 
+  /**
+   * Naviguer vers une url
+   * @param url 
+   */
   async navigateTo(url: string) {
     if (await this.router.navigate([url])) {
       this.modalCtrl.dismiss();

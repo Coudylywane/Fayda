@@ -217,13 +217,13 @@
                 class="px-1.5 py-1.5 bg-amber-100 text-amber-600 text-center uppercase text-xs font-medium rounded-md">
                 Moukhadam
               </div>
-              <div *appShowForPrimaryRole="UserRole.DISCIPLE"
+              <div *appShowForPrimaryRole="UserRole.G_DAHIRA"
                 class="px-1.5 py-1.5 bg-green-100 text-green-600 text-center uppercase text-xs font-medium rounded-md">
-                Disciple
+                Gestionnaire Dahira
               </div>
-              <div *appShowForPrimaryRole="UserRole.VISITEUR"
+              <div *appShowForPrimaryRole="UserRole.COLLECTE_FONDS"
                 class="px-1.5 py-1.5 bg-gray-100 text-gray-600 text-center uppercase text-xs font-medium rounded-md">
-                Visiteur
+                Collecte de fonds
               </div>
               <div *appShowForPrimaryRole="UserRole.ADMIN"
                 class="px-1.5 py-1.5 bg-gray-900 text-white text-center uppercase text-xs font-medium rounded-md">
@@ -258,19 +258,19 @@
                     class="inline-flex items-center px-1.5 py-0.5 ml-0.5 text-xs font-medium bg-gray-800 text-white rounded-md dark:bg-white dark:text-neutral-800">
                     ADMIN
                   </span> -->
-                  <span *appShowForPrimaryRole="UserRole.MOUKHADAM"
+                  <span *appShowForRole="UserRole.MOUKHADAM"
                     class="px-1.5 py-1.5 bg-amber-100 text-amber-600 text-center uppercase text-xs font-medium rounded-md">
                     Moukhadam
                   </span>
-                  <span *appShowForPrimaryRole="UserRole.DISCIPLE"
+                  <span *appShowForRole="UserRole.G_DAHIRA"
                     class="px-1.5 py-1.5 bg-green-100 text-green-600 text-center uppercase text-xs font-medium rounded-md">
-                    Disciple
+                    Gestionnaire Dahira
                   </span>
-                  <span *appShowForPrimaryRole="UserRole.VISITEUR"
+                  <span *appShowForRole="UserRole.COLLECTE_FONDS"
                     class="px-1.5 py-1.5 bg-gray-100 text-gray-600 text-center uppercase text-xs font-medium rounded-md">
-                    Visiteur
+                    Collecte de fonds
                   </span>
-                  <span *appShowForPrimaryRole="UserRole.ADMIN"
+                  <span *appShowForRole="UserRole.ADMIN"
                     class="px-1.5 py-1.5 bg-gray-900 text-white text-center uppercase text-xs font-medium rounded-md">
                     ADMIN
                   </span>

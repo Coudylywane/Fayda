@@ -2,104 +2,56 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { Dahira, DahiraMember, MemberRole } from '../models/dahira.model';
+import axios from 'axios';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DahiraServiceAdmin {
-//   private apiUrl = `${environment.apiUrl}/dahiras`;
+  //   private apiUrl = `${environment.apiUrl}/dahiras`;
   private dahirasSubject = new BehaviorSubject<Dahira[]>([]);
   public dahiras$ = this.dahirasSubject.asObservable();
-  
+
   // Données mockées pour le développement
-  private mockDahiras: Dahira[] = Array(12).fill(null).map((_, i) => ({
-    id: `dahira-${i + 1}`,
-    name: `Dahira Mouhamadou Mourtada ${i + 1}`,
-    memberCount: 160,
-    location: `Location ${i + 1}`,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }));
+
 
   constructor() {
-    // Initialiser avec les données mockées
-    this.dahirasSubject.next(this.mockDahiras);
   }
 
-  // Obtenir un Dahira par ID
-  getDahiraById(id: string): Observable<Dahira> {
-    // Pour la démo, nous utilisons les données mockées
-    const dahira = this.mockDahiras.find(d => d.id === id);
-    return of(dahira as Dahira);
-    
-    // Dans une vraie implémentation :
-    // return this.http.get<Dahira>(`${this.apiUrl}/${id}`);
-  }
+  /**
+   * Obtenir les details d'une Dahira par ID
+   * @param dahiraId 
+   * @returns 
+   */
+  async getDahiraById(dahiraId: string) {
+    try {
+      const response = await axios.get(`dahiras/${dahiraId}/members`);
+      console.log("getDisciple: ", response);
 
-  // Obtenir les membres d'un Dahira
-  getDahiraMembers(dahiraId: string): Observable<DahiraMember[]> {
-    // Simuler des membres pour la démo
-    const mockMembers: DahiraMember[] = Array(10).fill(null).map((_, i) => ({
-      userId: `user-${i + 1}`,
-      dahiraId,
-      user: {
-        id: `user-${i + 1}`,
-        firstName: `Prénom${i + 1}`,
-        lastName: `Nom${i + 1}`,
-        email: `user${i + 1}@example.com`,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      role: i === 0 ? MemberRole.RESPONSIBLE : 
-            i < 3 ? MemberRole.MOUKHADAM : MemberRole.DISCIPLE,
-      joinedAt: new Date()
-    }));
-    
-    return of(mockMembers);
-    
-    // Dans une vraie implémentation :
-    // return this.http.get<DahiraMember[]>(`${this.apiUrl}/${dahiraId}/members`);
-  }
-
-  // Mettre à jour un Dahira
-  updateDahira(id: string, changes: Partial<Dahira>): Observable<Dahira> {
-    // Pour la démo
-    const index = this.mockDahiras.findIndex(d => d.id === id);
-    if (index !== -1) {
-      this.mockDahiras[index] = {
-        ...this.mockDahiras[index],
-        ...changes,
-        updatedAt: new Date()
+      return {
+        success: true,
+        data: response.data
       };
-      this.dahirasSubject.next([...this.mockDahiras]);
-      return of(this.mockDahiras[index]);
+    } catch (error: any) {
+      console.error('Erreur lors de la récupération des disciples:', error);
+      throw {
+        success: false,
+        message: error.response?.data?.message || 'Erreur de récupération de la Dahira',
+        response: error.response
+      };
     }
-    
-    // Dans une vraie implémentation :
-    // return this.http.put<Dahira>(`${this.apiUrl}/${id}`, changes).pipe(
-    //   tap(updatedDahira => {
-    //     const currentDahiras = this.dahirasSubject.value;
-    //     const index = currentDahiras.findIndex(d => d.id === id);
-    //     if (index !== -1) {
-    //       currentDahiras[index] = updatedDahira;
-    //       this.dahirasSubject.next([...currentDahiras]);
-    //     }
-    //   })
-    // );
-    
-    return of({} as Dahira);
   }
 
   // Supprimer un Dahira
   deleteDahira(id: string): Observable<boolean> {
     // Pour la démo
-    const index = this.mockDahiras.findIndex(d => d.id === id);
-    if (index !== -1) {
-      this.mockDahiras.splice(index, 1);
-      this.dahirasSubject.next([...this.mockDahiras]);
-      return of(true);
-    }
-    
+    // const index = this.mockDahiras.findIndex(d => d.id === id);
+    // if (index !== -1) {
+    //   this.mockDahiras.splice(index, 1);
+    //   this.dahirasSubject.next([...this.mockDahiras]);
+    //   return of(true);
+    // }
+
     // Dans une vraie implémentation :
     // return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
     //   map(() => {
@@ -108,7 +60,7 @@ export class DahiraServiceAdmin {
     //     return true;
     //   })
     // );
-    
+
     return of(false);
   }
 
@@ -118,7 +70,7 @@ export class DahiraServiceAdmin {
     // return this.http.post<void>(`${this.apiUrl}/${dahiraId}/members`, { userId, role }).pipe(
     //   map(() => true)
     // );
-    
+
     return of(true);
   }
 
@@ -128,7 +80,7 @@ export class DahiraServiceAdmin {
     // return this.http.delete<void>(`${this.apiUrl}/${dahiraId}/members/${userId}`).pipe(
     //   map(() => true)
     // );
-    
+
     return of(true);
   }
 }

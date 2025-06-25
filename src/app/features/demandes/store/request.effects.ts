@@ -22,8 +22,8 @@ export class RequestEffects {
                         return of(RequestActions.loadRequestsSuccess({ request: response.data.data  }));
                     }),
                     catchError((error) => {
-                        const errorMessage = error.response?.data?.message || error.message || 'Erreur de récupération';
-                        console.error('Login error:', error);
+                        const errorMessage = error.response?.data?.message || error.message || 'Erreur de récupération Requests';
+                        console.error('Login Requests error:', error);
                         return of(RequestActions.loadRequestsFailure({ error: errorMessage }));
                     })
                 )
@@ -43,7 +43,7 @@ export class RequestEffects {
                     }),
                     catchError((error) => {
                         const errorMessage = error.response?.data?.message || error.message || 'Erreur de récupération';
-                        console.error('Login error:', error);
+                        console.error('Login demandeAdhesion error:', error);
                         return of(RequestActions.loadRequestsFailure({ error: errorMessage }));
                     })
                 )

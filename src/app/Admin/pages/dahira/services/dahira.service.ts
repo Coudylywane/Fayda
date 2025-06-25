@@ -1,19 +1,12 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { Dahira, DahiraMember, MemberRole } from '../models/dahira.model';
+import { Observable, of } from 'rxjs';
+
 import axios from 'axios';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DahiraServiceAdmin {
-  //   private apiUrl = `${environment.apiUrl}/dahiras`;
-  private dahirasSubject = new BehaviorSubject<Dahira[]>([]);
-  public dahiras$ = this.dahirasSubject.asObservable();
-
-  // Données mockées pour le développement
-
 
   constructor() {
   }
@@ -65,7 +58,7 @@ export class DahiraServiceAdmin {
   }
 
   // Ajouter un membre à un Dahira
-  addMemberToDahira(dahiraId: string, userId: string, role: MemberRole): Observable<boolean> {
+  addMemberToDahira(dahiraId: string, userId: string, role: any): Observable<boolean> {
     // Dans une vraie implémentation :
     // return this.http.post<void>(`${this.apiUrl}/${dahiraId}/members`, { userId, role }).pipe(
     //   map(() => true)

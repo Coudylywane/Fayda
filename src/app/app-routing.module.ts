@@ -53,7 +53,7 @@ const routes: Routes = [
     loadChildren: () => import('./features/demandes/demandes.module').then(m => m.DemandesPageModule)
   },
   {
-    path: 'demande-dahira',
+    path: 'demande-dahira/:id',
     loadChildren: () => import('./features/demande-dahira/demande-dahira.module').then( m => m.DemandeDahiraPageModule)
   },
   {
@@ -69,9 +69,18 @@ const routes: Routes = [
     loadChildren: () => import('./features/disciples/disciples.module').then( m => m.DisciplesPageModule)
   },
   {
-    path: 'mydahira',
+    path: 'mydahira/:id',
     loadChildren: () => import('./features/my-dahira/my-dahira.module').then( m => m.MyDahiraPageModule)
   },
+  {
+    path: 'mycollecte',
+    loadChildren: () => import('./features/my-collecte/my-collecte.module').then( m => m.MyCollectePageModule)
+  },
+  {
+    path: 'mymoukhadam/:id',
+    loadChildren: () => import('./features/my-moukhadam/my-moukhadam.module').then( m => m.MyMoukhadamPageModule)
+  },
+
 
   // Route fallback si aucune correspondance
   // {

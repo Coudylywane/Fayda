@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject, takeUntil } from 'rxjs';
 import { selectCurrentUser } from '../auth/store/auth.selectors';
@@ -27,7 +27,7 @@ export class DemandeDahiraPage implements OnInit {
   error: string | null = null;
   options: any;
   loading: boolean = false;
-  userId!: string;
+  dahiraId!: string;
 
   private destroy$ = new Subject<void>();
 
@@ -44,37 +44,40 @@ export class DemandeDahiraPage implements OnInit {
   requestToReject: RequestDto | null = null;
   rejectionReason: string = '';
 
+  demandeNull: boolean = false;
+
   constructor(
     private router: Router,
     private store: Store,
     private requestService: RequestService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private route: ActivatedRoute,
   ) { }
 
   ngOnInit() {
     // Charger toutes les données une seule fois
 
-    this.store.select(selectCurrentUser).subscribe(user => {
+    this.dahiraId = this.route.snapshot.paramMap.get('id') || '';
 
-      this.userId = user?.userId!;
-      console.log("store: demande this.userId:", this.userId);
-    });
+    if (this.dahiraId && this.dahiraId !== "undefined") {
+      this.loadAllAdhesionRequests();
 
-    this.loadAllRequests()
-
-    this.store.select(selectRequestState).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(requestState => {
-      this.error = requestState.error
-      this.loading = requestState.loading
+      this.store.select(selectRequestState).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe(requestState => {
+        this.error = requestState.error
+        this.loading = requestState.loading
 
 
-      if (requestState.demandes && Array.isArray(requestState.demandes)) {
-        this.allRequests = [...requestState.demandes];
-        this.applyFilters();
-        console.log('Demandes loaded:', this.allRequests.length); // DEBUG
-      }
-    })
+        if (requestState.demandeAdhesion && Array.isArray(requestState.demandeAdhesion)) {
+          this.allRequests = [...requestState.demandeAdhesion];
+          this.applyFilters();
+          console.log('Demandes loaded:', this.allRequests.length); // DEBUG
+        }
+      })
+    } else {
+      this.demandeNull = true;
+    }
   }
 
   // Gestion des onglets
@@ -86,9 +89,9 @@ export class DemandeDahiraPage implements OnInit {
   /**
    * Charge toutes les demandes du serveur
    */
-  private loadAllRequests(): void {
-    console.log('loadAllRequests');
-    this.requestService.getRequestByTargetUser(this.userId);
+  private loadAllAdhesionRequests(): void {
+    console.log('Charge toutes les demandes adhesion');
+    this.requestService.getRequestByTargetUser(this.dahiraId);
   }
 
   // Application des filtres
@@ -276,10 +279,12 @@ export class DemandeDahiraPage implements OnInit {
     if (this.requestToReject && this.isRejectionReasonValid) {
       // Appel à votre service pour rejeter la demande
       if (this.requestToApprove) {
-        const data: ApprovalDto = { targetId: this.requestToApprove.requestId,
+        const data: ApprovalDto = {
+          targetId: this.requestToApprove.requestId,
           approved: true,
           rejectionReason: this.rejectionReason,
-          targetType: this.requestToApprove.requestType }
+          targetType: this.requestToApprove.requestType
+        }
 
         try {
           const response = await RequestApiService.approval(data);
@@ -317,7 +322,7 @@ export class DemandeDahiraPage implements OnInit {
 
   // === AUTRES MÉTHODES ===
   refresh() {
-    this.loadAllRequests();
+    this.loadAllAdhesionRequests();
   }
 
   goHome() {

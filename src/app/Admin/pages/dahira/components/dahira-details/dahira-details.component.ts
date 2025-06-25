@@ -1,6 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DahiraMember, MemberRole } from '../../models/dahira.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DahiraService } from 'src/app/features/dahiras/services/dahira.service';
@@ -219,25 +218,25 @@ export class DahiraDetailsComponent implements OnInit {
     this.router.navigate(['admin/dahira']);
   }
 
-  getRoleBadgeClass(role: MemberRole): string {
+  getRoleBadgeClass(role: UserRole): string {
     switch (role) {
-      case MemberRole.RESPONSIBLE:
+      case UserRole.COLLECTE_FONDS:
         return 'bg-purple-100 text-purple-800';
-      case MemberRole.MOUKHADAM:
+      case UserRole.MOUKHADAM:
         return 'bg-blue-100 text-blue-800';
-      case MemberRole.DISCIPLE:
+      case UserRole.DISCIPLE:
       default:
         return 'bg-green-100 text-green-800';
     }
   }
 
-  getRoleLabel(role: MemberRole): string {
+  getRoleLabel(role: UserRole): string {
     switch (role) {
-      case MemberRole.RESPONSIBLE:
-        return 'Responsable';
-      case MemberRole.MOUKHADAM:
+      case UserRole.COLLECTE_FONDS:
+        return 'Collecteur de fonds';
+      case UserRole.MOUKHADAM:
         return 'Moukhadam';
-      case MemberRole.DISCIPLE:
+      case UserRole.DISCIPLE:
       default:
         return 'Disciple';
     }

@@ -12,7 +12,8 @@ export const requestReducer = createReducer(
   on(RequestActions.loadRequestsSuccess, (state, { request }) => ({
     ...state,
     loading: false,
-    demandes: request
+    demandes: request,
+    error: null
   })),
   on(RequestActions.loadRequestsFailure, RequestActions.loadAdhesionRequestsFailure, (state, { error }) => ({
     ...state,
@@ -22,6 +23,7 @@ export const requestReducer = createReducer(
   on(RequestActions.loadAdhesionRequestsSuccess, (state, { demandeAdhesion }) => ({
     ...state,
     loading: false,
-    demandeAdhesion
+    demandeAdhesion,
+    error: null
   }))
 );

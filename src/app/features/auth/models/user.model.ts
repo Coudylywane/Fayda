@@ -12,15 +12,15 @@ export interface User {
     gender: string,
     userIdKeycloak?: string,
     dateOfBirth: string,
-    createdAt: string,
     location: LocationInfo,
     active: boolean,
-    updatedAt: string,
     dahira?: Dahira;
     dahiraId?: string;
-    mouqadam?: User;
+    mouqadamId?: string;
     disciples?: User[];
     roles?: UserRole[];
+    createdAt: string,
+    updatedAt: string,
 }
 
 export enum UserRole {
@@ -51,3 +51,5 @@ export interface LocationInfo {
 //     department: string,
 //     address: string
 //   }
+
+

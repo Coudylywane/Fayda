@@ -17,16 +17,16 @@ export const loadRequestsFailure = createAction(
 );
 
 export const loadAdhesionRequests = createAction(
-  '[Requests] Load Request',
+  '[Requests] Load Adhesion Request',
   props<{ dahiraId: string }>()
 );
 
 export const loadAdhesionRequestsSuccess = createAction(
-  '[Requests] Load Request Success',
+  '[Requests] Load Adhesion Request Success',
   props<{ demandeAdhesion: RequestDto[] }>()
 );
 
 export const loadAdhesionRequestsFailure = createAction(
-  '[Requests] Load Request Failure',
+  '[Requests] Load Adhesion Request Failure',
   props<{ error: string }>()
 );

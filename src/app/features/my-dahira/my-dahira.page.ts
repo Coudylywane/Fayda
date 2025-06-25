@@ -26,6 +26,7 @@ export class MyDahiraPage implements OnInit {
   usersWithoutDahira: User[] = [];
   selectedUser: User | null = null;
   selectedMember: User | null = null;
+  dahiraNull: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -36,10 +37,10 @@ export class MyDahiraPage implements OnInit {
   ngOnInit(): void {
     this.dahiraId = this.route.snapshot.paramMap.get('id') || '';
 
-    if (this.dahiraId) {
+    if (this.dahiraId && this.dahiraId !== "undefined") {
       this.loadDahiraDetails();
     } else {
-      // this.goBack();
+      this.dahiraNull = true;
     }
   }
 
@@ -182,7 +183,7 @@ export class MyDahiraPage implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['home']);
+    this.router.navigate(['tabs/home']);
   }
 
   getResponsable(): string {

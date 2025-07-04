@@ -15,7 +15,7 @@ export interface ProjectDTO {
     description: string,
     targetAmount: number,
     currentAmount: number,
-    status: "APPROVED" | "",
+    status: string,
     progressPercentage: number,
     isActive: boolean,
     isTargetAchieved: boolean,

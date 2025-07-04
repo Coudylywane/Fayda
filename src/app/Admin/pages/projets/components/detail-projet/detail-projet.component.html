@@ -1,100 +1,198 @@
-<div class="w-full max-w-full p-4 bg-gray-100 min-h-screen">
+<!-- Template Angular pour detail-projet.component.html -->
+<div class="w-full max-w-7xl mx-auto p-4 bg-gray-100 min-h-screen">
   <!-- En-tête avec bouton retour -->
   <div class="mb-6">
     <button 
       (click)="goBack()" 
-      class="flex items-center text-gray-700 hover:text-gray-900 focus:outline-none"
+      class="flex items-center text-gray-700 hover:text-gray-900 focus:outline-none transition-colors duration-200"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
       </svg>
       Retour
     </button>
   </div>
 
-  <div *ngIf="project" class="bg-white rounded-lg shadow-md overflow-hidden">
+  <!-- Loader -->
+  <div *ngIf="loading" class="bg-white rounded-lg shadow-md p-8 text-center">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+    <p class="text-gray-600">Chargement des détails du projet...</p>
+  </div>
+
+  <!-- Contenu principal du projet -->
+  <div *ngIf="project && !loading" class="bg-white rounded-lg shadow-md overflow-hidden">
     <!-- En-tête du projet -->
     <div class="p-6 border-b border-gray-200">
-      <div class="flex justify-between items-start">
-        <h1 class="text-2xl font-bold text-gray-800">{{ project.title }}</h1>
-        <span [ngClass]="getStatusClass(project.status)" class="px-3 py-1 rounded-full text-sm font-medium">
-          {{ getStatusLabel(project.status) }}
-        </span>
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+        <div class="flex-1">
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">{{ project.title }}</h1>
+          <p class="text-gray-600 text-sm sm:text-base">{{ project.description }}</p>
+          <p class="text-sm text-gray-500 mt-2">
+            <span class="font-medium">Créateur:</span> 
+            <span class="text-green-600">{{ project.creatorName }}</span>
+          </p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <span [ngClass]="getStatusClass(project.status)" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium">
+            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+            {{ getStatusLabel(project.status) }}
+          </span>
+          <span [ngClass]="getActiveStatusClass(project.isActive)" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium">
+            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+            </svg>
+            {{ getActiveStatusLabel(project.isActive) }}
+          </span>
+          <span *ngIf="project.isTargetAchieved" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" clip-rule="evenodd"/>
+            </svg>
+            Objectif atteint
+          </span>
+          <span *ngIf="project.isClosed" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"/>
+            </svg>
+            Fermé
+          </span>
+        </div>
       </div>
-      <p class="mt-2 text-gray-600">{{ project.description }}</p>
 
       <!-- Barre de progression -->
-      <div class="mt-4">
-        <div class="flex justify-between items-center mb-1">
+      <div class="mt-6">
+        <div class="flex justify-between items-center mb-2">
           <span class="text-sm font-medium text-gray-700">Progression</span>
-          <span class="text-sm font-medium text-gray-700">{{ project.progress }}%</span>
+          <span class="text-sm font-medium text-gray-700">{{ project.progressPercentage }}%</span>
         </div>
-        <div class="h-2.5 bg-gray-200 rounded-full">
-          <div class="h-full bg-green-600 rounded-full" [style.width]="project.progress + '%'"></div>
+        <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all duration-300" 
+               [style.width]="project.progressPercentage + '%'"></div>
         </div>
       </div>
 
-      <!-- Informations supplémentaires -->
-      <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Informations financières -->
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
+          <h3 class="text-sm font-medium text-green-700 mb-1">Montant collecté</h3>
+          <p class="text-2xl font-bold text-green-800">{{ formatCurrency(project.currentAmount) }}</p>
+        </div>
+        <div class="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-lg border border-red-200">
+          <h3 class="text-sm font-medium text-red-700 mb-1">Objectif</h3>
+          <p class="text-2xl font-bold text-red-800">{{ formatCurrency(project.targetAmount) }}</p>
+        </div>
+        <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg border border-yellow-200">
+          <h3 class="text-sm font-medium text-yellow-700 mb-1">Reste à collecter</h3>
+          <p class="text-2xl font-bold text-yellow-800">{{ formatCurrency(getRemainingAmount()) }}</p>
+        </div>
+      </div>
+
+      <!-- Informations temporelles -->
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-gray-50 p-4 rounded-lg">
-          <h3 class="text-sm font-medium text-gray-500">Date d'échéance</h3>
-          <p class="mt-1 text-base font-medium text-gray-900">{{ formatDate(project.dueDate) }}</p>
+          <h3 class="text-sm font-medium text-gray-500 mb-1">Date de début</h3>
+          <p class="text-base font-medium text-gray-900">{{ formatDate(project.startDate) }}</p>
         </div>
         <div class="bg-gray-50 p-4 rounded-lg">
-          <h3 class="text-sm font-medium text-gray-500">Montant total collecté</h3>
-          <p class="mt-1 text-base font-medium text-gray-900">{{ totalContribution | currency:'XAF':'symbol':'1.0-0' }}</p>
+          <h3 class="text-sm font-medium text-gray-500 mb-1">Date d'échéance</h3>
+          <p class="text-base font-medium text-gray-900">{{ formatDate(project.endDate) }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <h3 class="text-sm font-medium text-gray-500 mb-1">Jours restants</h3>
+          <p class="text-base font-medium text-gray-900">{{ project.remainingDays }} jours</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <h3 class="text-sm font-medium text-gray-500 mb-1">Durée totale</h3>
+          <p class="text-base font-medium text-gray-900">{{ project.totalDurationInDays }} jours</p>
         </div>
       </div>
     </div>
 
-    <!-- Liste des contributeurs -->
-    <div class="p-6">
-      <h2 class="text-xl font-semibold text-gray-800 mb-4">Contributeurs</h2>
+    <!-- Section des contributeurs -->
+    <!-- <div class="p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-semibold text-gray-800">Contributeurs</h2>
+        <span class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+          {{ getContributorsCount() }} contributeur{{ getContributorsCount() > 1 ? 's' : '' }}
+        </span>
+      </div>
       
-      <div *ngIf="project.contributors && project.contributors.length > 0; else noContributors" class="space-y-2">
-        <div class="bg-gray-50 p-4 rounded-lg mb-4 grid grid-cols-12 font-medium text-gray-700">
-          <div class="col-span-5">Nom</div>
-          <div class="col-span-4">Date</div>
-          <div class="col-span-3 text-right">Montant</div>
+      <div *ngIf="hasContributors()" class="space-y-4">
+        <div class="hidden md:grid grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg font-medium text-gray-700 text-sm">
+          <div class="col-span-2">Contributeur</div>
+          <div>Date de contribution</div>
+          <div class="text-right">Montant</div>
         </div>
         
-        <div *ngFor="let contributor of project.contributors" class="bg-white border border-gray-200 p-4 rounded-lg shadow-sm grid grid-cols-12 items-center">
-          <div class="col-span-5">
-            <p class="font-medium text-gray-800">{{ contributor.name }}</p>
-          </div>
-          <div class="col-span-4 text-gray-600">
-            {{ formatDate(contributor.date) }}
-          </div>
-          <div class="col-span-3 text-right font-medium text-gray-800">
-            {{ contributor.amount | currency:'XAF':'symbol':'1.0-0' }}
+        <div *ngFor="let contributor of project.contributors; let i = index" 
+             class="bg-white border border-gray-200 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <div class="md:grid md:grid-cols-4 md:gap-4 md:items-center">
+            <div class="col-span-2 mb-2 md:mb-0">
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold mr-3"
+                     [ngClass]="'bg-' + ['blue', 'green', 'purple', 'red', 'yellow', 'indigo', 'pink'][i % 7] + '-500'">
+                  {{ getInitials(contributor.fisrtName, contributor.lastName) }}
+                </div>
+                <div>
+                  <p class="font-medium text-gray-800">{{ getContributorFullName(contributor) }}</p>
+                  <p class="text-sm text-gray-500 md:hidden">{{ formatDate(contributor.donateDate) }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="hidden md:block text-gray-600">
+              {{ formatDate(contributor.donateDate) }}
+            </div>
+            <div class="md:text-right">
+              <span class="font-semibold text-gray-800 text-lg">{{ formatCurrency(contributor.amount) }}</span>
+            </div>
           </div>
         </div>
       </div>
       
-      <ng-template #noContributors>
-        <div class="p-8 text-center text-gray-500">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div *ngIf="!hasContributors()" class="p-8 text-center">
+        <div class="max-w-md mx-auto">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
-          <p class="text-lg font-medium mb-2">Aucun contributeur pour l'instant</p>
-          <p>Ce projet n'a pas encore de contributions enregistrées.</p>
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">Aucun contributeur pour l'instant</h3>
+          <p class="text-gray-600 mb-6">Ce projet n'a pas encore de contributions enregistrées. Soyez le premier à contribuer!</p>
         </div>
-      </ng-template>
-    </div>
+      </div>
+    </div> -->
   </div>
   
   <!-- Message d'erreur si le projet n'existe pas -->
-  <div *ngIf="!project" class="bg-white rounded-lg shadow-md p-8 text-center">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-red-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-    </svg>
-    <h2 class="text-xl font-semibold text-gray-800 mb-2">Projet introuvable</h2>
-    <p class="text-gray-600 mb-4">Le projet que vous recherchez n'existe pas ou a été supprimé.</p>
-    <button 
-      (click)="goBack()" 
-      class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none"
-    >
-      Retourner à la liste des projets
-    </button>
+  <div *ngIf="projectNull && !loading" class="bg-white rounded-lg shadow-md p-8 text-center">
+    <div class="max-w-md mx-auto">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-red-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">Projet introuvable</h2>
+      <p class="text-gray-600 mb-6">Le projet que vous recherchez n'existe pas ou a été supprimé.</p>
+      <button 
+        (click)="goBack()" 
+        class="px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors duration-200"
+      >
+        Retourner à la liste des projets
+      </button>
+    </div>
+  </div>
+
+  <!-- Message d'erreur générique -->
+  <div *ngIf="error && !loading && !projectNull" class="bg-white rounded-lg shadow-md p-8 text-center">
+    <div class="max-w-md mx-auto">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-red-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">Erreur de chargement</h2>
+      <p class="text-gray-600 mb-6">{{ error }}</p>
+      <button 
+        (click)="retryLoading()" 
+        class="px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors duration-200"
+      >
+        Réessayer
+      </button>
+    </div>
   </div>
 </div>

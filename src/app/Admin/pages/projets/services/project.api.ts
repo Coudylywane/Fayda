@@ -8,10 +8,25 @@ export class ProjectApiService {
      * Recupérer toutes les collections de l'utilisateur courant
      * @returns 
      */
-    static getProjectByUser() {
-        console.log("ProjectApiService");
+    static async getProjectByUser() {
+        console.log("getProjectByUser");
 
-        return axios.get(`fund-collections/my-collections`);
+        try {
+            const response = await axios.get(`fund-collections/my-collections`);
+            console.log("getProjectByUser: ", response);
+
+            return {
+                success: true,
+                data: response.data
+            };
+        } catch (error: any) {
+            console.error('Erreur lors de la récupération de collecte de fonds:', error);
+            throw {
+                success: false,
+                message: error.response?.data?.message || 'Erreur de récupération de collecte de fonds',
+                response: error.response
+            };
+        }
     }
 
     /**

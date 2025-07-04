@@ -34,7 +34,7 @@
                 Prénom
               </h3>
               <p class="text-lg font-semibold text-gray-800">
-                {{ moukhadam?.firstName }}
+                {{ moukhadam.firstName }}
               </p>
             </div>
 
@@ -44,7 +44,7 @@
                 Nom
               </h3>
               <p class="text-lg font-semibold text-gray-800">
-                {{ moukhadam?.lastName }}
+                {{ moukhadam.lastName }}
               </p>
             </div>
 
@@ -53,7 +53,7 @@
               <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
                 Email
               </h3>
-              <p class="text-lg font-semibold text-gray-800">{{ moukhadam?.email }}</p>
+              <p class="text-lg font-semibold text-gray-800">{{ moukhadam.email }}</p>
             </div>
 
             <!-- Carte pour le téléphone -->
@@ -61,7 +61,7 @@
               <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
                 Téléphone
               </h3>
-              <p class="text-lg font-semibold text-gray-800">{{ moukhadam?.phoneNumber }}</p>
+              <p class="text-lg font-semibold text-gray-800">{{ moukhadam.phoneNumber }}</p>
             </div>
 
             <!-- Carte pour le genre -->
@@ -69,7 +69,7 @@
               <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
                 Genre
               </h3>
-              <p class="text-lg font-semibold text-gray-800">{{ moukhadam?.gender }}</p>
+              <p class="text-lg font-semibold text-gray-800">{{ moukhadam.gender }}</p>
             </div>
           </div>
         </div>
@@ -96,7 +96,7 @@
                 Nationalité
               </h3>
               <p class="text-lg font-semibold text-gray-800">
-                {{ moukhadam?.location?.nationality }}
+                {{ moukhadam.location.nationality }}
               </p>
             </div>
 
@@ -106,7 +106,7 @@
                 Pays
               </h3>
               <p class="text-lg font-semibold text-gray-800">
-                {{ moukhadam?.location?.country || "Non spécifié" }}
+                {{ moukhadam.location.country || "Non spécifié" }}
               </p>
             </div>
 
@@ -116,7 +116,7 @@
                 Région
               </h3>
               <p class="text-lg font-semibold text-gray-800">
-                {{ moukhadam?.location?.region || "Non spécifiée" }}
+                {{ moukhadam.location.region || "Non spécifiée" }}
               </p>
             </div>
 
@@ -126,7 +126,7 @@
                 Département
               </h3>
               <p class="text-lg font-semibold text-gray-800">
-                {{ moukhadam?.location?.department || "Non spécifié" }}
+                {{ moukhadam.location.department || "Non spécifié" }}
               </p>
             </div>
 
@@ -136,7 +136,7 @@
                 Adresse
               </h3>
               <p class="text-lg font-semibold text-gray-800">
-                {{ moukhadam?.location?.address || "Non spécifiée" }}
+                {{ moukhadam!.location!.address || "Non spécifiée" }}
               </p>
             </div>
           </div>

@@ -71,7 +71,7 @@
       <div class="relative pt-1">
         <div class="flex items-center justify-between mb-1">
           <div>
-            <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-green-700 text-white">
+            <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-green-600 text-white">
               68%
             </span>
           </div>
@@ -81,9 +81,8 @@
             </span>
           </div>
         </div>
-        <div class="overflow-hidden h-2 mb-1 text-xs flex rounded bg-gray-200">
-          <div style="width: 68%"
-            class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-700">
+        <div class="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+          <div class="bg-gradient-to-r from-green-500 to-green-700 rounded-full h-1.5" [style.width.%]="68">
           </div>
         </div>
       </div>
@@ -106,7 +105,8 @@
 
             <!-- Barre de progression -->
             <div class="w-full bg-gray-200 rounded-full h-1.5 mb-2">
-              <div class="bg-green-700 h-1.5 rounded-full" [style.width.%]="project.progressPercentage">
+              <div class="bg-gradient-to-r from-green-500 to-green-700 rounded-full h-1.5"
+                [style.width.%]="project.progressPercentage">
               </div>
             </div>
 

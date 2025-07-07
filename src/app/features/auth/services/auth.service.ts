@@ -4,6 +4,7 @@ import { Store } from '@ngrx/store';
 import * as AuthActions from '../store/auth.actions';
 import { selectCurrentUser } from "../store/auth.selectors";
 import { Login, Register, Token } from "../models/auth.model";
+import { AuthApi } from './auth.api';
 
 @Injectable({
   providedIn: "root",
@@ -67,5 +68,9 @@ constructor(private store: Store, ) {
 
   isAdmin(): boolean {
     return localStorage.getItem('is_admin') === 'true';
+  }
+
+  async resetPassword(payload: { newPassword: string }) {
+    return AuthApi.resetPassword(payload);
   }
 }

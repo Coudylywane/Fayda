@@ -18,6 +18,8 @@ import { RoleHideDirective } from '../auth/directives/role-hide.directive';
 import { RoleVisibilityDirective } from '../auth/directives/role-visibility.directive';
 import { ProfilModalService } from './services/profil-modal.service';
 import { VisiteurOnlyDirective } from '../auth/directives/role-visitor-only.directive';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-profil-modal',
@@ -29,7 +31,8 @@ import { VisiteurOnlyDirective } from '../auth/directives/role-visitor-only.dire
     ButtonComponent,
     RoleVisibilityDirective,
     RoleHideDirective,
-    VisiteurOnlyDirective],
+    VisiteurOnlyDirective,
+    ReactiveFormsModule],
 })
 export class ProfilModalComponent implements OnInit, OnDestroy {
   UserRole = UserRole;
@@ -40,7 +43,12 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
   logoutError: string = '';
   isLoading = false;
   error: string = '';
-
+  showLogoutConfirm = false;
+  showChangePasswordModal = false;
+  changePasswordForm: FormGroup;
+  isChangingPassword = false;
+  changePasswordError = '';
+  changePasswordSuccess = '';
 
   // Subject pour gérer la désinscription
   private destroy$ = new Subject<void>();
@@ -52,8 +60,14 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
     private router: Router,
     private store: Store<AppState>,
     private toastService: ToastService,
-    private profilModalService: ProfilModalService
+    private profilModalService: ProfilModalService,
+    private fb: FormBuilder
   ) {
+    this.changePasswordForm = this.fb.group({
+      oldPassword: ['', [Validators.required, Validators.minLength(6)]],
+      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]]
+    }, { validators: this.passwordsMatchValidator });
   }
 
   ngOnInit(): void {
@@ -112,17 +126,55 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
     // Implémentation pour ouvrir les activités
   }
 
-  changePassword() {
-    console.log('Changement de mot de passe');
-    // Implémentation pour changer le mot de passe
+  openChangePasswordModal() {
+    this.showChangePasswordModal = true;
+    this.changePasswordForm.reset();
+    this.changePasswordError = '';
+    this.changePasswordSuccess = '';
   }
 
-  async logout() {
-    await this.authService.logout();
+  closeChangePasswordModal() {
+    this.showChangePasswordModal = false;
+  }
 
+  passwordsMatchValidator(group: FormGroup) {
+    const newPassword = group.get('newPassword')?.value;
+    const confirmPassword = group.get('confirmPassword')?.value;
+    return newPassword === confirmPassword ? null : { passwordMismatch: true };
+  }
+
+  async changePassword() {
+    if (this.changePasswordForm.invalid) return;
+    this.isChangingPassword = true;
+    this.changePasswordError = '';
+    this.changePasswordSuccess = '';
+    const { oldPassword, newPassword } = this.changePasswordForm.value;
+    try {
+      await this.authService.resetPassword({ newPassword });
+      this.changePasswordSuccess = 'Mot de passe changé avec succès.';
+      this.toastService.showSuccess(this.changePasswordSuccess);
+      this.closeChangePasswordModal();
+    } catch (err: any) {
+      this.changePasswordError = err?.response?.data?.message || err?.message || 'Erreur lors du changement de mot de passe.';
+      this.toastService.showError(this.changePasswordError);
+    } finally {
+      this.isChangingPassword = false;
+    }
+  }
+
+  openLogoutConfirm() {
+    this.showLogoutConfirm = true;
+  }
+
+  closeLogoutConfirm() {
+    this.showLogoutConfirm = false;
+  }
+
+  async confirmLogout() {
+    this.closeLogoutConfirm();
+    await this.authService.logout();
     this.logoutAttempted = true;
     console.log('Déconnexion encours');
-    // this.dismiss();
   }
 
   /**

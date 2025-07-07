@@ -38,6 +38,7 @@ export class BaseLayoutAdminPage implements OnInit {
   logoutError: string = '';
   isLoading = false;
 
+  showLogoutConfirm = false;
 
   // Subject pour gérer la désinscription
   private destroy$ = new Subject<void>();
@@ -134,12 +135,19 @@ export class BaseLayoutAdminPage implements OnInit {
     return this.activeTab === tab;
   }
 
-  async logout() {
-    await this.authService.logout();
+  openLogoutConfirm() {
+    this.showLogoutConfirm = true;
+  }
 
+  closeLogoutConfirm() {
+    this.showLogoutConfirm = false;
+  }
+
+  async confirmLogout() {
+    this.closeLogoutConfirm();
+    await this.authService.logout();
     this.logoutAttempted = true;
     console.log('Déconnexion encours');
-    // this.dismiss();
   }
 
   // Méthodes utilitaires pour le template

@@ -45,4 +45,8 @@ export class AuthApi {
     static getUserInfo(id: string) {
         return axios.get(`users/keycloak/${id}`);
     }
+
+    static resetPassword(payload: {newPassword: string }) {
+        return axios.post('auth/reset-password', payload);
+    }
 }

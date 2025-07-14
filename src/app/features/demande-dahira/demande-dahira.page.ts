@@ -189,6 +189,7 @@ export class DemandeDahiraPage implements OnInit {
 
   // === GESTION DE L'APPROBATION ===
   openApprovalModal(request: RequestDto) {
+    console.log("resultat",request);
     this.requestToApprove = request;
     this.showApprovalModal = true;
   }
@@ -234,8 +235,9 @@ export class DemandeDahiraPage implements OnInit {
   async confirmApproval() {
     if (this.requestToApprove) {
       const data: ApprovalDto = { targetId: this.requestToApprove.requestId, approved: true, targetType: this.requestToApprove.requestType }
-
       try {
+        console.log('requestToApprove', data);
+        
         const response = await RequestApiService.approval(data);
         console.log("request ", response);
         this.toastService.showSuccess("Vous avez autorisé la demande");
@@ -276,39 +278,42 @@ export class DemandeDahiraPage implements OnInit {
   }
 
   async confirmRejection() {
+    console.log("requestToReject", this.requestToReject);
+    
     if (this.requestToReject && this.isRejectionReasonValid) {
+      console.log('requestToApprove', this.requestToApprove);
       // Appel à votre service pour rejeter la demande
-      if (this.requestToApprove) {
+      if (this.requestToReject) {
         const data: ApprovalDto = {
-          targetId: this.requestToApprove.requestId,
+          targetId: this.requestToReject.requestId,
           approved: true,
           rejectionReason: this.rejectionReason,
-          targetType: this.requestToApprove.requestType
-        }
+          targetType: this.requestToReject.requestType,
+        };
 
         try {
           const response = await RequestApiService.approval(data);
-          console.log("request ", response);
-          this.toastService.showSuccess("Vous avez décliné la demande");
+          console.log('request ', response);
+          this.toastService.showSuccess('Vous avez décliné la demande');
           // Mise à jour locale en attendant la réponse du serveur
           const requestIndex = this.allRequests.findIndex(
-            req => req.requestId === this.requestToReject!.requestId
+            (req) => req.requestId === this.requestToReject!.requestId
           );
 
           if (requestIndex !== -1) {
             this.allRequests[requestIndex] = {
               ...this.allRequests[requestIndex],
               approvalStatus: StatusEnum.REJECTED,
-              rejectionReason: this.rejectionReason
+              rejectionReason: this.rejectionReason,
             };
             this.applyFilters();
           }
         } catch (error: any) {
           console.error('Erreur demande adhésion:', error);
-          const errorMessage = error.message || 'Erreur lors de l\'envoi de la demande';
+          const errorMessage =
+            error.message || "Erreur lors de l'envoi de la demande";
           this.toastService.showError(errorMessage);
         }
-
 
         this.closeRejectionModal();
       }

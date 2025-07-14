@@ -120,26 +120,26 @@ export class RegisterPage {
   private createForm(): FormGroup {
     return this.fb.group({
       // Étape 1: Informations personnelles
-      firstName: ['dahiraTest', Validators.required],
-      lastName: ['dahiraTest', Validators.required],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
       dateOfBirth: ['', Validators.required],
-      gender: ['homme', Validators.required],
+      gender: ['', Validators.required],
 
       // Étape 2: Contact
-      email: ['dahira@at.sn', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.email]],
       phoneNumber: ['', [Validators.required]],
 
       // Étape 3: Compte
-      username: ['dahira', [Validators.required, Validators.minLength(3)]],
-      password: ['user123', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['user1234', [Validators.required, Validators.minLength(6)]],
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required, Validators.minLength(6)]],
 
       // Étape 4: Localisation
       nationality: ['', Validators.required],
       country: ['', Validators.required],
-      region: ['Dakar', Validators.required],
-      department: ['Dakar'], // Optionnel
-      address: ['Grand Dakar'] // Optionnel
+      region: ['', Validators.required],
+      department: [''], // Optionnel
+      address: [''] // Optionnel
     }, { validators: passwordMatchValidator() });
   }
 
@@ -207,6 +207,8 @@ export class RegisterPage {
 
   register() {
     if (this.registerForm.valid) {
+      console.log("Formulaire valide, envoi des données d'inscription...");
+      
       this.loginAttempted = true;
       const formData = this.prepareFormData();
       console.log("Form data:", formData);

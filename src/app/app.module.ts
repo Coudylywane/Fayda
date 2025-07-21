@@ -28,7 +28,8 @@ import { adminRequestReducer } from './Admin/pages/demandes/store/demande.reduce
 import { AdminRequestEffects } from './Admin/pages/demandes/store/demande.effects';
 import { projectReducer } from './Admin/pages/projets/store/project.reducer';
 import { ProjectEffects } from './Admin/pages/projets/store/project.effects';
-import {  provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import {  HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { AuthInterceptor } from './features/auth/store/auth.interceptor';
 
 @NgModule({
   declarations: [AppComponent],
@@ -40,28 +41,28 @@ import {  provideHttpClient, withInterceptorsFromDi } from '@angular/common/http
     FormsModule,
     StoreModule.forRoot({
       auth: authReducer,
-      dahira: dahiraReducer, 
-      request: requestReducer, 
+      dahira: dahiraReducer,
+      request: requestReducer,
       adminRequest: adminRequestReducer,
-      project: projectReducer
-     }),
+      project: projectReducer,
+    }),
     IonicStorageModule.forRoot(),
     EffectsModule.forRoot([
-      AuthEffects, 
-      DahiraEffects, 
-      RequestEffects, 
+      AuthEffects,
+      DahiraEffects,
+      RequestEffects,
       AdminRequestEffects,
-      ProjectEffects
+      ProjectEffects,
     ]),
-    ToastComponent
+    ToastComponent,
   ],
   providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideAppInitializer(axiosInitializer()),
     provideAnimations(),
-    provideHttpClient(withInterceptorsFromDi())
+    provideHttpClient(withInterceptorsFromDi()),
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {
-}
+export class AppModule {}

@@ -6,10 +6,10 @@
       <button (click)="dismissModal()" class="text-gray-700 p-1 rounded-full hover:bg-gray-200 focus:outline-none">
         <ion-icon name="close-outline" class="text-2xl"></ion-icon>
       </button>
-      <button (click)="toggleFavorite()" class="p-1 rounded-full hover:bg-gray-200 focus:outline-none">
+     <!-- <button (click)="toggleFavorite()" class="p-1 rounded-full hover:bg-gray-200 focus:outline-none">
         <ion-icon [name]="isFavorite ? 'heart' : 'heart-outline'"
           [ngClass]="isFavorite ? 'text-red-500' : 'text-gray-700'" class="text-2xl"></ion-icon>
-      </button>
+      </button> -->
     </div>
 
     <!-- Navigation par onglets - Également en sticky -->
@@ -76,7 +76,7 @@
             <p class="text-xl font-bold">{{ balance.toLocaleString() }} FCFA</p>
           </div>
 
-          <!-- Bouton de contribution -->
+          <!-- Bouton de contribution --> 
           <app-button text="Je contribue" size="xl" radius="md" variant="solid" color="primary" width="full"
             (buttonClick)="openDonateModal()">
           </app-button>

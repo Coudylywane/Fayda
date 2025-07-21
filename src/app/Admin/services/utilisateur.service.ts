@@ -1,86 +1,69 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import axios from 'axios';
 import { User } from '../models/utilisateur.model';
+  import { environment } from '../../../environments/environment';
+
+
+interface ApiResponse {
+  status: string;
+  statusCodeValue: number;
+  code: string;
+  message: string;
+  developerMessage: string;
+  data: User[];
+  timestamp: string;
+  traceId: string;
+  validationErrors: { field: string; rejectedValue: string; message: string }[];
+}
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserService {
-  // Source de données pour les utilisateurs
   private usersSubject = new BehaviorSubject<User[]>([]);
   public users$ = this.usersSubject.asObservable();
-  
-  // Source de données pour les filtres appliqués
+
   private filtersSubject = new BehaviorSubject<any>({});
   public filters$ = this.filtersSubject.asObservable();
 
-  constructor() {
-    // Initialiser avec des données de test
-    this.fetchUsers();
-  }
+  // Assurez-vous que Environment est correctement importé
+  
+  private baseUrl = environment.apiUrl;
 
-  // Simuler une requête API
-  private fetchUsers() {
-    // Données de test
-    const mockUsers: User[] = [
-      {
-        id: 1,
-        nom: 'Diop',
-        prenom: 'Moussa',
-        age: 28,
-        sexe: 'homme',
-        role: 'admin',
-        dahira: 'Touba',
-        position: { lat: 14.7645, lng: -17.3660 }
-      },
-      {
-        id: 2,
-        nom: 'Fall',
-        prenom: 'Aissatou',
-        age: 24,
-        sexe: 'femme',
-        role: 'membre',
-        dahira: 'Tivaouane',
-        position: { lat: 14.7565, lng: -17.3860 }
-      },
-      {
-        id: 3,
-        nom: 'Ndiaye',
-        prenom: 'Amadou',
-        age: 35,
-        sexe: 'homme',
-        role: 'moderateur',
-        dahira: 'Medina Baye',
-        position: { lat: 14.7745, lng: -17.3960 }
-      },
-      {
-        id: 4,
-        nom: 'Sow',
-        prenom: 'Fatou',
-        age: 22,
-        sexe: 'femme',
-        role: 'membre',
-        dahira: 'Touba',
-        position: { lat: 14.7545, lng: -17.3560 }
-      },
-      {
-        id: 5,
-        nom: 'Ba',
-        prenom: 'Omar',
-        age: 40,
-        sexe: 'homme',
-        role: 'admin',
-        dahira: 'Tivaouane',
-        position: { lat: 14.7845, lng: -17.3360 }
-      }
-    ];
+  constructor() {}
 
-    this.usersSubject.next(mockUsers);
-  }
-
-  // Obtenir tous les utilisateurs
-  getAllUsers(): Observable<User[]> {
-    return this.users$;
+  // Récupérer les utilisateurs depuis l'API
+  getAllUsers(page: number = 0, size: number = 10): Observable<User[]> {
+    return new Observable<User[]>((observer) => {
+      axios
+        .get(`${this.baseUrl}/users`, {
+          params: { page, size },
+        })
+        .then((response) => {
+          const apiResponse: ApiResponse = response.data;
+          if (apiResponse.status === 'SUCCESS') {
+            this.usersSubject.next(apiResponse.data);
+            observer.next(apiResponse.data);
+            observer.complete();
+          } else {
+            observer.error(
+              new Error(
+                apiResponse.message ||
+                  'Erreur lors de la récupération des utilisateurs'
+              )
+            );
+          }
+        })
+        .catch((error) => {
+          const errorResponse = error.response?.data || {};
+          const errorMessage =
+            errorResponse.message ||
+            'Erreur lors de la récupération des utilisateurs';
+          observer.error(new Error(errorMessage));
+        });
+    });
   }
 
   // Appliquer des filtres aux utilisateurs
@@ -88,43 +71,51 @@ export class UserService {
     this.filtersSubject.next(filters);
   }
 
-  // Obtenir les utilisateurs filtrés
+  // Obtenir les utilisateurs filtrés (localement pour l'instant)
   getFilteredUsers(): Observable<User[]> {
-    return new Observable<User[]>(observer => {
-      // S'abonner aux utilisateurs et aux filtres
-      const usersSub = this.users$.subscribe(users => {
-        const filtersSub = this.filters$.subscribe(filters => {
-          // Appliquer les filtres
+    return new Observable<User[]>((observer) => {
+      const usersSub = this.users$.subscribe((users) => {
+        const filtersSub = this.filters$.subscribe((filters) => {
           let filteredUsers = [...users];
-          
+
           if (filters.role) {
-            filteredUsers = filteredUsers.filter(user => user.role === filters.role);
+            filteredUsers = filteredUsers.filter(
+              (user) => user.role === filters.role
+            );
           }
-          
+
           if (filters.sexe) {
-            filteredUsers = filteredUsers.filter(user => user.sexe === filters.sexe);
+            filteredUsers = filteredUsers.filter(
+              (user) => user.sexe === filters.sexe
+            );
           }
-          
+
           if (filters.dahira) {
-            filteredUsers = filteredUsers.filter(user => user.dahira === filters.dahira);
+            filteredUsers = filteredUsers.filter(
+              (user) => user.dahira === filters.dahira
+            );
           }
-          
+
           if (filters.ageMin !== undefined) {
-            filteredUsers = filteredUsers.filter(user => user.age >= filters.ageMin);
+            filteredUsers = filteredUsers.filter(
+              (user) => user.age >= filters.ageMin
+            );
           }
-          
+
           if (filters.ageMax !== undefined) {
-            filteredUsers = filteredUsers.filter(user => user.age <= filters.ageMax);
+            filteredUsers = filteredUsers.filter(
+              (user) => user.age <= filters.ageMax
+            );
           }
-          
+
           observer.next(filteredUsers);
         });
-        
+
         return () => {
           filtersSub.unsubscribe();
         };
       });
-      
+
       return () => {
         usersSub.unsubscribe();
       };

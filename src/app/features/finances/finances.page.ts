@@ -15,7 +15,6 @@ import { ProjectDTO } from 'src/app/Admin/pages/projets/models/projet.model';
   standalone: false,
 })
 export class FinancesPage implements OnInit {
-
   allProjects: ProjectDTO[] = [];
   showContributionAmount = false;
   showBalanceAmount = false;
@@ -25,13 +24,22 @@ export class FinancesPage implements OnInit {
   showAddModal: boolean = false;
   addLoading: boolean = false;
 
+  contributionAmount: number = 234000;
+  contributionPercentage: number = 75;
+  balance: number = 0; // Initialiser à 0, mis à jour dans ngOnInit
+  zakatAmount: number = 180000;
+  zakatTarget: number = 350000;
+  zakatPercentage: number = Math.round(
+    (this.zakatAmount / this.zakatTarget) * 100
+  );
+
   private destroy$ = new Subject<void>();
 
   constructor(
     private detailFondsService: DetailFondsService,
     private modalController: ModalController,
-    private store: Store,
-  ) { }
+    private store: Store
+  ) {}
 
   toggleContributionVisibility() {
     this.showContributionAmount = !this.showContributionAmount;
@@ -41,34 +49,27 @@ export class FinancesPage implements OnInit {
     this.showBalanceAmount = !this.showBalanceAmount;
   }
 
-  contributionAmount: number = 234000;
-  contributionPercentage: number = 75;
-
-  // Données pour le solde
-  balance: number = 75000;
-
-  // Données pour le Zakat Tracker
-  zakatAmount: number = 180000;
-  zakatTarget: number = 350000;
-  zakatPercentage: number = Math.round((this.zakatAmount / this.zakatTarget) * 100);
-
-    ngOnInit() {
-      this.loadProjects();
+  ngOnInit() {
+    this.loadProjects();
+    // Initialiser balance depuis localStorage
+    const storedBalance = localStorage.getItem('user_balance');
+    this.balance = storedBalance ? parseInt(storedBalance, 10) : 75000; // Valeur par défaut : 75000 FCFA
 
     // Initialisation ou récupération des données depuis un service
     this.openContributionStory();
 
-    this.store.select(selectProjectState).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(projectState => {
-      this.error = projectState.error;
-      this.loading = projectState.loading;
+    this.store
+      .select(selectProjectState)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((projectState) => {
+        this.error = projectState.error;
+        this.loading = projectState.loading;
 
-      if (projectState.projects && Array.isArray(projectState.projects)) {
-        this.allProjects = [...projectState.projects];
-        console.log('fonds loaded:', this.allProjects.length);
-      }
-    });
+        if (projectState.projects && Array.isArray(projectState.projects)) {
+          this.allProjects = [...projectState.projects];
+          console.log('fonds loaded:', this.allProjects.length);
+        }
+      });
   }
 
   loadProjects() {
@@ -77,7 +78,7 @@ export class FinancesPage implements OnInit {
 
   // Méthode pour formater les nombres avec espacement des milliers
   formatNumber(num: number): string {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   }
 
   // Autres méthodes pour votre application
@@ -111,7 +112,7 @@ export class FinancesPage implements OnInit {
       percentageCollected: 48,
       contributors: 245,
       daysRemaining: 250,
-      imageUrl: 'assets/images/1.png'
+      imageUrl: 'assets/images/1.png',
     };
 
     this.detailFondsService.openCampaignModal(data);
@@ -122,7 +123,7 @@ export class FinancesPage implements OnInit {
       component: ContributionStoryComponent,
       initialBreakpoint: 0.2,
       breakpoints: [0, 0.4, 0.6, 0.9],
-      cssClass: 'comment-modal'
+      cssClass: 'comment-modal',
     });
 
     return await modal.present();

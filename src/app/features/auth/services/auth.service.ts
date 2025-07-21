@@ -45,46 +45,9 @@ export class AuthService {
     this.store.dispatch(AuthActions.login({ login }));
   }
 
-  // register(userData: Register) {
-  //   console.log('register: ', userData);
-
-  //   this.store.dispatch(AuthActions.register({ userData }));
-  // }
-
-    register(userData: Register) {
-    try {
-      const response = this.store.dispatch(AuthActions.register({ userData })); // Ajustez l'URL selon votre API
-      console.log('register: ', response);
-    } catch (error: any) {
-      console.error("Erreur lors de l'inscription:", error);
-      const errorResponse = error.response?.data || {};
-      let errorMessage =
-        errorResponse.developerMessage ||
-        errorResponse.message ||
-        "Erreur lors de l'inscription";
-      let validationErrors: { field: string; message: string }[] = [];
-
-      // Gérer les erreurs de violation d'unicité
-      if (
-        error.response?.status === 500 &&
-        errorMessage.includes('duplicate key value violates unique constraint')
-      ) {
-        if (errorMessage.includes('phone_number')) {
-          errorMessage = 'Ce numéro de téléphone existe déjà.';
-          validationErrors = [{ field: 'phoneNumber', message: errorMessage }];
-        } else if (errorMessage.includes('email')) {
-          errorMessage = 'Cet email existe déjà.';
-          validationErrors = [{ field: 'email', message: errorMessage }];
-        }
-      }
-
-      throw {
-        success: false,
-        message: errorMessage,
-        statusCode: error.response?.status,
-        validationErrors,
-      };
-    }
+  register(userData: Register) {
+    console.log('register: ', userData);
+    this.store.dispatch(AuthActions.register({ userData }));
   }
 
   logout() {
@@ -112,4 +75,35 @@ export class AuthService {
   async resetPassword(payload: { newPassword: string }) {
     return AuthApi.resetPassword(payload);
   }
+
+
+  async refreshToken(): Promise<boolean> {
+    const token: Token = JSON.parse(localStorage.getItem('auth_token') || '{}');
+    if (!token.refresh_token) {
+      this.logout();
+      return false;
+    }
+
+    try {
+      const response = await AuthApi.refreshToken({
+        refreshToken: token.refresh_token,
+      });
+      const newToken: Token = response.data;
+      localStorage.setItem('auth_token', JSON.stringify(newToken));
+      this.isAuthenticatedSubject.next(true);
+      this.store.dispatch(AuthActions.loadUserFromToken());
+      return true;
+    } catch (error: any) {
+      console.error('Erreur lors du rafraîchissement du token:', error);
+      const errorResponse = error.message || 'Erreur lors du rafraîchissement du token';
+
+      // if (error.statusCode === 400 || error.statusCode === 401) {
+      //   this.toastService.showError('Votre session a expiré. Veuillez vous reconnecter.');
+      //   this.logout();
+      // }
+
+      return false;
+    }
+  }
+
 }

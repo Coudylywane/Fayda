@@ -7,6 +7,7 @@ import { Store } from '@ngrx/store';
 import { Subject, takeUntil } from 'rxjs';
 import { selectProjectState } from 'src/app/Admin/pages/projets/store/project.selectors';
 import { ProjectDTO } from 'src/app/Admin/pages/projets/models/projet.model';
+import { ZakatContributionModalComponent } from './components/zakat-contribution-modal/zakat-contribution-modal.component';
 
 @Component({
   selector: 'app-finances',
@@ -18,16 +19,18 @@ export class FinancesPage implements OnInit {
   allProjects: ProjectDTO[] = [];
   showContributionAmount = false;
   showBalanceAmount = false;
-  zakatProgress = 75; // Pourcentage pour le cercle de progression
   error: string | null = null;
   loading: boolean = false;
   showAddModal: boolean = false;
   addLoading: boolean = false;
 
   contributionAmount: number = 234000;
-  contributionPercentage: number = 75;
+  contributionPercentage: number = 0;
   balance: number = 0; // Initialiser à 0, mis à jour dans ngOnInit
-  zakatAmount: number = 180000;
+  contribut: number = 0;
+  showGoalModal = false;
+  contributionGoal: number = 0;
+  zakatAmount: number = 0;
   zakatTarget: number = 350000;
   zakatPercentage: number = Math.round(
     (this.zakatAmount / this.zakatTarget) * 100
@@ -53,23 +56,34 @@ export class FinancesPage implements OnInit {
     this.loadProjects();
     // Initialiser balance depuis localStorage
     const storedBalance = localStorage.getItem('user_balance');
-    this.balance = storedBalance ? parseInt(storedBalance, 10) : 75000; // Valeur par défaut : 75000 FCFA
+    this.balance = storedBalance ? parseInt(storedBalance, 10) : 75000;
+    const storedContribut = localStorage.getItem('user_contribut');
+    this.contribut = storedContribut ? parseInt(storedContribut, 10) : 0;
+    const savedGoal = localStorage.getItem('contributionGoal');
+    const storedZakat = localStorage.getItem('zakatAmount');
+    this.zakatAmount = storedZakat ? parseInt(storedZakat, 10) : 0;
+    this.zakatPercentage = Math.round(
+      (this.zakatAmount / this.zakatTarget) * 100
+    );
+    if (savedGoal) {
+      this.contributionGoal = parseInt(savedGoal, 10);
+    } else {
+      this.contributionGoal = 100000; // Valeur par défaut si rien de sauvegardé
+    }
 
-    // Initialisation ou récupération des données depuis un service
-    this.openContributionStory();
+    this.calculatePercentage();
+        this.store
+          .select(selectProjectState)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((projectState) => {
+            this.error = projectState.error;
+            this.loading = projectState.loading;
 
-    this.store
-      .select(selectProjectState)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((projectState) => {
-        this.error = projectState.error;
-        this.loading = projectState.loading;
-
-        if (projectState.projects && Array.isArray(projectState.projects)) {
-          this.allProjects = [...projectState.projects];
-          console.log('fonds loaded:', this.allProjects.length);
-        }
-      });
+            if (projectState.projects && Array.isArray(projectState.projects)) {
+              this.allProjects = [...projectState.projects];
+              console.log('fonds loaded:', this.allProjects.length);
+            }
+          });
   }
 
   loadProjects() {
@@ -128,4 +142,43 @@ export class FinancesPage implements OnInit {
 
     return await modal.present();
   }
+
+  calculatePercentage() {
+    if (this.contributionGoal > 0) {
+      this.contributionPercentage = Math.min(
+        Math.round((this.contribut / this.contributionGoal) * 100),
+        100
+      );
+    } else {
+      this.contributionPercentage = 0;
+    }
+  }
+
+  onSaveGoal(goal: number) {
+    this.contributionGoal = goal;
+    localStorage.setItem('contributionGoal', goal.toString()); // <-- Sauvegarde
+    this.calculatePercentage();
+  }
+
+  async openZakatModal() {
+    const modal = await this.modalController.create({
+      component: ZakatContributionModalComponent,
+      cssClass: 'rounded-modal',
+    });
+
+    await modal.present();
+
+    const { data: amount } = await modal.onWillDismiss();
+
+    if (amount) {
+      this.zakatAmount += parseInt(amount, 10);
+      localStorage.setItem('zakatAmount', this.zakatAmount.toString());
+      this.zakatPercentage = Math.min(
+        Math.round((this.zakatAmount / this.zakatTarget) * 100),
+        100
+      );
+    }
+  }
+
+
 }

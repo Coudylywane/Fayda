@@ -8,6 +8,7 @@ import { FinancesPageRoutingModule } from './finances-routing.module';
 
 import { FinancesPage } from './finances.page';
 import { BaseLayoutComponent } from "../../shared/components/base-layout/base-layout.component";
+import { ContributionGoalModalComponent } from "./components/contribution-goal-modal/contribution-goal-modal.component";
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { BaseLayoutComponent } from "../../shared/components/base-layout/base-la
     FormsModule,
     IonicModule,
     FinancesPageRoutingModule,
-    BaseLayoutComponent
+    BaseLayoutComponent,
+    ContributionGoalModalComponent
 ],
   declarations: [FinancesPage]
 })

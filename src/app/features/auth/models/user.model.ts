@@ -1,26 +1,34 @@
 import { Dahira } from "../../dahiras/models/dahira.model";
 
 export interface User {
-    userId: string,
-    firstName: string,
-    lastName: string,
-    email: string,
-    username: string,
-    password: string,
-    img: string,
-    phoneNumber: string,
-    gender: string,
-    userIdKeycloak?: string,
-    dateOfBirth: string,
-    location: LocationInfo,
-    active: boolean,
-    dahira?: Dahira;
-    dahiraId?: string;
-    mouqadamId?: string;
-    disciples?: User[];
-    roles?: UserRole[];
-    createdAt: string,
-    updatedAt: string,
+  userId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  username: string;
+  password: string;
+  img: string;
+  phoneNumber: string;
+  gender: string;
+  userIdKeycloak?: string;
+  dateOfBirth: string;
+  location: LocationInfo;
+  active: boolean;
+  dahira?: Dahira;
+  dahiraId?: string;
+  mouqadamId?: string;
+  disciples?: User[];
+  roles?: UserRole[];
+  createdAt: string;
+  updatedAt: string;
+  contributions?: Contribution[];
+}
+
+export interface Contribution {
+  id: number;
+  amount: number;
+  date: string;
+  userId: number;
 }
 
 export enum UserRole {

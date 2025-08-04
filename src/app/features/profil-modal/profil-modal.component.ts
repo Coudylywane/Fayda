@@ -25,14 +25,16 @@ import { ReactiveFormsModule } from '@angular/forms';
   selector: 'app-profil-modal',
   templateUrl: './profil-modal.component.html',
   styleUrls: ['./profil-modal.component.scss'],
-  imports: [IonicModule,
+  imports: [
+    IonicModule,
     CommonModule,
     IconButtonComponent,
     ButtonComponent,
     RoleVisibilityDirective,
     RoleHideDirective,
     VisiteurOnlyDirective,
-    ReactiveFormsModule],
+    ReactiveFormsModule,
+  ],
 })
 export class ProfilModalComponent implements OnInit, OnDestroy {
   UserRole = UserRole;
@@ -50,6 +52,7 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
   changePasswordError = '';
   changePasswordSuccess = '';
 
+
   // Subject pour gérer la désinscription
   private destroy$ = new Subject<void>();
 
@@ -63,45 +66,50 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
     private profilModalService: ProfilModalService,
     private fb: FormBuilder
   ) {
-    this.changePasswordForm = this.fb.group({
-      oldPassword: ['', [Validators.required, Validators.minLength(6)]],
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
-    }, { validators: this.passwordsMatchValidator });
+    this.changePasswordForm = this.fb.group(
+      {
+        oldPassword: ['', [Validators.required, Validators.minLength(6)]],
+        newPassword: ['', [Validators.required, Validators.minLength(6)]],
+        confirmPassword: ['', [Validators.required]],
+      },
+      { validators: this.passwordsMatchValidator }
+    );
   }
 
   ngOnInit(): void {
-    this.store.select(selectAuthState).pipe(
-      takeUntil(this.destroy$),
-    ).subscribe(authState => {
-      this.isLoading = authState.loading;
-    });
-
+    this.store
+      .select(selectAuthState)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((authState) => {
+        this.isLoading = authState.loading;
+      });
 
     // S'abonner aux données utilisateur
-    this.store.select(selectAuthState).pipe(
-      takeUntil(this.destroy$),
-      filter(authState => !authState.loading)
-    ).subscribe(authState => {
-      this.logoutError = authState.error ?? '';
-      this.user = authState.user;
+    this.store
+      .select(selectAuthState)
+      .pipe(
+        takeUntil(this.destroy$),
+        filter((authState) => !authState.loading)
+      )
+      .subscribe((authState) => {
+        this.logoutError = authState.error ?? '';
+        this.user = authState.user;
 
-      if (this.logoutAttempted && !authState.isAuthenticated) {
-        this.modalCtrl.dismiss();
-        // this.confettiService.triggerConfetti();
-        this.toastService.showSuccess('Vous êtes déconnecté');
-        this.router.navigate(['/login']);
-      } else if (this.logoutAttempted && this.logoutError) {
-        console.log('Déconnexion echec');
-        this.toastService.showError(this.logoutError);
-        this.logoutAttempted = false;
-      } else {
-        console.log('rien');
-        this.logoutAttempted = false;
-      }
-      console.log('Données utilisateur:', authState.user);
-
-    });
+        if (this.logoutAttempted && !authState.isAuthenticated) {
+          this.modalCtrl.dismiss();
+          // this.confettiService.triggerConfetti();
+          this.toastService.showSuccess('Vous êtes déconnecté');
+          this.router.navigate(['/login']);
+        } else if (this.logoutAttempted && this.logoutError) {
+          console.log('Déconnexion echec');
+          this.toastService.showError(this.logoutError);
+          this.logoutAttempted = false;
+        } else {
+          console.log('rien');
+          this.logoutAttempted = false;
+        }
+        console.log('Données utilisateur:', authState.user);
+      });
   }
 
   ngOnDestroy(): void {
@@ -112,7 +120,7 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
 
   dismiss() {
     this.modalCtrl.dismiss();
-    this.navigationService.setActiveTab("home");
+    this.navigationService.setActiveTab('home');
   }
 
   // Méthodes pour rendre la modale interactive si nécessaire
@@ -155,7 +163,10 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
       this.toastService.showSuccess(this.changePasswordSuccess);
       this.closeChangePasswordModal();
     } catch (err: any) {
-      this.changePasswordError = err?.response?.data?.message || err?.message || 'Erreur lors du changement de mot de passe.';
+      this.changePasswordError =
+        err?.response?.data?.message ||
+        err?.message ||
+        'Erreur lors du changement de mot de passe.';
       this.toastService.showError(this.changePasswordError);
     } finally {
       this.isChangingPassword = false;
@@ -179,7 +190,7 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
 
   /**
    * Naviguer vers une url
-   * @param url 
+   * @param url
    */
   async navigateTo(url: string) {
     if (await this.router.navigate([url])) {
@@ -193,13 +204,14 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
 
     try {
       const response = await this.profilModalService.becomeMoukhadam();
-      console.log("l", response);
+      console.log('l', response);
       this.isLoading = false;
       this.dismiss();
       this.toastService.showSuccess(response.data.message);
     } catch (error: any) {
       console.error('Erreur lors d envoie:', error);
-      this.error = error.response?.data?.message || 'Impossible d\'envoyer la demande';
+      this.error =
+        error.response?.data?.message || "Impossible d'envoyer la demande";
       this.isLoading = false;
       this.dismiss();
       this.toastService.showError(this.error!);
@@ -222,10 +234,16 @@ export class ProfilModalComponent implements OnInit, OnDestroy {
     const firstName = this.user.firstName || '';
     const lastName = this.user.lastName || '';
 
-    return `${firstName} ${lastName}`.trim() || this.user.username || 'Utilisateur';
+    return (
+      `${firstName} ${lastName}`.trim() || this.user.username || 'Utilisateur'
+    );
   }
 
   getUserEmail(): string {
     return this.user?.email || '';
   }
+
+  
+
+ 
 }

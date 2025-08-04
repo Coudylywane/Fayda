@@ -159,7 +159,7 @@
         </div>
 
         <div class="flex justify-end mt-1">
-          <a href="#" class="text-xs text-primary hover:text-yellow-300">Mot de passe oublié ?</a>
+          <a (click)="forgotPassword()" class="text-xs text-primary hover:text-yellow-300">Mot de passe oublié ?</a>
         </div>
         <!-- Bouton de connexion -->
         <div class="mx-auto w-full">
@@ -185,6 +185,8 @@
         <p>Pas encore inscrit ? <span (click)="goToRegister()"
             class="text-primary font-medium hover:text-yellow-300 transition-colors">Créer un compte</span></p>
       </div>
+
+      
     </div>
   </div>
 </div>

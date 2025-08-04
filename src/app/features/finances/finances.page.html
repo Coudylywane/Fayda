@@ -8,38 +8,53 @@
 
     <!-- Cartes de contributions et solde -->
     <div class="flex justify-between mb-6 space-x-2">
-      <!-- Carte des contributions -->
+      <!-- Carte des contributions <div class="flex space-x-1">
+            <span class="opacity-60">•••</span>
+          </div> -->
       <div class="w-6/12 text-white bg-yellow-500 rounded-xl p-3 relative overflow-hidden">
         <div class="flex justify-between items-start">
           <span class=" opacity-60 text-sm">2024</span>
-          <div class="flex space-x-1">
-            <span class="opacity-60">•••</span>
+          <div class="flex space-x-1" >
+              <button (click)="showGoalModal = true">
+                <span class="opacity-60">•••</span>
+              </button>
           </div>
         </div>
         <div class="mt-2">
-          <span *ngIf="showContributionAmount" class="text-xl font-bold">234 000 FCFA</span>
+          <span *ngIf="showContributionAmount" class="text-xl font-bold">{{ contribut.toLocaleString() }} FCFA </span>
           <span *ngIf="!showContributionAmount" class="text-xl font-bold">••••••</span>
         </div>
         <div class="flex justify-center mt-2">
-          <div class="relative w-20 h-20">
+        <div class="relative w-20 h-20">
+          <!-- Cercle de fond -->
+          <svg class="w-full h-full" viewBox="0 0 36 36">
+            <!-- Cercle gris (fond) -->
+            <path class="stroke-current text-gray-300 opacity-30"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              fill="none"
+              stroke-width="4"
+              stroke-linecap="round" />
+
             <!-- Cercle de progression -->
-            <svg class="w-full h-full" viewBox="0 0 36 36">
-              <path class="stroke-current text-gray-300 opacity-30"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
-                stroke-width="4" stroke-linecap="round" />
-              <path class="stroke-current "
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
-                stroke-width="4" stroke-dasharray="70, 100" stroke-linecap="round" />
-            </svg>
-            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl font-bold ">
-              75%
-            </div>
+            <path class="stroke-current text-blue-500"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              fill="none"
+              stroke-width="4"
+              stroke-linecap="round"
+              [attr.stroke-dasharray]="contributionPercentage + ', 100'" />
+          </svg>
+
+          <!-- Valeur au centre -->
+          <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl font-bold">
+            {{ contributionPercentage }}%
           </div>
         </div>
+      </div>
         <button (click)="toggleContributionVisibility()" name="b" type="button" class="absolute bottom-3 left-3">
           <ion-icon [name]="showContributionAmount ? 'eye' : 'eye-off'" class="text-white text-xl w-6 h-6"></ion-icon>
         </button>
       </div>
+      
       <!-- Carte du solde -->
       <div class="w-6/12 bg-green-700 rounded-xl p-3 relative text-white">
         <div class="flex justify-between items-start">
@@ -63,30 +78,29 @@
     </div>
 
 
-    <div class="mb-6 p-4 bg-white rounded-xl shadow-sm">
-      <div class="flex justify-between items-center mb-2">
-        <h2 class="text-lg font-semibold">Zakat Tracker</h2>
-        <span class="text-sm font-semibold text-gray-500">2024</span>
+<div (click)="openZakatModal()" class="mb-6 p-4 bg-white rounded-xl shadow-sm cursor-pointer">
+  <div class="flex justify-between items-center mb-2">
+    <h2 class="text-lg font-semibold">Zakat Tracker</h2>
+    <span class="text-sm font-semibold text-gray-500">2024</span>
+  </div>
+  <div class="relative pt-1">
+    <div class="flex items-center justify-between mb-1">
+      <div>
+        <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-green-600 text-white">
+          {{ zakatPercentage }}%
+        </span>
       </div>
-      <div class="relative pt-1">
-        <div class="flex items-center justify-between mb-1">
-          <div>
-            <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-green-600 text-white">
-              68%
-            </span>
-          </div>
-          <div class="text-right">
-            <span class="text-xs font-semibold inline-block text-gray-600">
-              180 000 FCFA / 350 000 FCFA
-            </span>
-          </div>
-        </div>
-        <div class="w-full bg-gray-200 rounded-full h-1.5 mb-2">
-          <div class="bg-gradient-to-r from-green-500 to-green-700 rounded-full h-1.5" [style.width.%]="68">
-          </div>
-        </div>
+      <div class="text-right">
+        <span class="text-xs font-semibold inline-block text-gray-600">
+          {{ formatNumber(zakatAmount) }} FCFA / {{ formatNumber(zakatTarget) }} FCFA
+        </span>
       </div>
     </div>
+    <div class="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+      <div class="bg-gradient-to-r from-green-500 to-green-700 rounded-full h-1.5" [style.width.%]="zakatPercentage"></div>
+    </div>
+  </div>
+</div>
 
     <!-- Section levée de fonds -->
     <div class="mb-6">
@@ -127,5 +141,11 @@
       <h2 class="text-lg font-semibold mb-3">Historique de contribution</h2>
 
     </div>
+
+      <app-contribution-goal-modal
+        *ngIf="showGoalModal"
+        (close)="showGoalModal = false"
+        (saveGoal)="onSaveGoal($event)">
+      </app-contribution-goal-modal>
   </div>
 </app-base-layout>

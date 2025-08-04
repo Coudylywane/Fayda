@@ -25,6 +25,7 @@ import { DetailFondsService } from '../../services/detail-fonds.service';
 export class DetailFondsComponent implements OnInit {
   @Input() p!: ProjectDTO;
   @Input() balance: number = 0;
+  @Input() contribut: number = 0;
   showDonateModal: boolean = false;
   addLoading: boolean = false;
   loading: boolean = false;
@@ -45,6 +46,8 @@ export class DetailFondsComponent implements OnInit {
     this.getCollectById();
     const storedBalance = localStorage.getItem('user_balance');
     this.balance = storedBalance ? parseInt(storedBalance, 10) : 100000;
+    const storedContribut = localStorage.getItem('user_contribut');
+    this.contribut = storedContribut ? parseInt(storedContribut, 10) : 0;
   }
 
   setActiveTab(tab: string) {
@@ -118,13 +121,8 @@ export class DetailFondsComponent implements OnInit {
         // Mettre à jour le solde localement
         this.balance -= don.amount;
         localStorage.setItem('user_balance', this.balance.toString());
-
-        // Incrémenter totalContributors localement
-        // this.totalContributors += 1;
-        // localStorage.setItem(
-        //   `contributors_${this.project!.collectionId}`,
-        //   this.totalContributors.toString()
-        // );
+        this.contribut += don.amount;
+        localStorage.setItem('user_contribut', this.contribut.toString());
         this.addLoading = false;
         console.log('Succès création collecte de fonds:', response);
         if (response.success) {

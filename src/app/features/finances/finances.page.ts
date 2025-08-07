@@ -4,10 +4,14 @@ import { DetailFondsService } from './services/detail-fonds.service';
 import { ModalController } from '@ionic/angular';
 import { ContributionStoryComponent } from './components/contribution-story/contribution-story.component';
 import { Store } from '@ngrx/store';
-import { Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { selectProjectState } from 'src/app/Admin/pages/projets/store/project.selectors';
 import { ProjectDTO } from 'src/app/Admin/pages/projets/models/projet.model';
 import { ZakatContributionModalComponent } from './components/zakat-contribution-modal/zakat-contribution-modal.component';
+import { selectUserBalance } from '../auth/store/auth.selectors';
+import { AddBalanceModalComponent } from './components/add-balance-modal/add-balance-modal.component';
+import { AuthService } from '../auth/services/auth.service';
+import * as AuthActions from '../auth/store/auth.actions';
 
 @Component({
   selector: 'app-finances',
@@ -41,7 +45,8 @@ export class FinancesPage implements OnInit {
   constructor(
     private detailFondsService: DetailFondsService,
     private modalController: ModalController,
-    private store: Store
+    private store: Store,
+    private authService: AuthService
   ) {}
 
   toggleContributionVisibility() {
@@ -54,9 +59,17 @@ export class FinancesPage implements OnInit {
 
   ngOnInit() {
     this.loadProjects();
+    this.openContributionStory();
     // Initialiser balance depuis localStorage
-    const storedBalance = localStorage.getItem('user_balance');
-    this.balance = storedBalance ? parseInt(storedBalance, 10) : 75000;
+    // const storedBalance = localStorage.getItem('user_balance');
+    // this.balance = storedBalance ? parseInt(storedBalance, 10) : 75000;
+    this.store
+      .select(selectUserBalance)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((balance) => {
+        this.balance = balance ?? 0; // Assign 0 if balance is undefined
+      });
+    localStorage.setItem('user_balance', this.balance.toString());
     const storedContribut = localStorage.getItem('user_contribut');
     this.contribut = storedContribut ? parseInt(storedContribut, 10) : 0;
     const savedGoal = localStorage.getItem('contributionGoal');
@@ -72,22 +85,26 @@ export class FinancesPage implements OnInit {
     }
 
     this.calculatePercentage();
-        this.store
-          .select(selectProjectState)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe((projectState) => {
-            this.error = projectState.error;
-            this.loading = projectState.loading;
+    this.store
+      .select(selectProjectState)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((projectState) => {
+        this.error = projectState.error;
+        this.loading = projectState.loading;
 
-            if (projectState.projects && Array.isArray(projectState.projects)) {
-              this.allProjects = [...projectState.projects];
-              console.log('fonds loaded:', this.allProjects.length);
-            }
-          });
+        if (projectState.projects && Array.isArray(projectState.projects)) {
+          this.allProjects = [...projectState.projects];
+          console.log('fonds loaded:', this.allProjects.length);
+        }
+      });
   }
 
   loadProjects() {
     this.detailFondsService.getFonds();
+    console.log(
+      'Chargement des projets de fonds',
+      this.detailFondsService.getFonds()
+    );
   }
 
   // Méthode pour formater les nombres avec espacement des milliers
@@ -180,5 +197,31 @@ export class FinancesPage implements OnInit {
     }
   }
 
+  async openAddBalanceModal() {
+    const modal = await this.modalController.create({
+      component: AddBalanceModalComponent,
+      componentProps: { currentBalance: this.balance },
+    });
 
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+
+    if (data?.newBalance != null) {
+      const currentUser = this.authService.getCurrentUser(); 
+      if (!currentUser) return;
+
+      const updatedUser = {
+        balance: data.newBalance,
+      };
+
+      // Déclenche l'action NgRx pour mettre à jour le solde
+      this.store.dispatch(
+        AuthActions.updateUser({
+          userId: currentUser.userId,
+          updatedUser: updatedUser,
+        })
+      );
+    }
+  }
 }

@@ -98,3 +98,21 @@ export const checkTokenExpiration = createAction(
 export const tokenExpired = createAction(
   '[Auth] Token Expired'
 );
+
+// Action pour démarrer la mise à jour utilisateur (comme balance)
+export const updateUser = createAction(
+  '[Auth] Update User',
+  props<{ userId: string; updatedUser: Partial<User> }>()
+);
+
+// Succès de la mise à jour
+export const updateUserSuccess = createAction(
+  '[Auth] Update User Success',
+  props<{ user: User; message: string }>()
+);
+
+// Échec de la mise à jour
+export const updateUserFailure = createAction(
+  '[Auth] Update User Failure',
+  props<{ error: string }>()
+);

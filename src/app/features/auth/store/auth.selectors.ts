@@ -37,3 +37,8 @@ export const selectUserRoles = createSelector(
     selectCurrentUser,
     (user) => user?.roles || []
 );
+
+export const selectUserBalance = createSelector(
+  selectCurrentUser,
+  (user) => user?.balance
+);

@@ -9,6 +9,10 @@ import { DonateComponent } from "../donate/donate.component";
 import { ToastService } from 'src/app/shared/components/toast/toast.service';
 import { ProjectApiService } from 'src/app/Admin/pages/projets/services/project.api';
 import { DetailFondsService } from '../../services/detail-fonds.service';
+import { selectUserBalance } from 'src/app/features/auth/store/auth.selectors';
+import { Store } from '@ngrx/store';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-detail-fonds',
@@ -36,16 +40,25 @@ export class DetailFondsComponent implements OnInit {
   isFavorite: boolean = false;
   tabs: string[] = ['Résumé', 'Détails', 'Comité'];
 
+    private destroy$ = new Subject<void>();
+  
+
   constructor(
     private modalCtrl: ModalController,
     private toastService: ToastService,
-    private detailFondsService: DetailFondsService
+    private detailFondsService: DetailFondsService,
+    private store: Store,
   ) {}
 
   ngOnInit() {
     this.getCollectById();
-    const storedBalance = localStorage.getItem('user_balance');
-    this.balance = storedBalance ? parseInt(storedBalance, 10) : 100000;
+    //const storedBalance = localStorage.getItem('user_balance');
+    this.store
+      .select(selectUserBalance)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((balance) => {
+        this.balance = balance ?? 0; // Assign 0 if balance is undefined
+      });
     const storedContribut = localStorage.getItem('user_contribut');
     this.contribut = storedContribut ? parseInt(storedContribut, 10) : 0;
   }

@@ -22,6 +22,10 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   contributions?: Contribution[];
+  balance: number;
+  totalContributions?: number;
+  totalContributionsAmount?: number;
+  totalContributionsCount?: number;
 }
 
 export interface Contribution {

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Login, Register } from '../models/auth.model';
+import { User } from '../models/user.model';
 
 export class AuthApi {
   static login(login: Login) {
@@ -81,5 +82,12 @@ export class AuthApi {
 
   static resetPassword(payload: { newPassword: string }) {
     return axios.post('auth/reset-password', payload);
+  }
+
+  static updateUser(userId: string, updatedUser: Partial<User>) {
+    return axios.put(
+      `/users/${userId}`,
+      updatedUser
+    );
   }
 }

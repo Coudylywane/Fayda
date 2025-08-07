@@ -1,0 +1,20 @@
+<div class="p-6 bg-white rounded-xl shadow-lg max-w-sm w-full text-center">
+  <h3 class="text-lg font-bold text-gray-900 mb-4">Ajouter un montant</h3>
+  <form [formGroup]="form" (ngSubmit)="confirm()">
+    <input type="number"
+           formControlName="amount"
+           class="w-full p-2 border rounded-md focus:ring focus:ring-green-400"
+           placeholder="Montant (FCFA)" />
+    <div *ngIf="form.get('amount')?.invalid && form.get('amount')?.touched" class="text-red-500 text-sm mt-1">
+      Montant requis (min 1000 FCFA)
+    </div>
+
+    <div class="flex justify-center gap-4 mt-6">
+      <button type="button" (click)="dismiss()" class="px-4 py-2 bg-gray-200 rounded">Annuler</button>
+      <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded" [disabled]="form.invalid">
+        Confirmer
+      </button>
+    </div>
+  </form>
+</div>
+

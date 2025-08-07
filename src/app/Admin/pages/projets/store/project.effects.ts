@@ -39,7 +39,11 @@ export class ProjectEffects {
                     mergeMap((response) => {
                         console.log("resultat Projects actifs: ", response.data);
 
-                        return of(ProjectActions.loadProjectsSuccess({ projects: response.data.data }));
+                        return of(
+                          ProjectActions.loadActiveProjectsSuccess({
+                            projects: response.data.data.content,
+                          })
+                        );
                     }),
                     catchError((error) => {
                         const errorMessage = error.response?.data?.message || error.message || 'Erreur de récupération';

@@ -18,6 +18,7 @@ import { ConfettiService } from 'src/app/Admin/services/confetti.service';
 import { ToastService } from 'src/app/shared/components/toast/toast.service';
 import { PhonenumberInputComponent } from 'src/app/shared/components/phonenumber-input/phonenumber-input.component';
 import { ResetPasswordComponent } from '../../profil-modal/components/reset-password/reset-password.component';
+import { ChooseResetMethodComponent } from '../../profil-modal/components/choose-reset-method/choose-reset-method.component';
 
 @Component({
   selector: 'app-login',
@@ -124,21 +125,54 @@ export class LoginPage {
     this.hidePassword = !this.hidePassword;
   }
 
+  // async forgotPassword() {
+  //   const email = this.loginForm.get('username')?.value || '';
+
+  //   const modal = await this.modalCtrl.create({
+  //     component: ResetPasswordComponent,
+  //     componentProps: {
+  //       email: email,
+  //       phone: '', // ou récupère le téléphone si tu en as dans le contexte
+  //     },
+  //   });
+
+  //   await modal.present();
+
+  //   const { data } = await modal.onDidDismiss();
+  //   if (data?.success) {
+  //     this.toast.showSuccess('Mot de passe réinitialisé avec succès !');
+  //   }
+  // }
+
   async forgotPassword() {
     const email = this.loginForm.get('username')?.value || '';
+    const phone = '770000000'; // <-- Remplace par une vraie valeur si tu en as
 
-    const modal = await this.modalCtrl.create({
+    const methodModal = await this.modalCtrl.create({
+      component: ChooseResetMethodComponent,
+      componentProps: { email, phone },
+    });
+
+    await methodModal.present();
+    const { data } = await methodModal.onDidDismiss();
+
+    if (!data?.method) return; // utilisateur a annulé
+
+    // Ici tu peux appeler le backend pour envoyer le code à l’email ou au téléphone sélectionné
+    // await this.authService.sendResetCode(data.method, email or phone)
+
+    const resetModal = await this.modalCtrl.create({
       component: ResetPasswordComponent,
       componentProps: {
-        email: email,
-        phone: '', // ou récupère le téléphone si tu en as dans le contexte
+        email: data.method === 'email' ? email : '',
+        phone: data.method === 'phone' ? phone : '',
       },
     });
 
-    await modal.present();
+    await resetModal.present();
 
-    const { data } = await modal.onDidDismiss();
-    if (data?.success) {
+    const result = await resetModal.onDidDismiss();
+    if (result?.data?.success) {
       this.toast.showSuccess('Mot de passe réinitialisé avec succès !');
     }
   }

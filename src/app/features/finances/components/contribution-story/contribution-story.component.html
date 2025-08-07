@@ -4,7 +4,7 @@
     <!-- Header avec boutons de fermeture et favori -->
     <div class="flex justify-between items-center p-4 bg-gray-100 sticky top-0 z-10">
       <button class="text-gray-700 p-1 rounded-full hover:bg-gray-200 focus:outline-none">
-        <ion-icon name="close-outline" class="text-2xl"></ion-icon>
+        <ion-icon name="close-outline" class="text-2xl" (click)="dismiss()" ></ion-icon>
       </button>
     </div>
 
@@ -33,5 +33,6 @@
 
       </div>
     </div>
+    
   </div>
 </ion-content>

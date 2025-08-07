@@ -1,0 +1,18 @@
+<div class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-xl shadow-lg w-96 max-w-full text-center">
+    <h2 class="text-lg font-bold text-gray-900 mb-4">Choisissez la méthode</h2>
+    <p class="text-sm text-gray-700 mb-6">Sélectionnez où recevoir le code de vérification</p>
+
+    <div class="flex flex-col gap-4">
+      <button (click)="choose('email')" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg">
+        Envoyer le code à {{ maskedEmail }}
+      </button>
+      <button (click)="choose('phone')" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg">
+        Envoyer le code à {{ maskedPhone }}
+      </button>
+    </div>
+
+    <button (click)="cancel()" class="mt-6 text-gray-500 text-sm hover:underline">Annuler</button>
+  </div>
+</div>
+

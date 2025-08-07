@@ -5,6 +5,7 @@ import * as AuthActions from '../store/auth.actions';
 import { selectCurrentUser } from "../store/auth.selectors";
 import { Login, Register, Token } from "../models/auth.model";
 import { AuthApi } from './auth.api';
+import { User } from "../models/user.model";
 
 @Injectable({
   providedIn: 'root',
@@ -76,7 +77,6 @@ export class AuthService {
     return AuthApi.resetPassword(payload);
   }
 
-
   async refreshToken(): Promise<boolean> {
     const token: Token = JSON.parse(localStorage.getItem('auth_token') || '{}');
     if (!token.refresh_token) {
@@ -95,7 +95,8 @@ export class AuthService {
       return true;
     } catch (error: any) {
       console.error('Erreur lors du rafraîchissement du token:', error);
-      const errorResponse = error.message || 'Erreur lors du rafraîchissement du token';
+      const errorResponse =
+        error.message || 'Erreur lors du rafraîchissement du token';
 
       // if (error.statusCode === 400 || error.statusCode === 401) {
       //   this.toastService.showError('Votre session a expiré. Veuillez vous reconnecter.');
@@ -106,4 +107,13 @@ export class AuthService {
     }
   }
 
+  getCurrentUser(): User | null {
+    try {
+      const stored = localStorage.getItem('user');
+      return stored ? JSON.parse(stored) : null;
+    } catch (error) {
+      console.error('Erreur de parsing du user depuis le localStorage', error);
+      return null;
+    }
+  }
 }
